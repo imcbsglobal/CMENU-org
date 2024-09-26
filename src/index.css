@@ -1,0 +1,54 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+html{
+  scroll-behavior: smooth;
+}
+body{
+  scroll-behavior: smooth;
+  background-color: hsl(78, 68%, 78%);
+  overflow:scroll;
+}
+.GlassBg{
+  backdrop-filter: blur(10px);
+  border: 1px solid white;
+}
+table{
+  text-align: center;
+  border-collapse: collapse;
+  border-spacing: 0;
+  border-radius: 12px 12px 0 0;
+  overflow: hidden;
+  margin: auto;
+  width: 100%;
+}
+th{
+  background-color: rgb(38, 43, 43);
+  color: white;
+}
+th,td{
+  padding: 10px 20px;
+}
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+.HideScrollBar::-webkit-scrollbar{
+  display: none;
+  scroll-behavior: smooth;
+}
+.BgBlur{
+  backdrop-filter: blur(10px);
+}
+.GlassBackground{
+  backdrop-filter: blur(10px);
+  border: 1px solid white;
+  background-color: rgba(255, 255, 255, 0.285);
+}
