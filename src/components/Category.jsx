@@ -10,6 +10,9 @@ import EditItemPopUP from './EditItemPopUP';
 import DeleteItem from './DeleteItem';
 import { ref, remove } from 'firebase/database';
 import { TbCurrencyRupee } from "react-icons/tb";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 const Category = () => {
     const [categories, setCategories] = useState([]);
@@ -29,6 +32,9 @@ const Category = () => {
     const [selectedCategoryForEdit, setSelectedCategoryForEdit] = useState(null);
     const [categoryToDelete, setCategoryToDelete] = useState(null); // Store the category to be deleted
     const [activeCategoryId, setActiveCategoryId] = useState(null);
+    const [selectedItem, setSelectedItem] = useState(null);
+    const [selectedItemToDelete, setSelectedItemToDelete] = useState(null); // Item to delete state 
+    const [itemToDelete, setItemToDelete] = useState(null); // State to hold the item to delete
 
     // Fetch categories and items when the component mounts
     useEffect(() => {
@@ -57,13 +63,33 @@ const Category = () => {
     };
 
     const handleFileInput = (e) => {
-        setCategoryImage(e.target.files[0]);
+        const file = e.target.files[0];
+        if(file){
+            const fileSizeInKB = file.size / 1024
+            if(fileSizeInKB > 50) {
+                toast.error("File size must be under 50Kb!")
+            }
+            else{
+                setCategoryImage(file)
+                toast.success("File Selected Successfully",{position:'top-center'})
+            }
+        }
+        // setCategoryImage(e.target.files[0]);
         e.target.value = null;
     };
 
     const handleItemImage = (e) => {
-        setItemImage(e.target.files[0]);
-        e.target.value = null;
+        const file = e.target.files[0];
+        if (file) {
+            const fileSizeInKB = file.size / 1024;
+            if (fileSizeInKB > 50) {
+                toast.error('File size must be under 50KB!',{ position:"top-center"});
+            } else {
+                setItemImage(file); // Only set the image if it's within the size limit
+                toast.success("File selected successfully",{})
+            }
+        }
+        e.target.value = null; // Reset file input
     };
 
     const addCategory = () => {
@@ -157,12 +183,70 @@ const Category = () => {
         setSelectedCategoryForEdit(category); // Set the selected category to edit
         setCategoryEditPopUp(true); // Open the edit popup
     };
-    
 
+    // Function to open the edit pop-up and set the selected item
+    const openItemEditPopUp = (item) => {
+        setSelectedItem(item); // Set the item to be edited
+        setItemEditPopUp(true); // Open the pop-up
+    };
+
+    // Function to handle the actual update logic (e.g., Firebase update)
+    const handleUpdateItem = (name, price, image) => {
+        const itemRef = ref(db, `categories/${selectedCategory}/items/${selectedItem.id}`);
+    
+        // If an image is selected, upload it first, then update the item with the new image URL.
+        if (image) {
+            const storage = getStorage();
+            const imageRef = storageRef(storage, `items/${image.name}`);
+            uploadBytes(imageRef, image).then((snapshot) => {
+                getDownloadURL(snapshot.ref).then((downloadURL) => {
+                    // Update the item with the new name, price, and image URL
+                    set(itemRef, {
+                        name: name,
+                        price: price,
+                        imageUrl: downloadURL,
+                    }).then(() => {
+                        toast.success("Item updated successfully!");
+                    }).catch((error) => {
+                        toast.error("Error updating item: " + error.message);
+                    });
+                });
+            });
+        } else {
+            // If no image is updated, just update the name and price.
+            set(itemRef, {
+                name: name,
+                price: price,
+                imageUrl: selectedItem.imageUrl, // Keep the old image URL
+            }).then(() => {
+                toast.success("Item updated successfully!");
+            }).catch((error) => {
+                toast.error("Error updating item: " + error.message);
+            });
+        }
+    };
+
+    const deleteItem = (itemId, categoryId) => {
+        const itemRef = ref(db, `categories/${categoryId}/items/${itemId}`);
+        remove(itemRef)
+            .then(() => {
+                console.log('Item deleted successfully');
+                // Optionally refresh the items list here
+            })
+            .catch((error) => {
+                console.error("Error deleting item: ", error);
+            });
+    };
+
+    const openItemDeletePopUp = (item) => {
+        setItemToDelete(item); // Store the item to be deleted
+        setItemDeletePopUp(true);
+    };
+    
     // const openCategoryEditPopUp = () => setCategoryEditPopUp(!categoryEditPopUp);
     // const openCategoryDeletePopUp = () => setCategoryDeletePopUp(!categoryDeletePopUp);
-    const openItemEditPopUp = () => setItemEditPopUp(!itemEditPopUp);
-    const openItemDeletePopUp = () => setItemDeletePopUp(!itemDeletePopUp);
+    // const openItemEditPopUp = () => setItemEditPopUp(!itemEditPopUp);
+    // const openItemDeletePopUp = () => setItemDeletePopUp(!itemDeletePopUp);
 
     return (
         <div className='px-6'>
@@ -172,6 +256,7 @@ const Category = () => {
                     <span className='absolute text-2xl right-2 text-[#80964c] drop-shadow-md flex items-center justify-center'><FiSearch /></span>
                 </div>
                 <div className='text-2xl font-bold'>Add Categories</div>
+                    <ToastContainer/>
                 <div className='w-full mb-5'>
                     <input
                         type="text"
@@ -254,8 +339,8 @@ const Category = () => {
                                 </div>
                                 <div className='flex items-center gap-3'>
                                     
-                                    <MdModeEdit className='cursor-pointer text-xl text-[#80964c]' onClick={openItemEditPopUp} />
-                                    <MdDelete className='cursor-pointer text-xl text-red-500' onClick={openItemDeletePopUp} />
+                                    <MdModeEdit className='cursor-pointer text-xl text-[#80964c]' onClick={() => openItemEditPopUp(item)} />
+                                    <MdDelete className='cursor-pointer text-xl text-red-500' onClick={() => openItemDeletePopUp(item)}  />
                                 </div>
                             </div>
                         ))
@@ -280,8 +365,21 @@ const Category = () => {
                     deleteCategory={deleteCategory} 
                 />
             )}
-            {itemEditPopUp && <EditItemPopUP setItemEditPopUp={setItemEditPopUp} />}
-            {itemDeletePopUp && <DeleteItem setItemDeletePopUp={setItemDeletePopUp} />}
+            {itemEditPopUp && selectedItem && (
+                <EditItemPopUP 
+                    setItemEditPopUp={setItemEditPopUp}
+                    itemData={selectedItem}
+                    handleUpdateItem={handleUpdateItem}
+                />
+            )}
+            {itemDeletePopUp && (
+                <DeleteItem 
+                    setItemDeletePopUp={setItemDeletePopUp} 
+                    itemToDelete={itemToDelete} 
+                    deleteItem={deleteItem} 
+                />
+            )}
+
         </div>
     );
 };

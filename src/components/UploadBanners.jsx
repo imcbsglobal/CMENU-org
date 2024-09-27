@@ -5,6 +5,8 @@ import { ref as dbRef, set, push } from 'firebase/database';
 import { onAuthStateChanged } from 'firebase/auth';
 import { BiSolidFileImage } from 'react-icons/bi';
 import { FaSquarePlus } from 'react-icons/fa6';
+import { toast, ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 const UploadBanners = ({ storagePath, dbPath }) => {
   const [file, setFile] = useState(null);
@@ -31,6 +33,14 @@ const UploadBanners = ({ storagePath, dbPath }) => {
   const handleInputFile = (e) => {
     if (e.target.files && e.target.files[0]) {
       let fileData = e.target.files[0];
+      const fileSizeInKB = fileData.size / 1024; // Convert size from bytes to KB
+      if (fileSizeInKB > 50) {
+        // Show an error or pop-up message here
+        // alert('File size exceeds the 50KB limit. Please select a smaller file.');
+        toast.error("File size must be under 50KB!",{position:'top-center'})
+        setIsError(true); // Set error state to true
+        return; // Exit the function, do not set the file
+      }
       setFile(fileData);
       setFileName(fileData.name);
     } else {
@@ -80,6 +90,7 @@ const UploadBanners = ({ storagePath, dbPath }) => {
 
   return (
     <div>
+      <ToastContainer/>
       <input type="file" accept="image/*" ref={inRef} className="hidden" onChange={handleInputFile} />
       <div className="flex justify-center items-center gap-10 mt-5">
         <button

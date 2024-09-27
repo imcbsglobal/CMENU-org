@@ -4,6 +4,8 @@ import { ref as storageRef, uploadBytesResumable, getDownloadURL } from 'firebas
 import { ref as dbRef, set, push } from 'firebase/database';
 import { BiSolidFileImage } from 'react-icons/bi';
 import { FaSquarePlus } from 'react-icons/fa6';
+import { toast, ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 const UploadFile = ({ user }) => {
   const [file, setFile] = useState(null);
@@ -28,6 +30,15 @@ const UploadFile = ({ user }) => {
   const handleInputFile = (e) => {
     if (e.target.files && e.target.files[0]) {
       const fileData = e.target.files[0];
+      // Check if file size exceeds 50KB
+      const fileSizeInKB = fileData.size / 1024; // Convert size from bytes to KB
+      if (fileSizeInKB > 50) {
+        // Show an error or pop-up message here
+        // alert('File size exceeds the 50KB limit. Please select a smaller file.');
+        toast.error("File size exceeds the 50KB limit. Please select a smaller file.")
+        setIsError(true); // Set error state to true
+        return; // Exit the function, do not set the file
+      }
       setFile(fileData);
       setFileName(fileData.name); // Save the original file name
       setIsError(false); // Reset error state on file selection
