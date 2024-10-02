@@ -7,6 +7,7 @@ import { BiSolidFileImage } from 'react-icons/bi';
 import { FaSquarePlus } from 'react-icons/fa6';
 import { toast, ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
+import { ref as storageRef } from "firebase/storage"; // Ensure correct import for storageRef
 
 const UploadBanners = ({ storagePath, dbPath }) => {
   const [file, setFile] = useState(null);
@@ -51,8 +52,9 @@ const UploadBanners = ({ storagePath, dbPath }) => {
   const handleImageUpload = () => {
     if (!file || !user) return;
     setIsLoading(true);
-    const storageRef = ref(storage, `${storagePath}/${fileName}`);
-    const uploadTask = uploadBytesResumable(storageRef, file);
+    const storagePathWithUID = `${storagePath}/${user.uid}/${fileName}`; // Include user ID in the path
+    const storageRefInstance = storageRef(storage, storagePathWithUID);
+    const uploadTask = uploadBytesResumable(storageRefInstance, file);
 
     uploadTask.on(
       'state_changed',
@@ -61,27 +63,21 @@ const UploadBanners = ({ storagePath, dbPath }) => {
         setPercentage(Math.round(progress));
       },
       (error) => {
-        setIsError(true);
+        console.error(error);
         setIsLoading(false);
       },
       async () => {
         try {
           const url = await getDownloadURL(uploadTask.snapshot.ref);
           const newImageRef = push(dbRef(db, dbPath));
-          const randomKey = newImageRef.key;
-
-          // Save the image URL and admin UID to the database
           await set(newImageRef, {
             url,
-            adminUID: user.uid,
-            randomKey
+            adminUID: user.uid // Save admin UID with the image
           });
-
           setIsLoading(false);
-          setShowSuccess(true);
-          setTimeout(() => setShowSuccess(false), 5000);
+          toast.success("Upload successful!");
         } catch (error) {
-          setIsError(true);
+          console.error(error);
           setIsLoading(false);
         }
       }

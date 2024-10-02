@@ -22,20 +22,21 @@ const BannerSlider = () => {
   }, []);
 
   useEffect(() => {
-    // Fetch banners from Firebase Realtime Database
-    const dbRef = ref(db, 'offerbanners');
-    onValue(dbRef, (snapshot) => {
-      const data = snapshot.val();
-      const fetchedPosters = [];
-      for (let key in data) {
-        if (key !== 'latest') {
-          fetchedPosters.push({ key, ...data[key] });
+    if (user) {
+      const dbRef = ref(db, `offerbanners`);
+      onValue(dbRef, (snapshot) => {
+        const data = snapshot.val();
+        const fetchedPosters = [];
+        for (let key in data) {
+          if (data[key].adminUID === user.uid) { // Filter by user ID
+            fetchedPosters.push({ key, ...data[key] });
+          }
         }
-      }
-      setPosters(fetchedPosters);
-      setLoading(false);
-    });
-  }, []);
+        setPosters(fetchedPosters);
+        setLoading(false);
+      });
+    }
+  }, [user]);
 
   const handleDelete = async (key, url) => {
     try {
@@ -69,7 +70,7 @@ const BannerSlider = () => {
   };
 
   return (
-    <div>
+    <div id='uploadBanner'>
       <section className="mt-10 mb-5">
         <div className="flex justify-center items-center font-bold text-2xl mb-5">
           Upload Your Banners
@@ -99,7 +100,7 @@ const BannerSlider = () => {
               </div>
             ))
           ) : (
-            <div className="grid place-items-center">Loading...</div>
+            <div className="grid place-items-center text-center">There Is no Banners</div>
           )}
         </Slider>
       </section>

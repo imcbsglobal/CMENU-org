@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { IoIosClose } from "react-icons/io";
 import { motion } from "framer-motion";
 import { toast } from 'react-toastify';
@@ -11,19 +11,35 @@ const EditItemPopUP = ({ setItemEditPopUp, itemData, handleUpdateItem }) => {
   const [editedItemPrice, setEditedItemPrice] = useState(itemData.price);
   const [editedItemImage, setEditedItemImage] = useState(null);
 
+  useEffect(() => {
+    setEditedItemName(itemData.name);
+    setEditedItemPrice(itemData.price);
+    // Don't reset image selection here
+  }, [itemData]);
+
   const handleImageChange = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile && selectedFile.size > 50 * 1024) {
       toast.error('File size must be under 50KB!');
+      setEditedItemImage(null); // Reset the image if too large
     } else {
       setEditedItemImage(selectedFile);
     }
   };
 
   const handleSaveChanges = () => {
-    handleUpdateItem(editedItemName, editedItemPrice, editedItemImage); // Pass edited values back to parent
-    setItemEditPopUp(false); // Close the popup
+    console.log("Saving Changes:", editedItemName, editedItemPrice, editedItemImage);
+    handleUpdateItem(editedItemName, editedItemPrice, editedItemImage)
+      .then(() => {
+        setItemEditPopUp(false); // Close the popup only after success
+      })
+      .catch((error) => {
+        toast.error("Error updating item: " + error.message);
+      });
   };
+
+
+
 
   return (
     <div className='fixed bottom-0 top-0 left-0 right-0 bg-[#006aff79] z-50 BgBlur flex justify-center items-center'>
@@ -60,7 +76,7 @@ const EditItemPopUP = ({ setItemEditPopUp, itemData, handleUpdateItem }) => {
         </div>
         <div className='flex justify-between items-center'>
           <button className='px-8 py-2 rounded-xl bg-[#868282] text-[#fff] font-bold' onClick={() => setItemEditPopUp(false)}>Cancel</button>
-          <button className='px-8 py-2 rounded-xl bg-[#80964c] text-[#fff] font-bold' onClick={handleSaveChanges}>Save Changes</button>
+          <button className='px-8 py-2 rounded-xl bg-[#80964c] text-[#fff] font-bold' onClick={handleSaveChanges}>Save</button>
         </div>
       </motion.div>
     </div>

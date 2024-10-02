@@ -2,10 +2,22 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { ref, onValue } from 'firebase/database';
 import { db } from '../components/Firebase';
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 const CategoryPage = () => {
   const { category } = useParams(); // Get the category ID from the URL parameters
   const [items, setItems] = useState([]); // State to hold items for the category
+  const auth = getAuth();
+  const adminId = auth.currentUser ? auth.currentUser.uid : null; // Safely access uid
+
+
+  useEffect(() => {
+    // Listen for auth state changes
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     // Reference to the items in the Firebase database based on the category

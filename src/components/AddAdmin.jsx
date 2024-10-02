@@ -48,7 +48,7 @@ const AddAdmin = () => {
       password: formData.password.trim(),
       adminId,
       randomKey, // Store the random key
-      status: 'active', // Default status
+      status: 'Disable', // Default status
     };
 
     try {

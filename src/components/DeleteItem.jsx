@@ -5,34 +5,37 @@ import { getStorage, ref as storageRef, deleteObject } from "firebase/storage";
 import { toast } from 'react-toastify';
 import { db } from './Firebase'; // Ensure correct Firebase setup
 
-const DeleteItem = ({ setItemDeletePopUp, itemToDelete, deleteItem }) => {
+const DeleteItem = ({ setItemDeletePopUp, itemToDelete, deleteItem,adminId }) => {
   
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (itemToDelete) {
       const itemId = itemToDelete.id;
-      const categoryId = itemToDelete.categoryId; // Assuming you have categoryId in itemToDelete
+      const categoryId = itemToDelete.categoryId;
 
-      // Construct the path to the image correctly
-      const storage = getStorage();
+      // Get the image URL and extract the image name
       const imageUrl = itemToDelete.imageUrl;
-      const imageName = decodeURIComponent(imageUrl.split('/').pop().split('?')[0]); // Extract and decode the file name
-      const imageRef = storageRef(storage, `items/${imageName}`); // Construct the storage reference
+      const imageName = decodeURIComponent(imageUrl.split('/').pop().split('?')[0]);
+      const storage = getStorage();
+      const imageRef = storageRef(storage, `admins/${adminId}/categories/${categoryId}/items/${imageName}`);
 
-      console.log(`Attempting to delete image at path: ${imageRef.fullPath}`); // Log the full path for debugging
+      console.log(`Attempting to delete image at path: ${imageRef.fullPath}`);
 
-      // Delete the image from Firebase Storage
-      deleteObject(imageRef).then(() => {
-        deleteItem(itemId, categoryId); // Call the delete function with item ID and category ID
-        setItemDeletePopUp(false); // Close popup after deletion
+      try {
+        // Delete image from storage first
+        await deleteObject(imageRef);
+        console.log('Image deleted successfully from storage');
+
+        // Now, delete the item from the database
+        await deleteItem(itemId, categoryId);
+        setItemDeletePopUp(false); // Close the pop-up after deletion
         toast.success("Item deleted successfully!");
-      }).catch((error) => {
-        // Improved error handling
+      } catch (error) {
         if (error.code === 'storage/object-not-found') {
           toast.error("Error: Image not found. It may have already been deleted.");
         } else {
           toast.error("Error deleting image: " + error.message);
         }
-      });
+      }
     } else {
       toast.error("Missing item data. Cannot delete item.");
     }
@@ -47,7 +50,7 @@ const DeleteItem = ({ setItemDeletePopUp, itemToDelete, deleteItem }) => {
         <div className='absolute right-5 top-5 text-2xl text-[#80964c] cursor-pointer' onClick={() => setItemDeletePopUp(false)}>
             <IoIosClose/>
         </div>
-        <div className='px-8 pt-8 mb-5 text-[28px] font-bold text-[#80964c]'>Are you sure?</div>
+        <div className='px-8 pt-5 mb-5 text-[28px] font-bold text-[#80964c]'>Are you sure?</div>
         <div className='px-8 mb-7'>You want to delete this <span className='font-bold'>item</span>? You won't be able to view this <span className='font-bold'>item</span> in your list anymore.</div>
         <div className='px-8 flex justify-between items-center'>
             <button className='px-8 py-2 rounded-xl bg-[#7a7171bc] font-bold text-[#fff]' onClick={() => setItemDeletePopUp(false)}>Cancel</button>

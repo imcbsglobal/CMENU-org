@@ -28,8 +28,8 @@ const Login = () => {
           // Navigate to the superAdminIndex page
           navigate('/superAdminIndex');
         } else {
-          // Navigate to the home page for other users
-          navigate('/');
+          // Navigate to the home page for other users with their admin ID
+          navigate(`/${user.uid}`); // Use the user ID to create the path
         }
       }
     } catch (error) {

@@ -7,8 +7,9 @@ import { onAuthStateChanged, setPersistence, browserLocalPersistence } from 'fir
 import { ref, get, onValue, remove } from 'firebase/database';
 import { getStorage, ref as storageRef, deleteObject, getDownloadURL } from 'firebase/storage'; 
 import { MdDelete } from "react-icons/md";
+import { IoIosMenu } from "react-icons/io";
 
-const Navbar = () => {
+const Navbar = ({setOPenAdminPanel, handleOpenAdminPanel}) => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [randomKey, setRandomKey] = useState('');
@@ -96,35 +97,48 @@ const Navbar = () => {
     }
   };
 
+  
+
   return (
-    <div>
-      <header className='flex justify-between fixed items-center w-full pt-5 px-5 bg-[#fff] pb-2 z-50 rounded-b'>
+    <div id='uploadLogo'>
+      <header className='flex justify-center fixed items-center w-full py-5  px-5 bg-[#fff]  z-50 rounded-b mb-5'>
         {/* Logo and Logout Button Section */}
-        {user ? (
+        
           <div className='flex items-center justify-between w-full'> {/* Use full width for the flex container */}
             <div className='flex items-center'>
               {logoUrl && (
                 <div className='relative flex items-center gap-2'> {/* Add margin-right for spacing */}
                   <img src={logoUrl} alt="Logo" className="w-[100px] object-contain" />
-                  <button onClick={handleDeleteLogo} className=' top-0 right-0 bg-red-500 p-1'>
-                    <MdDelete className='text-white' />
-                  </button>
+                  {user &&(
+                    <button onClick={handleDeleteLogo} className=' top-0 right-0 bg-red-500 p-1'>
+                      <MdDelete className='text-white' />
+                    </button>
+                  )}
+                  
                 </div>
               )}
             </div>
-            <button onClick={handleLogout} className='flex items-center text-red-600'>
-              <FaUserAltSlash className='mr-2' />
-              Logout
-            </button>
+            {user && (
+              <div className=' flex flex-col items-end gap-3'>
+                <button onClick={handleLogout} className='flex items-center text-red-600 relative z-50'>
+                  <FaUserAltSlash className='mr-2' />
+                  Logout
+                </button>
+                <button className=' text-3xl' onClick={handleOpenAdminPanel}>
+                  <IoIosMenu/>
+                </button>
+              </div>
+            )}
           </div>
-        ) : (
-          <button onClick={() => navigate('/login')} className='bg-blue-500 text-white px-4 py-2 rounded'>
+        
+          {/* <button onClick={() => navigate('/login')} className='bg-blue-500 text-white px-4 py-2 rounded'>
             Login
-          </button>
-        )}
+          </button> */}
+        
       </header>
 
-      <main className='pt-20'>
+      <main className='pt-32'>
+        <div className='flex justify-center items-center font-bold text-2xl mb-5'>Upload Your Logo</div>
         {/* Pass user and randomKey to UploadFile component for proper functionality */}
         {user && <UploadFile user={user} randomKey={randomKey} />}
       </main>

@@ -19,7 +19,7 @@ const DeleteAlert = ({ setCategoryDeletePopUp, category, deleteCategory }) => {
                 <div className='absolute right-8 top-5 cursor-pointer text-2xl text-[#80964c]' onClick={() => setCategoryDeletePopUp(false)}>
                     <IoIosClose />
                 </div>
-                <div className='px-8 pt-8 text-[28px] mb-5 text-[#80964c] font-bold'>Are you sure?</div>
+                <div className='px-8 pt-5 text-[28px] mb-5 text-[#80964c] font-bold'>Are you sure?</div>
                 <div className='px-8 mb-5 text-[#8e8a8a]'>
                     You want to reject this profile? You can't view this <span className='font-bold'>category</span> in your list anymore.
                 </div>

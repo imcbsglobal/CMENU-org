@@ -10,8 +10,9 @@ import EditItemPopUP from './EditItemPopUP';
 import DeleteItem from './DeleteItem';
 import { ref, remove } from 'firebase/database';
 import { TbCurrencyRupee } from "react-icons/tb";
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 
 const Category = () => {
@@ -35,10 +36,24 @@ const Category = () => {
     const [selectedItem, setSelectedItem] = useState(null);
     const [selectedItemToDelete, setSelectedItemToDelete] = useState(null); // Item to delete state 
     const [itemToDelete, setItemToDelete] = useState(null); // State to hold the item to delete
+    const auth = getAuth();
+    const adminId = auth.currentUser ? auth.currentUser.uid : null; // Safely access uid
+    const [searchTerm, setSearchTerm] = useState(''); // State for search input
+    const [searchTerm2, setSearchTerm2] = useState(''); // State for item search input
+    const [user, setUser] = useState(null);
+
+
+    useEffect(() => {
+        // Listen for auth state changes
+        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+          setUser(currentUser);
+        });
+        return () => unsubscribe();
+      }, []);
 
     // Fetch categories and items when the component mounts
     useEffect(() => {
-        const categoryRef = dbRef(db, 'categories/');
+        const categoryRef = dbRef(db, `admins/${adminId}/categories/`); // Fetch categories for the logged-in admin
         onValue(categoryRef, (snapshot) => {
             const data = snapshot.val();
             if (data) {
@@ -50,7 +65,26 @@ const Category = () => {
                 setCategories(categoryList);
             }
         });
-    }, []);
+    }, [adminId]); // Add adminId as a dependency
+    
+    useEffect(() => {
+        if (selectedCategory) {
+            const itemsRef = dbRef(db, `admins/${adminId}/categories/${selectedCategory}/items`);
+            onValue(itemsRef, (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    const itemList = Object.keys(data).map((key) => ({
+                        id: key,
+                        ...data[key],
+                    }));
+                    setItems(itemList);
+                } else {
+                    setItems([]); // Clear items if there are none
+                }
+            });
+        }
+    }, [selectedCategory, adminId]); // Fetch items whenever selectedCategory or adminId changes
+
 
     // Trigger file input for category image
     const handleFileInputTrigger = () => {
@@ -95,20 +129,18 @@ const Category = () => {
     const addCategory = () => {
         if (categoryName && categoryImage) {
             const storage = getStorage();
-            const imageRef = storageRef(storage, `categories/${categoryImage.name}`);
+            const imageRef = storageRef(storage, `admins/${adminId}/categories/${categoryImage.name}`); // Store image under admin folder
             uploadBytes(imageRef, categoryImage).then((snapshot) => {
                 getDownloadURL(snapshot.ref).then((downloadURL) => {
-                    const newCategoryRef = push(dbRef(db, 'categories/'));
-                    const adminId = Math.random().toString(36).substring(2, 15);
-                    const randomKey = Math.random().toString(36).substring(2, 15);
+                    const newCategoryRef = push(dbRef(db, `admins/${adminId}/categories/`)); // Store category under admin folder
                     set(newCategoryRef, {
                         name: categoryName,
                         adminId: adminId,
-                        randomKey: randomKey,
                         imageUrl: downloadURL,
                     }).then(() => {
                         setCategoryName('');
                         setCategoryImage(null);
+                        toast.success("Category Uploaded Successfully",{position:'top-center'})
                     });
                 });
             });
@@ -116,14 +148,16 @@ const Category = () => {
             console.error("Category name and image must be provided");
         }
     };
+    
 
     const addItem = () => {
         if (itemName && itemPrice && selectedCategory && itemImage) {
             const storage = getStorage();
-            const imageRef = storageRef(storage, `items/${itemImage.name}`);
+            const imageRef = storageRef(storage, `admins/${adminId}/categories/${selectedCategory}/items/${itemImage.name}`); // Store item image under admin folder
+            console.log("Item Reference Path:", imageRef.toString());
             uploadBytes(imageRef, itemImage).then((snapshot) => {
                 getDownloadURL(snapshot.ref).then((downloadURL) => {
-                    const newItemRef = push(dbRef(db, `categories/${selectedCategory}/items`));
+                    const newItemRef = push(dbRef(db, `admins/${adminId}/categories/${selectedCategory}/items`)); // Store item under the admin's selected category
                     set(newItemRef, {
                         name: itemName,
                         price: itemPrice,
@@ -132,18 +166,20 @@ const Category = () => {
                         setItemName('');
                         setItemPrice('');
                         setItemImage(null);
+                        toast.success("Item Uploaded Successfully",{position:'top-center'})
                     });
                 });
             });
         }
     };
+    
 
     const handleCategoryClick = (categoryId) => {
         setSelectedCategory(categoryId);
-        setActiveCategoryId(categoryId)
+        setActiveCategoryId(categoryId);
     
-        // Fetch the items for the selected category
-        const itemsRef = dbRef(db, `categories/${categoryId}/items`);
+        // Fetch the items for the selected category under the logged-in admin's folder
+        const itemsRef = dbRef(db, `admins/${adminId}/categories/${categoryId}/items`);
         onValue(itemsRef, (snapshot) => {
             const data = snapshot.val();
             if (data) {
@@ -157,14 +193,14 @@ const Category = () => {
             }
         });
     };
+    
 
 
-    // Function to delete a category
+    // Delete category under admin's folder
     const deleteCategory = (categoryId) => {
-        remove(ref(db, `categories/${categoryId}`))
+        remove(ref(db, `admins/${adminId}/categories/${categoryId}`))
             .then(() => {
                 console.log('Category deleted successfully');
-                // Optionally, you can also reset the selected category and items
                 setSelectedCategory('');
                 setItems([]);
             })
@@ -172,6 +208,7 @@ const Category = () => {
                 console.error("Error deleting category: ", error);
             });
     };
+
 
     const openCategoryDeletePopUp = (category) => {
         setCategoryToDelete(category); // Store the category to be deleted
@@ -190,58 +227,90 @@ const Category = () => {
         setItemEditPopUp(true); // Open the pop-up
     };
 
-    // Function to handle the actual update logic (e.g., Firebase update)
     const handleUpdateItem = (name, price, image) => {
-        const itemRef = ref(db, `categories/${selectedCategory}/items/${selectedItem.id}`);
-    
-        // If an image is selected, upload it first, then update the item with the new image URL.
-        if (image) {
-            const storage = getStorage();
-            const imageRef = storageRef(storage, `items/${image.name}`);
-            uploadBytes(imageRef, image).then((snapshot) => {
-                getDownloadURL(snapshot.ref).then((downloadURL) => {
-                    // Update the item with the new name, price, and image URL
-                    set(itemRef, {
-                        name: name,
-                        price: price,
-                        imageUrl: downloadURL,
-                    }).then(() => {
-                        toast.success("Item updated successfully!");
-                    }).catch((error) => {
-                        toast.error("Error updating item: " + error.message);
+        const itemRef = dbRef(db, `admins/${adminId}/categories/${selectedCategory}/items/${selectedItem.id}`);
+        
+        // Fetch the existing item data first
+        onValue(itemRef, (snapshot) => {
+            const existingData = snapshot.val();
+        
+            // Create an object to hold the updated item data
+            const updatedItemData = {
+                name: name || existingData.name,      // Keep existing name if not updated
+                price: price || existingData.price,   // Keep existing price if not updated
+                imageUrl: existingData.imageUrl       // Keep the old image URL by default
+            };
+        
+            if (image) {
+                const storage = getStorage();
+                const imageRef = storageRef(storage, `admins/${adminId}/categories/${selectedCategory}/items/${image.name}`);
+                uploadBytes(imageRef, image).then((snapshot) => {
+                    getDownloadURL(snapshot.ref).then((downloadURL) => {
+                        updatedItemData.imageUrl = downloadURL; // Set new image URL
+                        // Update the item in the database
+                        set(itemRef, updatedItemData).then(() => {
+                            toast.success('Item updated successfully!');
+                            setItemEditPopUp(false);
+                        }).catch((error) => {
+                            toast.error('Error updating item: ' + error.message);
+                        });
                     });
+                }).catch((error) => {
+                    toast.error('Error uploading image: ' + error.message);
                 });
-            });
-        } else {
-            // If no image is updated, just update the name and price.
-            set(itemRef, {
-                name: name,
-                price: price,
-                imageUrl: selectedItem.imageUrl, // Keep the old image URL
-            }).then(() => {
-                toast.success("Item updated successfully!");
-            }).catch((error) => {
-                toast.error("Error updating item: " + error.message);
-            });
+            } else {
+                // If there's no new image, just update the name and price
+                set(itemRef, updatedItemData).then(() => {
+                    toast.success('Item updated successfully!');
+                    setItemEditPopUp(false);
+                }).catch((error) => {
+                    toast.error('Error updating item: ' + error.message);
+                });
+            }
+        });
+    };
+    
+    const deleteItem = async (itemToDelete) => {
+        if (itemToDelete) {
+            const itemId = itemToDelete.id;
+            const categoryId = selectedCategory;
+    
+            try {
+                // Call the database remove function
+                await remove(ref(db, `admins/${adminId}/categories/${categoryId}/items/${itemId}`));
+                toast.success('Item deleted successfully!');
+                setItems((prevItems) => prevItems.filter(item => item.id !== itemId)); // Update local state
+            } catch (error) {
+                toast.error('Error deleting item: ' + error.message);
+            }
         }
     };
-
-    const deleteItem = (itemId, categoryId) => {
-        const itemRef = ref(db, `categories/${categoryId}/items/${itemId}`);
-        remove(itemRef)
-            .then(() => {
-                console.log('Item deleted successfully');
-                // Optionally refresh the items list here
-            })
-            .catch((error) => {
-                console.error("Error deleting item: ", error);
-            });
-    };
+    
 
     const openItemDeletePopUp = (item) => {
         setItemToDelete(item); // Store the item to be deleted
-        setItemDeletePopUp(true);
+        setItemDeletePopUp(true); // Open the delete confirmation pop-up
     };
+
+    // Handle search input change
+    const handleSearchChange = (e) => {
+        setSearchTerm(e.target.value);
+    };
+
+    // Filter categories based on search input
+    const filteredCategories = categories.filter((category) =>
+        category.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    // Handle search input change for filtering items
+    const handleSearchChange2 = (e) => {
+        setSearchTerm2(e.target.value);
+    };
+
+    // Filter items based on search term (case-insensitive)
+    const filteredItems = items.filter((item) =>
+        item.name.toLowerCase().includes(searchTerm2.toLowerCase())
+    );
     
     // const openCategoryEditPopUp = () => setCategoryEditPopUp(!categoryEditPopUp);
     // const openCategoryDeletePopUp = () => setCategoryDeletePopUp(!categoryDeletePopUp);
@@ -249,103 +318,164 @@ const Category = () => {
     // const openItemDeletePopUp = () => setItemDeletePopUp(!itemDeletePopUp);
 
     return (
-        <div className='px-6'>
+        <div className='px-6' id='addCategory'>
             <div className='flex justify-between items-center mt-10 flex-col gap-5 overflow-hidden'>
-                <div className='relative flex justify-center items-center'>
-                    <input type="text" className='outline-none border-none rounded-lg py-2 px-8' placeholder='Search...' />
+                {/* <div className='relative flex justify-center items-center'>
+                    <input type="text" className='outline-none border-none rounded-lg py-2 px-8' value={searchTerm} 
+                    onChange={handleSearchChange}  placeholder='Search Categories..' />
                     <span className='absolute text-2xl right-2 text-[#80964c] drop-shadow-md flex items-center justify-center'><FiSearch /></span>
-                </div>
-                <div className='text-2xl font-bold'>Add Categories</div>
-                    <ToastContainer/>
-                <div className='w-full mb-5'>
-                    <input
-                        type="text"
-                        placeholder='Category Name'
-                        value={categoryName}
-                        onChange={(e) => setCategoryName(e.target.value)}
-                        className='w-full px-8 mb-5 py-3 rounded-xl border-none outline-none'
-                    />
-                    <input type="file" onChange={handleFileInput} ref={inRef1} className='mb-5 hidden' />
-                    <div className='flex justify-center items-center gap-10'>
-                        <button className='px-8 py-2 rounded-xl bg-[#fff4] GlassBg font-bold text-[#80964c]' onClick={handleFileInputTrigger}>Select</button>
-                        <button onClick={addCategory} className='px-8 py-2 rounded-xl bg-[#fff4] GlassBg font-bold text-[#80964c]'>Upload</button>
+                </div> */}
+                {user ? (
+                    <div className='text-2xl font-bold'>Add Categories</div>
+                ):(
+                    <div className='text-2xl font-bold'>Categories</div>
+                )}
+                
+                <div className='text-2xl font-bold'>Categories</div>
+                    {/* <ToastContainer/> */}
+                { user && (
+                    <div className='w-full mb-5'>
+                        <input
+                            type="text"
+                            placeholder='Category Name'
+                            value={categoryName}
+                            onChange={(e) => setCategoryName(e.target.value)}
+                            className='w-full px-8 mb-5 py-3 rounded-xl border-none outline-none'
+                        />
+                        <input type="file" onChange={handleFileInput} ref={inRef1} className='mb-5 hidden' />
+                        <div className='flex justify-center items-center gap-10'>
+                            <button className='px-8 py-2 rounded-xl bg-[#fff4] GlassBg font-bold text-[#80964c]' onClick={handleFileInputTrigger}>Select</button>
+                            <button onClick={addCategory} className='px-8 py-2 rounded-xl bg-[#fff4] GlassBg font-bold text-[#80964c]'>Upload</button>
+                        </div>
                     </div>
-                </div>
-
-                <div className='text-2xl font-bold'>Add Items</div>
-                <div className='mb-2 flex flex-col gap-5 w-full'>
-                    <input
-                        type="text"
-                        placeholder='Item Name'
-                        value={itemName}
-                        onChange={(e) => setItemName(e.target.value)}
-                        className='py-3 px-8 outline-none border-none rounded-xl w-full'
-                    />
-                    <select
-                        value={selectedCategory}
-                        onChange={(e) => setSelectedCategory(e.target.value)}
-                        className='py-3 px-8 rounded-xl border-none outline-none'
-                    >
-                        <option value="" selected disabled>Select Category</option>
-                        {categories.map((category) => (
-                            <option key={category.id} value={category.id}>{category.name}</option>
-                        ))}
-                    </select>
-                    <input
-                        type="number"
-                        placeholder='Item Price'
-                        value={itemPrice}
-                        onChange={(e) => setItemPrice(e.target.value)}
-                        className='px-8 py-3 rounded-xl border-none outline-none'
-                    />
-                    <div className='flex justify-center items-center gap-10'>
-                        <input type="file" onChange={handleItemImage} ref={inRef2} className='hidden' />
-                        <button onClick={handleFileInputTrigger2} className='px-8 py-2 rounded-xl bg-[#fff4] GlassBg font-bold text-[#80964c]'>Select Item Image</button>
-                        <button onClick={addItem} className='px-8 py-2 rounded-xl bg-[#fff4] GlassBg font-bold text-[#80964c]'>Add Item</button>
-                    </div>
-                </div>
+                )}
+                
 
                 {/* Categories Display */}
+                <div className='flex justify-start items-start'>
+                    <div className='relative flex justify-start items-center'>
+                        <input type="text" className='outline-none border-none rounded-lg py-2 px-8' value={searchTerm} 
+                        onChange={handleSearchChange}  placeholder='Search Categories..' />
+                        <span className='absolute text-2xl right-2 text-[#80964c] drop-shadow-md flex items-center justify-center'><FiSearch /></span>
+                    </div>
+                </div>
                 <div className="flex gap-10 overflow-x-auto whitespace-nowrap w-full HideScrollBar">
-                    {categories.map((category) => (
-                        <div
-                            key={category.id}
-                            className={`flex flex-col justify-center items-center flex-shrink-0 cursor-pointer ${activeCategoryId === category.id ? 'active-category text-[#1eb5ad]' : ''}`}
-                            onClick={() => handleCategoryClick(category.id)} 
-                        >
-                            <div className="w-[80px] h-[80px] bg-[#80964c] flex justify-center items-center rounded-lg overflow-hidden">
-                                <img src={category.imageUrl} alt={category.name} className='object-cover w-full h-full' />
+                    {filteredCategories.length > 0 ? (
+                        filteredCategories.map((category) => (
+                            <div
+                                key={category.id}
+                                className={`flex flex-col justify-center items-center flex-shrink-0 cursor-pointer ${activeCategoryId === category.id ? 'active-category text-[#1eb5ad]' : ''}`}
+                                onClick={() => handleCategoryClick(category.id)}
+                            >
+                                <div className="w-[80px] h-[80px] bg-[#80964c] flex justify-center items-center rounded-lg overflow-hidden">
+                                    <img src={category.imageUrl} alt={category.name} className='object-cover w-full h-full' />
+                                </div>
+                                <div className='mt-2 font-bold text-[13px] lg:text-lg'>{category.name}</div>
+                                {user && (
+                                    <div className='flex items-center gap-2'>
+                                        <div className='cursor-pointer text-[#80964c]' onClick={() => handleCategoryEditClick(category)}>
+                                            <MdModeEdit />
+                                        </div>
+                                        <div className='cursor-pointer text-[#80964c]' onClick={(e) => { e.stopPropagation(); openCategoryDeletePopUp(category); }}>
+                                            <MdDelete />
+                                        </div>
+                                    </div>
+                                )}
+                                
                             </div>
-                            <div className='mt-2 text-lg font-semibold'>{category.name}</div>
-                            <div className='flex items-center gap-2'>
-                                <div className='cursor-pointer text-[#80964c]' onClick={() => handleCategoryEditClick(category)}><MdModeEdit/></div>
-                                <div className='cursor-pointer text-[#80964c]' onClick={(e) => { e.stopPropagation(); openCategoryDeletePopUp(category); }}><MdDelete/></div>
+                        ))
+                    ) : (
+                        <p>No categories found</p>
+                    )}
+                </div>
+
+                    {/* Adding Items */}
+                    {user ? (
+                        <div className='text-2xl font-bold' id='addItems'>Add Items</div>
+
+                    ): (
+                        <div className='text-2xl font-bold' id='addItems'>Available Dishes</div>
+                    )}
+
+                    {user && (
+                        <div className='mb-2 flex flex-col gap-5 w-full'>
+                            <input
+                                type="text"
+                                placeholder='Item Name'
+                                value={itemName}
+                                onChange={(e) => setItemName(e.target.value)}
+                                className='py-3 px-8 outline-none border-none rounded-xl w-full'
+                            />
+                            <select
+                                value={selectedCategory}
+                                onChange={(e) => setSelectedCategory(e.target.value)}
+                                className='py-3 px-8 rounded-xl border-none outline-none text-sm'
+                            >
+                                <option value="" selected disabled>Select Category</option>
+                                {categories.map((category) => (
+                                    <option key={category.id} value={category.id}>{category.name}</option>
+                                ))}
+                            </select>
+                            <input
+                                type="number"
+                                placeholder='Item Price'
+                                value={itemPrice}
+                                onChange={(e) => setItemPrice(e.target.value)}
+                                className='px-8 py-3 rounded-xl border-none outline-none'
+                            />
+                            <div className='flex justify-center items-center gap-10 text-sm'>
+                                <input type="file" onChange={handleItemImage} ref={inRef2} className='hidden' />
+                                <button onClick={handleFileInputTrigger2} className='px-8 py-2 rounded-xl bg-[#fff4] GlassBg font-bold text-[#80964c]'>Select Item Image</button>
+                                <button onClick={addItem} className='px-8 py-2 rounded-xl bg-[#fff4] GlassBg font-bold text-[#80964c]'>Add Item</button>
                             </div>
                         </div>
-                    ))}
+                    )}
+                
+
+                
+
+                <div className='relative flex justify-center items-center'>
+                    <input type="text" className='outline-none border-none rounded-lg py-2 px-8' value={searchTerm2} 
+                    onChange={handleSearchChange2} placeholder='Search items...' />
+                    <span className='absolute text-2xl right-2 text-[#80964c] drop-shadow-md flex items-center justify-center'><FiSearch /></span>
                 </div>
 
                 {/* Items Display */}
                 <div className='mt-5 w-full'>
-                    {items.length > 0 ? (
-                        items.map((item) => (
+                    {filteredItems.length > 0 ? (
+                        filteredItems.map((item) => (
                             <div key={item.id} className='flex justify-between items-center mb-5 GlassBackground px-2 h-[100px] rounded-2xl'>
                                 <div className='flex items-center gap-4'>
-                                    <img src={item.imageUrl} alt={item.name} className='w-16 h-16 rounded-lg object-cover GlassBackground' />
+                                    <img
+                                        src={item.imageUrl}
+                                        alt={item.name}
+                                        className='w-16 h-16 rounded-lg object-cover GlassBackground'
+                                    />
                                     <div>
                                         <div className='text-xl font-bold'>{item.name}</div>
-                                        <div className='text-lg flex items-center gap-1 font-bold'><TbCurrencyRupee />{item.price}</div>
+                                        <div className='text-lg flex items-center gap-1 font-bold'>
+                                            <TbCurrencyRupee />
+                                            {item.price}
+                                        </div>
                                     </div>
                                 </div>
-                                <div className='flex items-center gap-3'>
-                                    
-                                    <MdModeEdit className='cursor-pointer text-xl text-[#80964c]' onClick={() => openItemEditPopUp(item)} />
-                                    <MdDelete className='cursor-pointer text-xl text-red-500' onClick={() => openItemDeletePopUp(item)}  />
-                                </div>
+                                {user && (
+                                    <div className='flex items-center gap-3'>
+                                        <MdModeEdit
+                                            className='cursor-pointer text-xl text-[#80964c]'
+                                            onClick={() => openItemEditPopUp(item)}
+                                        />
+                                        <MdDelete
+                                            className='cursor-pointer text-xl text-red-500'
+                                            onClick={() => deleteItem(item)}
+                                        />
+                                    </div>
+                                )}
+                                
                             </div>
                         ))
                     ) : (
-                        <div>No items found for this category.</div>
+                        <div className=' text-center'>No items found for this category.</div>
                     )}
                 </div>
 

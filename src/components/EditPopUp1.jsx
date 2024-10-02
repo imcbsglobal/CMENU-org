@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { IoIosClose } from "react-icons/io";
 import { motion } from "framer-motion";
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -8,6 +8,11 @@ import { db } from './Firebase'; // Make sure you're importing your Firebase set
 const EditPopUp1 = ({ setCategoryEditPopUp, category }) => {
     const [newCategoryName, setNewCategoryName] = useState(category.name);
     const [newCategoryImage, setNewCategoryImage] = useState(null);
+
+    useEffect(() => {
+        setNewCategoryName(category.name);
+        setNewCategoryImage(null); // Reset image selection
+    }, [category]);
 
     // Handle file selection for a new image
     const handleFileInput = (e) => {
@@ -21,14 +26,14 @@ const EditPopUp1 = ({ setCategoryEditPopUp, category }) => {
         if (newCategoryImage) {
             // If a new image is selected, upload the new image
             const storage = getStorage();
-            const imageRef = storageRef(storage, `categories/${newCategoryImage.name}`);
+            const imageRef = storageRef(storage, `admins/${category.adminId}/categories/${newCategoryImage.name}`);
             const snapshot = await uploadBytes(imageRef, newCategoryImage);
             const downloadURL = await getDownloadURL(snapshot.ref);
             updatedCategoryData.imageUrl = downloadURL; // Update with the new image URL
         }
 
         // Update category in Firebase
-        set(ref(db, `categories/${category.id}`), {
+        set(ref(db, `admins/${category.adminId}/categories/${category.id}`), {
             ...category, // Keep the other data like adminId and randomKey
             ...updatedCategoryData, // Update name and imageUrl if changed
         }).then(() => {

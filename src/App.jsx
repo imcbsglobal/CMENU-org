@@ -6,6 +6,9 @@ import AddAdmin from "./components/AddAdmin";
 import Home from "./components/Home";
 import Loader from "./components/Loader";
 import CategoryPage from "./components/CategoryPage";
+import EditAdmin from "./components/EditAdmin";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   const [loader, setLoader] = useState(true);
@@ -23,20 +26,25 @@ function App() {
   };
 
   return (
-    <Router>
-      { loader ? (
-        <Loader />
-      ) : (
-        <Routes>
-          <Route path="/loader" element={<Loader />} />
-          <Route path="/" element={<ProtectedRoute element={<Home />} />} />
-          <Route path="/superAdminIndex" element={<ProtectedRoute element={<SuperAdminIndex />} />} />
-          <Route path="/addAdmin" element={<ProtectedRoute element={<AddAdmin />} />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/category/:category" element={<ProtectedRoute element={<CategoryPage />} />} /> {/* Add the CategoryPage route */}
-        </Routes>
-      )}
-    </Router>
+    <>
+      <Router>
+        { loader ? (
+          <Loader />
+        ) : (
+          <Routes>
+            <Route path="/loader" element={<Loader />} />
+            <Route path="/:admiId"  element={<Home />}/>
+            <Route path="/superAdminIndex" element={<ProtectedRoute element={<SuperAdminIndex />} />} />
+            <Route path="/addAdmin" element={<ProtectedRoute element={<AddAdmin />} />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/editAdmin/:adminId" element={<ProtectedRoute element={<EditAdmin />} />} /> {/* Add the EditAdmin route */}
+            <Route path="/category/:category" element={<ProtectedRoute element={<CategoryPage />} />} /> {/* Add the CategoryPage route */}
+          </Routes>
+        )}
+      </Router>
+
+      <ToastContainer/>
+    </>
   );
 }
 
