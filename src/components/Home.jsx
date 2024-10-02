@@ -23,7 +23,7 @@ const Home = () => {
   const [qrGenerated, setQrGenerated] = useState(false);
   const currentAdminId = localStorage.getItem('adminUid'); // Get currently logged-in admin ID
   const adminId = localStorage.getItem('adminUid'); 
-  const adminUrl = `https://qrrestaurant.onrender.com/${adminId || currentAdminId}`; // The URL that includes the admin ID
+  const adminUrl = `http://52.66.196.77/${adminId || currentAdminId}`; // The URL that includes the admin ID
   const qrRef = useRef(); // Create a ref to the QR code element
   const [openAdminPanel, setOPenAdminPanel] = useState(false)
 
