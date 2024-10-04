@@ -8,6 +8,7 @@ import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import allItemsImage from "../assets/all.jpg"
+import { FaPhoneAlt } from "react-icons/fa";
 
 const CustomerView = () => {
     const { adminId } = useParams();
@@ -230,7 +231,7 @@ const CustomerView = () => {
                 </div>
             </div>
 
-            <div className='mt-5 w-full px-2'>
+            <div className='mt-5 w-full px-2 mb-5'>
                 {displayedItems.length > 0 ? (
                     displayedItems.map((item) => (
                         <div key={item.id} className='flex justify-between items-center mb-5 GlassBackground px-2 h-[80px] rounded-2xl'>
@@ -253,6 +254,12 @@ const CustomerView = () => {
                 ) : (
                     <div className='text-center'>No items found.</div>
                 )}
+            </div>
+            {/* Footer */}
+            <div className='bg-[#fff] w-full py-2 px-2 flex flex-col justify-center items-center'>
+                <div className='text-center flex flex-col justify-center items-center text-[10px] text-[#383636] ItemText'>Design and Developed by <span className='block text-sm font-semibold text-[#80964c]'>IMC Business Solutions</span>
+                <span className=' flex justify-center items-center gap-2 font-bold text-[#383636]'><FaPhoneAlt className='text-[#80964c]'/>+91 7593820007</span>
+                </div>
             </div>
         </div>
     );
