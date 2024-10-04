@@ -46,10 +46,15 @@ const Category = () => {
     useEffect(() => {
         // Listen for auth state changes
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-          setUser(currentUser);
+            setUser(currentUser);
+            // Set adminId only if user is authenticated
+            const id = currentUser ? currentUser.uid : null;
+            setAdminId(id); // Assuming you have setAdminId to manage adminId state
         });
+    
         return () => unsubscribe();
-      }, []);
+    }, [auth]);
+    
 
     // Fetch categories and items when the component mounts
     useEffect(() => {

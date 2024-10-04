@@ -15,32 +15,40 @@ import { toast } from 'react-toastify'; // Import toast from react-toastify
 import 'react-toastify/dist/ReactToastify.css'; // Import the CSS for toast notifications
 import { FaUser } from "react-icons/fa";
 import { IoClose } from "react-icons/io5";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 const Home = () => {
   // const { adminId } = useParams(); 
   const [openQrPopUp, setOpenQrPopUp] = useState(false);
   const [qrUrl, setQrUrl] = useState('');
   const [qrGenerated, setQrGenerated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false); // Authentication state
   const currentAdminId = localStorage.getItem('adminUid'); // Get currently logged-in admin ID
   const adminId = localStorage.getItem('adminUid'); 
-  const adminUrl = `http://52.66.196.77/${adminId || currentAdminId}`; // The URL that includes the admin ID
+  const adminUrl = `http://52.66.196.77/${adminId}`; // The URL that includes the admin ID
   const qrRef = useRef(); // Create a ref to the QR code element
   const [openAdminPanel, setOPenAdminPanel] = useState(false)
 
   useEffect(() => {
-    const idToUse = adminId || currentAdminId; // Use adminId from URL or current logged-in admin
-    if (idToUse) {
-      setQrUrl(adminUrl);
-      console.log("Admin", idToUse);
-      // Fetch and display data based on idToUse
-    }
-  }, [adminId, currentAdminId]);
+    // Check for authentication state
+    const auth = getAuth();
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user && user.uid === adminId) {
+        setIsAuthenticated(true); // Admin is authenticated
+      } else {
+        setIsAuthenticated(false); // Admin is not authenticated
+      }
+    });
+
+    // Set the QR code URL
+    setQrUrl(adminUrl);
+
+    return () => unsubscribe();
+  }, [adminId]);
 
   const handleGenerateQR = () => {
-    if (currentAdminId) {
-      setQrGenerated(true);
-      setOpenQrPopUp(true);
-    }
+    setQrGenerated(true);
+    setOpenQrPopUp(true);
   };
 
   // Function to download the QR code as an image
@@ -55,24 +63,22 @@ const Home = () => {
     }
   };
 
-  
-  // Function to copy the URL to the clipboard and show a toast notification
   const handleCopyUrl = () => {
     navigator.clipboard.writeText(qrUrl);
     toast.success('URL copied to clipboard!'); // Show success message
   };
 
   const handleOpenAdminPanel = () => {
-    setOPenAdminPanel(!openAdminPanel)
-  }
-
+    setOPenAdminPanel(!openAdminPanel);
+  };
 
 
   return (
     <div className=' w-full overflow-hidden'>
       <div className=' w-full'>
         {/* Mobile Admin Pannel */}
-        {openAdminPanel && (
+        
+        {isAuthenticated && openAdminPanel && (
           <div className='fixed bottom-0 top-0 left-0 right-0 bg-[#fff] z-[999] flex flex-col justify-center items-center'>
           <div className=' absolute top-5 right-5 text-2xl' >
             <IoClose onClick={handleOpenAdminPanel} className='cursor-pointer'/>
@@ -101,7 +107,7 @@ const Home = () => {
         {/* First Div (Side Navbar) */}
         <div className='md:w-[20%] md:h-screen hidden md:block'>
           <div className=' md:fixed flex-col gap-16 w-[20%] h-screen bg-[#fff] md:flex justify-center items-center'>
-            <div className='text-center font-bold text-[#fff] flex justify-center items-center gap-2 px-8 py-3 rounded-3xl bg-[#082114] drop-shadow-md'>Admin Pannel
+            <div className='text-center font-bold text-[#fff] flex justify-center items-center px-8 py-3 rounded-3xl bg-[#082114] drop-shadow-md'>Admin Pannel
               <span><FaUser/></span>
             </div>
             <ul className='flex flex-col justify-center gap-5 font-semibold text-lg w-full text-center'>

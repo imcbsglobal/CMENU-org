@@ -9,20 +9,32 @@ import CategoryPage from "./components/CategoryPage";
 import EditAdmin from "./components/EditAdmin";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import CustomerView from "./components/CustomerView";
+
 
 function App() {
   const [loader, setLoader] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setIsAuthenticated(!!user);
+    });
+
     const timer = setTimeout(() => {
       setLoader(false);
     }, 3000);
-    return () => clearTimeout(timer);
+
+    return () => {
+      clearTimeout(timer);
+      unsubscribe();
+    };
   }, []);
 
   const ProtectedRoute = ({ element }) => {
-    const isAuthenticated = !!localStorage.getItem('adminUid'); // Check authentication status
-    return isAuthenticated ? element : <Navigate to="/login" />; // Redirect to login if not authenticated
+    return isAuthenticated ? element : <Navigate to="/login" />;
   };
 
   return (
@@ -33,12 +45,13 @@ function App() {
         ) : (
           <Routes>
             <Route path="/loader" element={<Loader />} />
-            <Route path="/:admiId"  element={<Home />}/>
+            <Route path="/:adminId" element={<CustomerView />} /> {/* Changed from Home to CustomerView */}
+            <Route path="/admin/:adminId" element={<Home />} /> {/* New route for admin view */}
             <Route path="/superAdminIndex" element={<ProtectedRoute element={<SuperAdminIndex />} />} />
             <Route path="/addAdmin" element={<ProtectedRoute element={<AddAdmin />} />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/editAdmin/:adminId" element={<ProtectedRoute element={<EditAdmin />} />} /> {/* Add the EditAdmin route */}
-            <Route path="/category/:category" element={<ProtectedRoute element={<CategoryPage />} />} /> {/* Add the CategoryPage route */}
+            <Route path="/editAdmin/:adminId" element={<ProtectedRoute element={<EditAdmin />} />} />
+            <Route path="/category/:category" element={<ProtectedRoute element={<CategoryPage />} />} />
           </Routes>
         )}
       </Router>
