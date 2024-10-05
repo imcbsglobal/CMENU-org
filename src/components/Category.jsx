@@ -8,7 +8,7 @@ import DeleteAlert from './DeleteAlert';
 import EditPopUp1 from './EditPopUp1';
 import EditItemPopUP from './EditItemPopUP';
 import DeleteItem from './DeleteItem';
-import { ref, remove } from 'firebase/database';
+import { ref, remove, update } from 'firebase/database';
 import { TbCurrencyRupee } from "react-icons/tb";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -41,6 +41,7 @@ const Category = () => {
     const [searchTerm, setSearchTerm] = useState(''); // State for search input
     const [searchTerm2, setSearchTerm2] = useState(''); // State for item search input
     const [user, setUser] = useState(null);
+    const [hiddenItems, setHiddenItems] = useState({});
 
 
     useEffect(() => {
@@ -83,8 +84,17 @@ const Category = () => {
                         ...data[key],
                     }));
                     setItems(itemList);
+                     // Update hidden items state
+                    const hiddenStatuses = {};
+                    itemList.forEach(item => {
+                        if (item.isHidden) {
+                            hiddenStatuses[item.id] = true;
+                        }
+                    });
+                    setHiddenItems(hiddenStatuses);
                 } else {
                     setItems([]); // Clear items if there are none
+                    setHiddenItems({});
                 }
             });
         }
@@ -316,6 +326,30 @@ const Category = () => {
     const filteredItems = items.filter((item) =>
         item.name.toLowerCase().includes(searchTerm2.toLowerCase())
     );
+
+    
+// Add the handler function for toggling item visibility
+const handleToggleItemVisibility = (itemId, isHidden) => {
+    const updatedRef = ref(db, `admins/${adminId}/categories/${selectedCategory}/items/${itemId}`);
+    
+    // Update the hidden status in Firebase
+    update(updatedRef, {
+        isHidden: isHidden
+    }).then(() => {
+        // Update local state
+        setHiddenItems(prev => ({
+            ...prev,
+            [itemId]: isHidden
+        }));
+        
+        // Show toast notification
+        toast.success(isHidden ? 'Item hidden successfully' : 'Item is now visible');
+    }).catch(error => {
+        console.error("Error updating item visibility:", error);
+        toast.error('Failed to update item visibility');
+    });
+};
+
     
     // const openCategoryEditPopUp = () => setCategoryEditPopUp(!categoryEditPopUp);
     // const openCategoryDeletePopUp = () => setCategoryDeletePopUp(!categoryDeletePopUp);
@@ -466,6 +500,21 @@ const Category = () => {
                                 </div>
                                 {user && (
                                     <div className='flex items-center gap-3'>
+                                        {hiddenItems[item.id] ? (
+                                            <button 
+                                                onClick={() => handleToggleItemVisibility(item.id, false)}
+                                                className='px-6 py-2 rounded-xl bg-[#fff] text-sm font-bold cursor-pointer text-[#80964c]'
+                                            >
+                                                Display
+                                            </button>
+                                        ) : (
+                                            <button 
+                                                onClick={() => handleToggleItemVisibility(item.id, true)}
+                                                className='px-6 py-2 rounded-xl bg-[#fff] text-sm font-bold cursor-pointer text-[#80964c]'
+                                            >
+                                                Hide
+                                            </button>
+                                        )}
                                         <MdModeEdit
                                             className='cursor-pointer text-xl text-[#80964c]'
                                             onClick={() => openItemEditPopUp(item)}

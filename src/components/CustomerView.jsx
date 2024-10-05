@@ -53,7 +53,8 @@ const CustomerView = () => {
     }, [adminId]);
 
       // Fetch categories and all items
-      useEffect(() => {
+      // Modify the useEffect hook that fetches items in CustomerView.jsx
+    useEffect(() => {
         const categoryRef = ref(db, `admins/${adminId}/categories/`);
         onValue(categoryRef, (snapshot) => {
             if (snapshot.exists()) {
@@ -72,20 +73,21 @@ const CustomerView = () => {
 
                 setCategories([allCategory, ...categoryList]);
 
-                // Collect all items across categories
+                // Collect all visible items across categories
                 let allItemsList = [];
                 Object.keys(data).forEach((categoryId) => {
                     if (data[categoryId].items) {
-                        const categoryItems = Object.keys(data[categoryId].items).map(itemId => ({
-                            id: itemId,
-                            categoryId,
-                            ...data[categoryId].items[itemId]
-                        }));
+                        const categoryItems = Object.keys(data[categoryId].items)
+                            .filter(itemId => !data[categoryId].items[itemId].isHidden) // Only include visible items
+                            .map(itemId => ({
+                                id: itemId,
+                                categoryId,
+                                ...data[categoryId].items[itemId]
+                            }));
                         allItemsList = [...allItemsList, ...categoryItems];
                     }
                 });
                 setAllItems(allItemsList);
-                // Initially show all items since 'all' is the default category
                 setDisplayedItems(allItemsList);
             }
         });

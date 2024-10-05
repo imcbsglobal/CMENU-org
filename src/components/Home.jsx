@@ -175,11 +175,11 @@ const Home = () => {
           )}
 
           {/* QR Icon */}
-          {!qrGenerated && (
+          {/* {!qrGenerated && (
             <div className='fixed z-[90] bottom-10 right-10 p-5 bg-[#082114] rounded-full text-3xl drop-shadow-md'>
               <IoQrCodeSharp className='drop-shadow-lg text-[#fff] cursor-pointer' onClick={handleGenerateQR} />
             </div>
-          )}
+          )} */}
 
           <div>
             <Navbar handleOpenAdminPanel={handleOpenAdminPanel} setOPenAdminPanel={setOPenAdminPanel}/>
