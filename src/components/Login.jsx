@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth"; // Use Firebase Auth for login
+import { ref, get } from "firebase/database"; // Add get from firebase/database
+import { db } from './Firebase'; // Make sure this import exists
 
 const Login = () => {
   const [email, setEmail] = useState(''); // Change from username to email
@@ -27,9 +29,38 @@ const Login = () => {
         if (email === 'info@imcbsglobal.com') {
           // Navigate to the superAdminIndex page
           navigate('/superAdminIndex');
+        } 
+        // For regular admins, check their status in the database
+        const adminRef = ref(db, 'admins');
+        const snapshot = await get(adminRef);
+        
+        if (snapshot.exists()) {
+          let adminData = null;
+          let adminId = null;
+          
+          // Find the admin entry that matches the logged-in user's UID
+          Object.entries(snapshot.val()).forEach(([key, value]) => {
+            if (value.userName === email) {
+              adminData = value;
+              adminId = key;
+            }
+          });
+
+          if (adminData) {
+            localStorage.setItem('adminUid', adminId);
+            
+            if (adminData.status === 'Disable') {
+              toast.warning('Account is disabled');
+              navigate('/disableStatus');
+            } else {
+              toast.success('Login successful!');
+              navigate(`/admin/${adminId}`);
+            }
+          } else {
+            toast.error('Admin account not found');
+          }
         } else {
-          // Navigate to the home page for other users with their admin ID
-          navigate(`/admin/${user.uid}`); // Update this line
+          toast.error('No admin data found');
         }
       }
     } catch (error) {

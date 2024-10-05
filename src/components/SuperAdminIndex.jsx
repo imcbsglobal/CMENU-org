@@ -20,20 +20,90 @@ const SuperAdminIndex = () => {
     const [adminData, setAdminData] = useState([]);
     const [searchTerm, setSearchTerm] =  useState('')
     const navigate = useNavigate();  // Initialize navigate
+    const [statusTimers, setStatusTimers] = useState({});
 
     useEffect(() => {
         const adminRef = ref(db, 'admins');
-        onValue(adminRef, (snapshot) => {
-        if (snapshot.exists()) {
-            const data = snapshot.val();
-            const adminArray = Object.keys(data).map(key => ({
-            id: key,
-            ...data[key]
-            }));
-            setAdminData(adminArray);
-        }
+        const unsubscribe = onValue(adminRef, (snapshot) => {
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                const adminArray = Object.keys(data).map(key => ({
+                    id: key,
+                    ...data[key],
+                    pendingStatus: data[key].pendingStatus || false,
+                    pendingStatusTime: data[key].pendingStatusTime || null
+                }));
+                setAdminData(adminArray);
+
+                // Check and update pending statuses
+                adminArray.forEach(admin => {
+                    if (admin.pendingStatus && admin.pendingStatusTime) {
+                        const timeLeft = admin.pendingStatusTime - Date.now();
+                        if (timeLeft > 0) {
+                            setTimer(admin.id, timeLeft);
+                        } else {
+                            updateAdminStatus(admin.id, admin.status === 'Active' ? 'Disable' : 'Active', false);
+                        }
+                    }
+                });
+            }
         });
+
+        return () => {
+            unsubscribe();
+            // Clear all timers on unmount
+            Object.values(statusTimers).forEach(timer => clearTimeout(timer));
+        };
     }, []);
+
+
+
+    const setTimer = (adminId, duration) => {
+        // Clear existing timer if any
+        if (statusTimers[adminId]) {
+            clearTimeout(statusTimers[adminId]);
+        }
+
+        // Set new timer
+        const newTimer = setTimeout(() => {
+            const admin = adminData.find(a => a.id === adminId);
+            if (admin) {
+                updateAdminStatus(adminId, admin.status === 'Active' ? 'Disable' : 'Active', false);
+            }
+        }, duration);
+
+        setStatusTimers(prev => ({
+            ...prev,
+            [adminId]: newTimer
+        }));
+    };
+
+    const updateAdminStatus = async (adminId, newStatus, isPending = true) => {
+        try {
+            const updates = {
+                status: newStatus,
+                pendingStatus: isPending,
+                pendingStatusTime: isPending ? Date.now() + 60000 : null // 1 minute = 60000 milliseconds
+            };
+
+            await update(ref(db, `admins/${adminId}`), updates);
+
+            if (isPending) {
+                setTimer(adminId, 60000);
+                toast.info(`Status will change to ${newStatus} in 1 minute`);
+            } else {
+                toast.success(`Admin status updated to ${newStatus}!`);
+            }
+        } catch (error) {
+            console.error("Error updating status:", error);
+            toast.error('Error updating status. Please try again.');
+        }
+    };
+
+    const handleToggleStatus = async (adminId, currentStatus) => {
+        const newStatus = currentStatus === 'Active' ? 'Disable' : 'Active';
+        await updateAdminStatus(adminId, newStatus);
+    };
 
     const handleEdit = (adminId) => {
         navigate(`/editAdmin/${adminId}`); // Navigate to the EditAdmin page
@@ -63,16 +133,16 @@ const SuperAdminIndex = () => {
     };
     
     
-    const handleToggleStatus = async (adminId, currentStatus) => {
-        const newStatus = currentStatus === 'Active' ? 'Disable' : 'Active';
-        try {
-            await update(ref(db, `admins/${adminId}`), { status: newStatus });
-            toast.success(`Admin status updated to ${newStatus}!`);
-        } catch (error) {
-            console.error("Error updating status:", error);
-            toast.error('Error updating status. Please try again.');
-        }
-    };
+    // const handleToggleStatus = async (adminId, currentStatus) => {
+    //     const newStatus = currentStatus === 'Active' ? 'Disable' : 'Active';
+    //     try {
+    //         await update(ref(db, `admins/${adminId}`), { status: newStatus });
+    //         toast.success(`Admin status updated to ${newStatus}!`);
+    //     } catch (error) {
+    //         console.error("Error updating status:", error);
+    //         toast.error('Error updating status. Please try again.');
+    //     }
+    // };
 
     const handleLogout = async () => {
         try {
@@ -161,9 +231,19 @@ const SuperAdminIndex = () => {
                                     <td>{admin.amount}</td>
                                     <td>{admin.location}</td>
                                     <td>
-                                        <button className='px-6 py-2 bg-[#fff] rounded-xl font-bold text-[#299816]' onClick={() => handleToggleStatus(admin.id, admin.status)}>
-                                            {admin.status}
-                                        </button>
+                                    <button 
+                                        className={`px-6 py-2 rounded-xl font-bold ${
+                                            admin.status === 'Active' ? 'bg-[#299816] text-white' : 'bg-[#ff0000] text-white'
+                                        }`}
+                                        onClick={() => handleToggleStatus(admin.id, admin.status)}
+                                    >
+                                        {admin.status}
+                                    </button>
+                                    {/* {admin.pendingStatus && (
+                                        <span className="text-sm text-orange-500 mt-1">
+                                            Pending Payment
+                                        </span>
+                                    )} */}
                                     </td>
                                     <td className='text-[#1e8ca5]'>
                                         <FaEdit className='cursor-pointer' onClick={() => handleEdit(admin.adminId)} />

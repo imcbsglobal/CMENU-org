@@ -11,6 +11,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import CustomerView from "./components/CustomerView";
+import DisbaleStatus from "./components/DisbaleStatus";
 
 
 function App() {
@@ -49,6 +50,7 @@ function App() {
             <Route path="/admin/:adminId" element={<Home />} /> {/* New route for admin view */}
             <Route path="/superAdminIndex" element={<ProtectedRoute element={<SuperAdminIndex />} />} />
             <Route path="/addAdmin" element={<ProtectedRoute element={<AddAdmin />} />} />
+            <Route path="/disableStatus" element={<ProtectedRoute element={<DisbaleStatus />} />} />
             <Route path="/login" element={<Login />} />
             <Route path="/editAdmin/:adminId" element={<ProtectedRoute element={<EditAdmin />} />} />
             <Route path="/category/:category" element={<ProtectedRoute element={<CategoryPage />} />} />
