@@ -20,6 +20,7 @@ const Login = () => {
       const auth = getAuth();
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
+      console.log("user credentials",user)
 
       if (user) {
         toast.success('Login successful!');
@@ -47,7 +48,7 @@ const Login = () => {
           });
 
           if (adminData) {
-            localStorage.setItem('adminUid', adminId);
+            // localStorage.setItem('adminUid', adminId);
             
             if (adminData.status === 'Disable') {
               toast.warning('Account is disabled');
@@ -63,6 +64,7 @@ const Login = () => {
           toast.error('No admin data found');
         }
       }
+
     } catch (error) {
       console.error("Error during login: ", error);
       toast.error('Invalid email or password!');

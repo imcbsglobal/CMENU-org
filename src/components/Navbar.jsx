@@ -20,6 +20,7 @@ const Navbar = ({setOPenAdminPanel, handleOpenAdminPanel}) => {
     setPersistence(auth, browserLocalPersistence)
       .then(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+          console.log("current user",currentUser)
           if (currentUser) {
             setUser(currentUser);
             const adminRef = ref(db, `admins/${currentUser.uid}`);
@@ -33,6 +34,7 @@ const Navbar = ({setOPenAdminPanel, handleOpenAdminPanel}) => {
 
             // Fetch logos for the user
             const logoRef = ref(db, `logos/${currentUser.uid}`);
+            console.log("current user is",currentUser.uid)
             onValue(logoRef, (snapshot) => {
               if (snapshot.exists()) {
                 const logos = snapshot.val();

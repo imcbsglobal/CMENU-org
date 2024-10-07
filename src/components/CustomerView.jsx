@@ -26,10 +26,15 @@ const CustomerView = () => {
     // Fetch logo
     useEffect(() => {
         const logoRef = ref(db, `logos/${adminId}`);
+        console.log("admin id",adminId)
+        console.log("logo display",logoRef)
         onValue(logoRef, (snapshot) => {
+            console.log("snapshot",snapshot.val())
             if (snapshot.exists()) {
                 const logos = snapshot.val();
+                console.log("logo only",logos)
                 const logoKeys = Object.keys(logos);
+                console.log("logo keys",logoKeys)
                 if (logoKeys.length > 0) {
                     setLogoUrl(logos[logoKeys[0]].url);
                 }
