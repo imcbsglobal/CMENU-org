@@ -4,8 +4,7 @@ import { ref as storageRef, uploadBytesResumable, getDownloadURL } from 'firebas
 import { ref as dbRef, set, push } from 'firebase/database';
 import { BiSolidFileImage } from 'react-icons/bi';
 import { FaSquarePlus } from 'react-icons/fa6';
-import { toast, ToastContainer } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
+import { toast } from 'react-hot-toast';
 
 const UploadFile = ({ user }) => {
   const [file, setFile] = useState(null);

@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { ref, set } from "firebase/database";
 import { db } from './Firebase';
 import { v4 as uuidv4 } from 'uuid'; // To generate unique admin IDs
-import { toast } from "react-toastify";
+import { toast } from 'react-hot-toast';
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth"; // Import Firebase Authentication
 
 const AddAdmin = () => {
@@ -29,6 +29,12 @@ const AddAdmin = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Check if password and confirmPassword are at least 6 characters long
+    if (formData.password.length < 6) {
+      toast.error("Password must be at least 6 characters long!");
+      return;
+    }
 
     if (formData.password !== formData.confirmPassword) {
       toast.error("Passwords do not match!");

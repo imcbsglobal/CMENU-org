@@ -1,7 +1,7 @@
 import React, { useState,useEffect } from 'react';
 import { IoIosClose } from "react-icons/io";
 import { motion } from "framer-motion";
-import { toast } from 'react-toastify';
+import { toast } from 'react-hot-toast';
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { ref, set } from 'firebase/database';  // Correct import for database reference
 import { db } from './Firebase'; // Make sure you're importing your Firebase setup properly

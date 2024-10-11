@@ -106,7 +106,7 @@ const Navbar = ({setOPenAdminPanel, handleOpenAdminPanel}) => {
       <header className='flex justify-center fixed items-center w-full py-5  px-5 bg-[#fff]  z-50 rounded-b mb-5'>
         {/* Logo and Logout Button Section */}
         
-          <div className='flex items-center justify-between w-full'> {/* Use full width for the flex container */}
+          <div className='flex items-center justify-between md:justify-start w-full md:gap-10'> {/* Use full width for the flex container */}
             <div className='flex items-center'>
               {logoUrl && (
                 <div className='relative flex items-center gap-2'> {/* Add margin-right for spacing */}
@@ -121,12 +121,12 @@ const Navbar = ({setOPenAdminPanel, handleOpenAdminPanel}) => {
               )}
             </div>
             {user && (
-              <div className=' flex flex-col items-end gap-3'>
-                <button onClick={handleLogout} className='flex items-center text-red-600 relative z-50'>
+              <div className=' flex flex-col items-end gap-5'>
+                <button onClick={handleLogout} className='flex items-center relative text-red-600 z-50'>
                   <FaUserAltSlash className='mr-2' />
                   Logout
                 </button>
-                <button className=' text-3xl' onClick={handleOpenAdminPanel}>
+                <button className='md:hidden text-3xl' onClick={handleOpenAdminPanel}>
                   <IoIosMenu/>
                 </button>
               </div>
@@ -139,8 +139,8 @@ const Navbar = ({setOPenAdminPanel, handleOpenAdminPanel}) => {
         
       </header>
 
-      <main className='pt-32'>
-        <div className='flex justify-center items-center font-bold text-2xl mb-5'>Upload Your Logo</div>
+      <main className='pt-36'>
+        <div className='flex justify-center items-center font-bold text-2xl mb-5 ItemText'>Upload Your Logo</div>
         {/* Pass user and randomKey to UploadFile component for proper functionality */}
         {user && <UploadFile user={user} randomKey={randomKey} />}
       </main>

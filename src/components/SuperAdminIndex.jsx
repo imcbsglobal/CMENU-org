@@ -7,7 +7,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { ref, onValue } from "firebase/database";
 import { db,auth } from './Firebase'; // Make sure to import Firebase setup
 import EditAdmin from './EditAdmin';
-import { toast, ToastContainer } from "react-toastify"
+import { toast } from 'react-hot-toast';
 // import { remove } from "firebase/database";  
 import { update, remove } from "firebase/database";
 import { signOut, getAuth } from "firebase/auth";  // Import signOut for logout
@@ -90,7 +90,7 @@ const SuperAdminIndex = () => {
 
             if (isPending) {
                 setTimer(adminId, 60000);
-                toast.info(`Status will change to ${newStatus} in 1 minute`);
+                toast(`Status will change to ${newStatus} in 1 minute`);
             } else {
                 toast.success(`Admin status updated to ${newStatus}!`);
             }
@@ -170,7 +170,7 @@ const SuperAdminIndex = () => {
 
     return (
         <div>
-            <div className='flex justify-between mx-auto w-[90%] mb-10 mt-10'>
+            <div className='flex lg:justify-between mx-auto w-[90%] mb-10 mt-10 flex-wrap gap-5 justify-center'>
                 <div className=' flex justify-center items-center gap-5'>
                     <Link to='/addAdmin'>
                         <button className='px-8 py-3 bg-[#fff] rounded-xl font-bold flex justify-center items-center gap-2 text-[#80964c]'>
@@ -197,7 +197,7 @@ const SuperAdminIndex = () => {
                     </div>
                 </div>
             </div>
-            <div className='w-[90%] mx-auto bg-[#ffffff72] rounded-3xl'>
+            <div className='w-[90%] mx-auto bg-[#ffffff72] rounded-3xl overflow-x-auto'>
                 <table>
                     <thead>
                         <tr>
@@ -255,8 +255,6 @@ const SuperAdminIndex = () => {
                             ))
                         )}
                     </tbody>
-
-                    
                 </table>
             </div>
         </div>

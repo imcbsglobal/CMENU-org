@@ -5,8 +5,7 @@ import { ref as dbRef, set, push } from 'firebase/database';
 import { onAuthStateChanged } from 'firebase/auth';
 import { BiSolidFileImage } from 'react-icons/bi';
 import { FaSquarePlus } from 'react-icons/fa6';
-import { toast, ToastContainer } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
+import { toast } from 'react-hot-toast';
 import { ref as storageRef } from "firebase/storage"; // Ensure correct import for storageRef
 
 const UploadBanners = ({ storagePath, dbPath }) => {
@@ -86,7 +85,6 @@ const UploadBanners = ({ storagePath, dbPath }) => {
 
   return (
     <div>
-      <ToastContainer/>
       <input type="file" accept="image/*" ref={inRef} className="hidden" onChange={handleInputFile} />
       <div className="flex justify-center items-center gap-10 mt-5">
         <button

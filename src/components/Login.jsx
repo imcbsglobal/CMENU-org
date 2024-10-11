@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
-import { toast, ToastContainer } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
+import { toast } from 'react-hot-toast';
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth"; // Use Firebase Auth for login
 import { ref, get } from "firebase/database"; // Add get from firebase/database
 import { db } from './Firebase'; // Make sure this import exists
@@ -51,7 +50,7 @@ const Login = () => {
             // localStorage.setItem('adminUid', adminId);
             
             if (adminData.status === 'Disable') {
-              toast.warning('Account is disabled');
+              toast('Account is disabled');
               navigate('/disableStatus');
             } else {
               toast.success('Login successful!');
@@ -75,7 +74,6 @@ const Login = () => {
 
   return (
     <div className='bg-[#D5ED9F] h-screen flex justify-center items-center'>
-      <ToastContainer className="flex justify-center items-center w-full" />
       <div className='flex flex-col justify-center items-center w-[90%] lg:w-[40%] mx-auto h-[400px] rounded-3xl bg-[#ffffff56] GlassBg'>
         <div className='text-2xl font-bold mb-10'>Login</div>
         <form className='flex flex-col gap-5 w-full' onSubmit={handleLogin}>

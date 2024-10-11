@@ -10,9 +10,10 @@ import EditItemPopUP from './EditItemPopUP';
 import DeleteItem from './DeleteItem';
 import { ref, remove, update } from 'firebase/database';
 import { TbCurrencyRupee } from "react-icons/tb";
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { toast } from 'react-hot-toast';
 import { getAuth, onAuthStateChanged } from "firebase/auth";
+import defaultCategory from "../assets/defaultcategory.png"
+import defaultItem from "../assets/defaultitem.png"
 
 
 const Category = () => {
@@ -43,6 +44,8 @@ const Category = () => {
     const [user, setUser] = useState(null);
     const [hiddenItems, setHiddenItems] = useState({});
 
+    const DEFAULT_CATEGORY_IMAGE_URL = "https://res.cloudinary.com/dqydgc2ky/image/upload/v1728627745/defaultcategory_a0dy81.png"; // You can replace this with your actual default image URL
+    const DEFAULT_ITEM_IMAGE_URL = "https://res.cloudinary.com/dqydgc2ky/image/upload/v1728627756/defaultitem_ko3p04.png"; // You can replace this with your actual default item image URL
 
     useEffect(() => {
         // Listen for auth state changes
@@ -142,50 +145,77 @@ const Category = () => {
     };
 
     const addCategory = () => {
-        if (categoryName && categoryImage) {
-            const storage = getStorage();
-            const imageRef = storageRef(storage, `admins/${adminId}/categories/${categoryImage.name}`); // Store image under admin folder
-            uploadBytes(imageRef, categoryImage).then((snapshot) => {
-                getDownloadURL(snapshot.ref).then((downloadURL) => {
-                    const newCategoryRef = push(dbRef(db, `admins/${adminId}/categories/`)); // Store category under admin folder
-                    set(newCategoryRef, {
-                        name: categoryName,
-                        adminId: adminId,
-                        imageUrl: downloadURL,
-                    }).then(() => {
-                        setCategoryName('');
-                        setCategoryImage(null);
-                        toast.success("Category Uploaded Successfully",{position:'top-center'})
+        if (categoryName) {
+            if (categoryImage) {
+                // If an image is selected, upload it and then create the category
+                const storage = getStorage();
+                const imageRef = storageRef(storage, `admins/${adminId}/categories/${categoryImage.name}`);
+                uploadBytes(imageRef, categoryImage).then((snapshot) => {
+                    getDownloadURL(snapshot.ref).then((downloadURL) => {
+                        createCategoryInDatabase(downloadURL);
                     });
                 });
-            });
+            } else {
+                // If no image is selected, use the default image URL
+                createCategoryInDatabase(DEFAULT_CATEGORY_IMAGE_URL);
+            }
         } else {
-            console.error("Category name and image must be provided");
+            toast.error("Category name must be provided");
         }
     };
+
+    const createCategoryInDatabase = (imageUrl) => {
+        const newCategoryRef = push(dbRef(db, `admins/${adminId}/categories/`));
+        set(newCategoryRef, {
+            name: categoryName,
+            adminId: adminId,
+            imageUrl: imageUrl,
+        }).then(() => {
+            setCategoryName('');
+            setCategoryImage(null);
+            toast.success("Category Added Successfully", {position: 'top-center'});
+        }).catch(error => {
+            toast.error("Error adding category: " + error.message);
+        });
+    };
+
     
 
     const addItem = () => {
-        if (itemName && itemPrice && selectedCategory && itemImage) {
-            const storage = getStorage();
-            const imageRef = storageRef(storage, `admins/${adminId}/categories/${selectedCategory}/items/${itemImage.name}`); // Store item image under admin folder
-            console.log("Item Reference Path:", imageRef.toString());
-            uploadBytes(imageRef, itemImage).then((snapshot) => {
-                getDownloadURL(snapshot.ref).then((downloadURL) => {
-                    const newItemRef = push(dbRef(db, `admins/${adminId}/categories/${selectedCategory}/items`)); // Store item under the admin's selected category
-                    set(newItemRef, {
-                        name: itemName,
-                        price: itemPrice,
-                        imageUrl: downloadURL,
-                    }).then(() => {
-                        setItemName('');
-                        setItemPrice('');
-                        setItemImage(null);
-                        toast.success("Item Uploaded Successfully",{position:'top-center'})
+        if (itemName && itemPrice && selectedCategory) {
+            if (itemImage) {
+                // If an image is selected, upload it and then create the item
+                const storage = getStorage();
+                const imageRef = storageRef(storage, `admins/${adminId}/categories/${selectedCategory}/items/${itemImage.name}`);
+                uploadBytes(imageRef, itemImage).then((snapshot) => {
+                    getDownloadURL(snapshot.ref).then((downloadURL) => {
+                        createItemInDatabase(downloadURL);
                     });
                 });
-            });
+            } else {
+                // If no image is selected, use the default image URL
+                createItemInDatabase(DEFAULT_ITEM_IMAGE_URL);
+            }
+        } else {
+            toast.error("Item name, price, and category must be provided");
         }
+    };
+
+
+    const createItemInDatabase = (imageUrl) => {
+        const newItemRef = push(dbRef(db, `admins/${adminId}/categories/${selectedCategory}/items`));
+        set(newItemRef, {
+            name: itemName,
+            price: itemPrice,
+            imageUrl: imageUrl,
+        }).then(() => {
+            setItemName('');
+            setItemPrice('');
+            setItemImage(null);
+            toast.success("Item Added Successfully", {position: 'top-center'});
+        }).catch(error => {
+            toast.error("Error adding item: " + error.message);
+        });
     };
     
 
@@ -371,7 +401,7 @@ const handleToggleItemVisibility = (itemId, isHidden) => {
                 )}
                 
                 <div className='text-2xl font-bold'>Categories</div>
-                    {/* <ToastContainer/> */}
+                    
                 { user && (
                     <div className='w-full mb-5'>
                         <input

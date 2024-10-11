@@ -2,7 +2,7 @@ import React from 'react';
 import { IoIosClose } from "react-icons/io";
 import { motion } from "framer-motion";
 import { getStorage, ref as storageRef, deleteObject } from "firebase/storage";
-import { toast } from 'react-toastify';
+import { toast } from 'react-hot-toast';
 import { db } from './Firebase'; // Ensure correct Firebase setup
 
 const DeleteItem = ({ setItemDeletePopUp, itemToDelete, deleteItem,adminId }) => {

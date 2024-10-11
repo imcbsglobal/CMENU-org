@@ -11,8 +11,7 @@ import { FaHome } from "react-icons/fa";
 import { IoIosCloseCircle } from "react-icons/io";
 import { IoQrCodeSharp } from "react-icons/io5";
 import html2canvas from 'html2canvas'; // Import html2canvas
-import { toast } from 'react-toastify'; // Import toast from react-toastify
-import 'react-toastify/dist/ReactToastify.css'; // Import the CSS for toast notifications
+import { toast } from 'react-hot-toast';
 import { FaUser } from "react-icons/fa";
 import { IoClose } from "react-icons/io5";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
@@ -91,19 +90,22 @@ const Home = () => {
             <li className='cursor-pointer' onClick={()=>{document.getElementById("addItems").scrollIntoView({ behavior:'smooth' });setOPenAdminPanel(!openAdminPanel)}}>Add Items</li>
           </ul>
           <div>
-          {!qrGenerated && (
+          
               <div className=' flex flex-col justify-center items-center gap-2'>
                 <div className='text-lg font-bold text-[#6d8040] drop-shadow-sm'>QR Link</div>
-                <div className=' z-[90] bottom-10 right-10 p-5 bg-[#082114] rounded-full text-3xl drop-shadow-md'>
-                  <IoQrCodeSharp className='drop-shadow-lg text-[#fff] cursor-pointer' onClick={handleGenerateQR} />
+                <div className=' bg-[#6d8040] p-3 rounded-full text-[#ffffff] drop-shadow-sm cursor-pointer'>
+                  <IoQrCodeSharp onClick={()=>{
+                    handleGenerateQR();
+                    setOPenAdminPanel(!openAdminPanel);
+                  }} />
                 </div>
               </div>
-            )}
+              {/* {handleGenerateQR};{setOPenAdminPanel(!openAdminPanel)} */}
           </div>
         </div>
         )}
         
-      <div className='md:flex justify-center gap-5 w-full'>
+      <div className='md:flex justify-center w-full'>
         {/* First Div (Side Navbar) */}
         <div className='md:w-[20%] md:h-screen hidden md:block'>
           <div className=' md:fixed flex-col gap-16 w-[20%] h-screen bg-[#fff] md:flex justify-center items-center'>
@@ -118,14 +120,14 @@ const Home = () => {
             </ul>
             {/* QR Icon */}
             
-            {!qrGenerated && (
               <div className=' flex flex-col justify-center items-center gap-2'>
                 <div className='text-lg font-bold text-[#6d8040] drop-shadow-sm'>QR Link</div>
-                <div className=' z-[90] bottom-10 right-10 p-5 bg-[#082114] rounded-full text-3xl drop-shadow-md'>
-                  <IoQrCodeSharp className='drop-shadow-lg text-[#fff] cursor-pointer' onClick={handleGenerateQR} />
+                {/* QR Button */}
+                <div className=' bg-[#6d8040] p-3 rounded-full text-[#ffffff] drop-shadow-sm cursor-pointer'>
+                  <IoQrCodeSharp onClick={handleGenerateQR} />
                 </div>
               </div>
-            )}
+            
           </div>
         </div>
         {/* Second Div (Contents) */}

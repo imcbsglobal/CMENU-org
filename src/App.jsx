@@ -7,8 +7,7 @@ import Home from "./components/Home";
 import Loader from "./components/Loader";
 import CategoryPage from "./components/CategoryPage";
 import EditAdmin from "./components/EditAdmin";
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { Toaster } from 'react-hot-toast';
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import CustomerView from "./components/CustomerView";
 import DisbaleStatus from "./components/DisbaleStatus";
@@ -58,7 +57,7 @@ function App() {
         )}
       </Router>
 
-      <ToastContainer/>
+      <Toaster />
     </>
   );
 }
