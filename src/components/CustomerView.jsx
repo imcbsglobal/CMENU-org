@@ -185,10 +185,10 @@ const CustomerView = () => {
     return (
         <div className=''>
             {/* Logo Section */}
-            <header className='flex justify-center fixed items-center w-full py-5 px-5 bg-[#fff] z-50 rounded-b mb-5'>
+            <header className='flex justify-center fixed items-center w-full py-2 px-5 bg-[#fff] z-50 rounded-b mb-5'>
                 <div className='flex items-center justify-between w-full'>
                     {logoUrl && (
-                        <img src={logoUrl} alt="Logo" className="w-[100px] object-contain" />
+                        <img src={logoUrl} alt="Logo" className="w-[100px] h-[80px] object-contain" />
                     )}
                     {/* <div className='flex justify-center items-center gap-5'>
                         <div><FaInstagram/></div>
