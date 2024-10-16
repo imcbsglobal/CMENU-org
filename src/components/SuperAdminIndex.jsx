@@ -95,7 +95,7 @@ const SuperAdminIndex = () => {
                 toast.success(`Admin status updated to ${newStatus}!`);
             }
         } catch (error) {
-            console.error("Error updating status:", error);
+            // console.error("Error updating status:", error);
             toast.error('Error updating status. Please try again.');
         }
     };
@@ -127,7 +127,7 @@ const SuperAdminIndex = () => {
     
             toast.success('Admin deleted successfully from storage!');
         } catch (error) {
-            console.error("Error deleting admin:", error);
+            // console.error("Error deleting admin:", error);
             toast.error('Error deleting admin. Please try again.');
         }
     };
@@ -150,7 +150,7 @@ const SuperAdminIndex = () => {
             toast.success("Logout successful!");
             navigate('/login');  // Redirect to login page
         } catch (error) {
-            console.error("Error during logout:", error);
+            // console.error("Error during logout:", error);
             toast.error("Error during logout. Please try again.");
         }
     };
@@ -210,11 +210,12 @@ const SuperAdminIndex = () => {
                             <th>Amount</th>
                             <th>Location</th>
                             <th>Status</th>
+                            <th>Validity</th>
                             <th>Edit</th>
                             <th>Delete</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody className='text-[13px] font-semibold w-full'>
                         {filteredAdminData.length === 0 ? (
                             <tr>
                                 <td colSpan="11" className="text-center">No admins found.</td>
@@ -224,8 +225,8 @@ const SuperAdminIndex = () => {
                                 <tr key={admin.id}>
                                     <td>{index + 1}</td>
                                     <td>{admin.customerName}</td>
-                                    <td>{admin.shopName}</td>
-                                    <td>{admin.adminId}</td>
+                                    <td className=''>{admin.shopName}</td>
+                                    <td className=' overflow-x-auto w-full text-nowrap'>{admin.adminId}</td>
                                     <td>{admin.userName}</td>
                                     <td>{admin.phoneNumber}</td>
                                     <td>{admin.amount}</td>
@@ -245,6 +246,7 @@ const SuperAdminIndex = () => {
                                         </span>
                                     )} */}
                                     </td>
+                                    <td className='w-full text-nowrap'>{admin.validity}</td>
                                     <td className='text-[#1e8ca5]'>
                                         <FaEdit className='cursor-pointer' onClick={() => handleEdit(admin.adminId)} />
                                     </td>

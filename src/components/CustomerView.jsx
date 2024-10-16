@@ -9,6 +9,11 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import allItemsImage from "../assets/all.jpg"
 import { FaPhoneAlt } from "react-icons/fa";
+import { FaInstagram } from "react-icons/fa";
+import { SlSocialFacebook } from "react-icons/sl";
+import { FaWhatsapp } from "react-icons/fa";
+import { FcGoogle } from "react-icons/fc";
+import {useNavigate} from "react-router-dom"
 
 const CustomerView = () => {
     const { adminId } = useParams();
@@ -22,6 +27,22 @@ const CustomerView = () => {
     const [searchTerm2, setSearchTerm2] = useState('');
     const [allItems, setAllItems] = useState([]); // Store all items
     const [displayedItems, setDisplayedItems] = useState([]); // Items to display
+    const navigate = useNavigate()
+
+
+    console.log("AdminId Is",adminId)
+    useEffect(()=>{
+        const adminData = ref(db,`admins/${adminId}`)
+        onValue(adminData,(snapshot)=>{
+            if(snapshot.exists()){
+                const storeAdminData = snapshot.val()
+                console.log("Store Admin Data",storeAdminData)
+                if(storeAdminData.status === "Disable"){
+                    navigate('/pageNotFound')
+                }
+            }
+        })
+    },[adminId])
 
     // Fetch logo
     useEffect(() => {
@@ -60,7 +81,7 @@ const CustomerView = () => {
       // Fetch categories and all items
       // Modify the useEffect hook that fetches items in CustomerView.jsx
     useEffect(() => {
-        const categoryRef = ref(db, `admins/${adminId}/categories/`);
+        const categoryRef = ref(db, `categories/`);
         onValue(categoryRef, (snapshot) => {
             if (snapshot.exists()) {
                 const data = snapshot.val();
@@ -81,7 +102,10 @@ const CustomerView = () => {
                 // Collect all visible items across categories
                 let allItemsList = [];
                 Object.keys(data).forEach((categoryId) => {
+                    console.log(`Data for category ${categoryId}:`, data[categoryId]);
+                    // console.log("items is",categoryId)
                     if (data[categoryId].items) {
+                        console.log("hey hello")
                         const categoryItems = Object.keys(data[categoryId].items)
                             .filter(itemId => !data[categoryId].items[itemId].isHidden) // Only include visible items
                             .map(itemId => ({
@@ -92,6 +116,7 @@ const CustomerView = () => {
                         allItemsList = [...allItemsList, ...categoryItems];
                     }
                 });
+                console.log("All Item is",allItemsList)
                 setAllItems(allItemsList);
                 setDisplayedItems(allItemsList);
             }
@@ -136,7 +161,7 @@ const CustomerView = () => {
 
     // Filter categories based on search
     const filteredCategories = categories.filter((category) =>
-        category.name.toLowerCase().includes(searchTerm.toLowerCase())
+        category?.name?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     // Filter items based on search
@@ -165,6 +190,12 @@ const CustomerView = () => {
                     {logoUrl && (
                         <img src={logoUrl} alt="Logo" className="w-[100px] object-contain" />
                     )}
+                    {/* <div className='flex justify-center items-center gap-5'>
+                        <div><FaInstagram/></div>
+                        <div><SlSocialFacebook/></div>
+                        <div><FaWhatsapp/></div>
+                        <div><FcGoogle/></div>
+                    </div> */}
                 </div>
             </header>
 
@@ -238,7 +269,7 @@ const CustomerView = () => {
                 </div>
             </div>
 
-            <div className='mt-5 w-full px-2 mb-5'>
+            <div className='mt-5 w-full px-2 mb-20'>
                 {displayedItems.length > 0 ? (
                     displayedItems.map((item) => (
                         <div key={item.id} className='flex justify-between items-center mb-5 GlassBackground px-2 h-[80px] rounded-2xl'>
@@ -263,7 +294,7 @@ const CustomerView = () => {
                 )}
             </div>
             {/* Footer */}
-            <div className='bg-[#fff] w-full py-2 px-2 flex flex-col justify-center items-center'>
+            <div className='bg-[#fff] w-full py-2 px-2 flex flex-col justify-center items-center fixed bottom-0'>
                 <div className='text-center flex flex-col justify-center items-center text-[10px] text-[#383636] ItemText'>Design and Developed by <span className='block text-sm font-semibold text-[#80964c]'>IMC Business Solutions</span>
                 <span className=' flex justify-center items-center gap-2 font-bold text-[#383636]'><FaPhoneAlt className='text-[#80964c]'/>+91 7593820007</span>
                 </div>

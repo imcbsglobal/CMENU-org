@@ -40,6 +40,7 @@ const Login = () => {
           
           // Find the admin entry that matches the logged-in user's UID
           Object.entries(snapshot.val()).forEach(([key, value]) => {
+            console.log("Admin Data Values is",value)
             if (value.userName === email) {
               adminData = value;
               adminId = key;
@@ -65,7 +66,7 @@ const Login = () => {
       }
 
     } catch (error) {
-      console.error("Error during login: ", error);
+      // console.error("Error during login: ", error);
       toast.error('Invalid email or password!');
     } finally {
       setIsLoading(false);

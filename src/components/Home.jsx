@@ -31,7 +31,7 @@ const Home = () => {
   useEffect(() => {
     // Check for authentication state
     const auth = getAuth();
-    const unsubscribe = auth.onAuthStateChanged((user) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user && user.uid === adminId) {
         setIsAuthenticated(true); // Admin is authenticated
       } else {

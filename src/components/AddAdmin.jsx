@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from "react-router-dom";
 import { ref, set } from "firebase/database";
 import { db } from './Firebase';
-import { v4 as uuidv4 } from 'uuid'; // To generate unique admin IDs
+import { v4 as uuidv4 } from 'uuid'; // To generate unique random keys
 import { toast } from 'react-hot-toast';
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth"; // Import Firebase Authentication
 
@@ -41,29 +41,29 @@ const AddAdmin = () => {
       return;
     }
 
-    const adminId = uuidv4(); // Generate a unique admin ID
     const randomKey = uuidv4(); // Generate a unique random key
-
-    const newAdmin = {
-      customerName: formData.customerName,
-      shopName: formData.shopName,
-      location: formData.location,
-      phoneNumber: formData.phoneNumber,
-      amount: formData.amount,
-      userName: formData.userName.trim(), // Treat as email
-      password: formData.password.trim(),
-      adminId,
-      randomKey, // Store the random key
-      status: 'Disable', // Default status
-    };
 
     try {
       // Create user in Firebase Authentication
       const auth = getAuth();
-      await createUserWithEmailAndPassword(auth, newAdmin.userName, newAdmin.password); // Email and password for authentication
+      const userCredential = await createUserWithEmailAndPassword(auth, formData.userName, formData.password); // Email and password for authentication
+      const user = userCredential.user;
+
+      const newAdmin = {
+        customerName: formData.customerName,
+        shopName: formData.shopName,
+        location: formData.location,
+        phoneNumber: formData.phoneNumber,
+        amount: formData.amount,
+        userName: formData.userName.trim(),
+        adminId: user.uid, // Use Firebase UID as adminId
+        randomKey, // Store the random key
+        status: 'Disable', // Default status
+        validity: '', // Set Year-Month
+      };
 
       // Save admin data to Firebase Realtime Database
-      await set(ref(db, `admins/${adminId}`), newAdmin);
+      await set(ref(db, `admins/${user.uid}`), newAdmin);
       toast.success('Admin created successfully!');
       navigate('/superAdminIndex'); // Redirect to SuperAdminIndex after successful creation
     } catch (error) {

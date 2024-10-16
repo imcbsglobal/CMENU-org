@@ -8,7 +8,9 @@ const CategoryPage = () => {
   const { category } = useParams(); // Get the category ID from the URL parameters
   const [items, setItems] = useState([]); // State to hold items for the category
   const auth = getAuth();
-  const adminId = auth.currentUser ? auth.currentUser.uid : null; // Safely access uid
+  // const adminId = auth.currentUser ? auth.currentUser.uid : null; 
+  const adminId = localStorage.getItem('adminUid');
+
 
 
   useEffect(() => {

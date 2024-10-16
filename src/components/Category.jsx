@@ -38,6 +38,8 @@ const Category = () => {
     const [selectedItemToDelete, setSelectedItemToDelete] = useState(null); // Item to delete state 
     const [itemToDelete, setItemToDelete] = useState(null); // State to hold the item to delete
     const auth = getAuth();
+
+    console.log("auth.currentUser",auth)
     const adminId = auth.currentUser ? auth.currentUser.uid : null; // Safely access uid
     const [searchTerm, setSearchTerm] = useState(''); // State for search input
     const [searchTerm2, setSearchTerm2] = useState(''); // State for item search input
@@ -50,6 +52,7 @@ const Category = () => {
     useEffect(() => {
         // Listen for auth state changes
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+            console.log("Auth is",auth.currentUser)
             setUser(currentUser);
             // Set adminId only if user is authenticated
             const id = currentUser ? currentUser.uid : null;
@@ -62,7 +65,7 @@ const Category = () => {
 
     // Fetch categories and items when the component mounts
     useEffect(() => {
-        const categoryRef = dbRef(db, `admins/${adminId}/categories/`); // Fetch categories for the logged-in admin
+        const categoryRef = dbRef(db, `categories/`); // Fetch categories for the logged-in admin
         onValue(categoryRef, (snapshot) => {
             const data = snapshot.val();
             if (data) {
@@ -78,7 +81,7 @@ const Category = () => {
     
     useEffect(() => {
         if (selectedCategory) {
-            const itemsRef = dbRef(db, `admins/${adminId}/categories/${selectedCategory}/items`);
+            const itemsRef = dbRef(db, `categories/${selectedCategory}/items`);
             onValue(itemsRef, (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
@@ -149,7 +152,7 @@ const Category = () => {
             if (categoryImage) {
                 // If an image is selected, upload it and then create the category
                 const storage = getStorage();
-                const imageRef = storageRef(storage, `admins/${adminId}/categories/${categoryImage.name}`);
+                const imageRef = storageRef(storage, `categories/${categoryImage.name}`);
                 uploadBytes(imageRef, categoryImage).then((snapshot) => {
                     getDownloadURL(snapshot.ref).then((downloadURL) => {
                         createCategoryInDatabase(downloadURL);
@@ -165,7 +168,7 @@ const Category = () => {
     };
 
     const createCategoryInDatabase = (imageUrl) => {
-        const newCategoryRef = push(dbRef(db, `admins/${adminId}/categories/`));
+        const newCategoryRef = push(dbRef(db, `categories/`));
         set(newCategoryRef, {
             name: categoryName,
             adminId: adminId,
@@ -186,7 +189,7 @@ const Category = () => {
             if (itemImage) {
                 // If an image is selected, upload it and then create the item
                 const storage = getStorage();
-                const imageRef = storageRef(storage, `admins/${adminId}/categories/${selectedCategory}/items/${itemImage.name}`);
+                const imageRef = storageRef(storage, `categories/${selectedCategory}/items/${itemImage.name}`);
                 uploadBytes(imageRef, itemImage).then((snapshot) => {
                     getDownloadURL(snapshot.ref).then((downloadURL) => {
                         createItemInDatabase(downloadURL);
@@ -203,7 +206,7 @@ const Category = () => {
 
 
     const createItemInDatabase = (imageUrl) => {
-        const newItemRef = push(dbRef(db, `admins/${adminId}/categories/${selectedCategory}/items`));
+        const newItemRef = push(dbRef(db, `categories/${selectedCategory}/items`));
         set(newItemRef, {
             name: itemName,
             price: itemPrice,
@@ -224,7 +227,7 @@ const Category = () => {
         setActiveCategoryId(categoryId);
     
         // Fetch the items for the selected category under the logged-in admin's folder
-        const itemsRef = dbRef(db, `admins/${adminId}/categories/${categoryId}/items`);
+        const itemsRef = dbRef(db, `categories/${categoryId}/items`);
         onValue(itemsRef, (snapshot) => {
             const data = snapshot.val();
             if (data) {
@@ -243,7 +246,7 @@ const Category = () => {
 
     // Delete category under admin's folder
     const deleteCategory = (categoryId) => {
-        remove(ref(db, `admins/${adminId}/categories/${categoryId}`))
+        remove(ref(db, `categories/${categoryId}`))
             .then(() => {
                 console.log('Category deleted successfully');
                 setSelectedCategory('');
@@ -273,7 +276,7 @@ const Category = () => {
     };
 
     const handleUpdateItem = (name, price, image) => {
-        const itemRef = dbRef(db, `admins/${adminId}/categories/${selectedCategory}/items/${selectedItem.id}`);
+        const itemRef = dbRef(db, `categories/${selectedCategory}/items/${selectedItem.id}`);
         
         // Fetch the existing item data first
         onValue(itemRef, (snapshot) => {
@@ -288,7 +291,7 @@ const Category = () => {
         
             if (image) {
                 const storage = getStorage();
-                const imageRef = storageRef(storage, `admins/${adminId}/categories/${selectedCategory}/items/${image.name}`);
+                const imageRef = storageRef(storage, `categories/${selectedCategory}/items/${image.name}`);
                 uploadBytes(imageRef, image).then((snapshot) => {
                     getDownloadURL(snapshot.ref).then((downloadURL) => {
                         updatedItemData.imageUrl = downloadURL; // Set new image URL
@@ -322,7 +325,7 @@ const Category = () => {
     
             try {
                 // Call the database remove function
-                await remove(ref(db, `admins/${adminId}/categories/${categoryId}/items/${itemId}`));
+                await remove(ref(db, `categories/${categoryId}/items/${itemId}`));
                 toast.success('Item deleted successfully!');
                 setItems((prevItems) => prevItems.filter(item => item.id !== itemId)); // Update local state
             } catch (error) {
@@ -344,7 +347,7 @@ const Category = () => {
 
     // Filter categories based on search input
     const filteredCategories = categories.filter((category) =>
-        category.name.toLowerCase().includes(searchTerm.toLowerCase())
+        category?.name?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     // Handle search input change for filtering items
@@ -360,7 +363,7 @@ const Category = () => {
     
 // Add the handler function for toggling item visibility
 const handleToggleItemVisibility = (itemId, isHidden) => {
-    const updatedRef = ref(db, `admins/${adminId}/categories/${selectedCategory}/items/${itemId}`);
+    const updatedRef = ref(db, `categories/${selectedCategory}/items/${itemId}`);
     
     // Update the hidden status in Firebase
     update(updatedRef, {
