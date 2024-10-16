@@ -9,9 +9,9 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import allItemsImage from "../assets/all.jpg"
 import { FaPhoneAlt } from "react-icons/fa";
-import { FaInstagram } from "react-icons/fa";
-import { SlSocialFacebook } from "react-icons/sl";
-import { FaWhatsapp } from "react-icons/fa";
+import { AiFillInstagram } from "react-icons/ai";
+import { FaFacebook } from "react-icons/fa";
+import { IoLogoWhatsapp } from "react-icons/io";
 import { FcGoogle } from "react-icons/fc";
 import {useNavigate} from "react-router-dom"
 
@@ -190,12 +190,12 @@ const CustomerView = () => {
                     {logoUrl && (
                         <img src={logoUrl} alt="Logo" className="w-[100px] h-[80px] object-contain" />
                     )}
-                    {/* <div className='flex justify-center items-center gap-5'>
-                        <div><FaInstagram/></div>
-                        <div><SlSocialFacebook/></div>
-                        <div><FaWhatsapp/></div>
-                        <div><FcGoogle/></div>
-                    </div> */}
+                    <div className='flex justify-center items-center gap-2'>
+                        <div className='text-[#d62976] cursor-pointer'><AiFillInstagram/></div>
+                        <div className='text-[#4267B2] cursor-pointer'><FaFacebook/></div>
+                        <div className='text-[#25D366] cursor-pointer'><IoLogoWhatsapp/></div>
+                        <div className='cursor-pointer'><FcGoogle/></div>
+                    </div>
                 </div>
             </header>
 

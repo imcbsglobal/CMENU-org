@@ -26,14 +26,14 @@ const EditPopUp1 = ({ setCategoryEditPopUp, category }) => {
         if (newCategoryImage) {
             // If a new image is selected, upload the new image
             const storage = getStorage();
-            const imageRef = storageRef(storage, `admins/${category.adminId}/categories/${newCategoryImage.name}`);
+            const imageRef = storageRef(storage, `categories/${newCategoryImage.name}`);
             const snapshot = await uploadBytes(imageRef, newCategoryImage);
             const downloadURL = await getDownloadURL(snapshot.ref);
             updatedCategoryData.imageUrl = downloadURL; // Update with the new image URL
         }
 
         // Update category in Firebase
-        set(ref(db, `admins/${category.adminId}/categories/${category.id}`), {
+        set(ref(db, `categories/${category.id}`), {
             ...category, // Keep the other data like adminId and randomKey
             ...updatedCategoryData, // Update name and imageUrl if changed
         }).then(() => {
