@@ -43,6 +43,13 @@ const AddAdmin = () => {
 
     const randomKey = uuidv4(); // Generate a unique random key
 
+    // Calculate validity period
+    const startDate = new Date();
+    const endDate = new Date(startDate.getFullYear() + 1, startDate.getMonth(), startDate.getDate());
+    const validityStart = startDate.toLocaleDateString('en-US', { month: '2-digit', year: 'numeric' });
+    const validityEnd = endDate.toLocaleDateString('en-US', { month: '2-digit', year: 'numeric' });
+    const validity = `${validityStart} - ${validityEnd}`;
+
     try {
       // Create user in Firebase Authentication
       const auth = getAuth();
@@ -59,7 +66,7 @@ const AddAdmin = () => {
         adminId: user.uid, // Use Firebase UID as adminId
         randomKey, // Store the random key
         status: 'Disable', // Default status
-        validity: '', // Set Year-Month
+        validity: validity, // Set Year-Month
       };
 
       // Save admin data to Firebase Realtime Database

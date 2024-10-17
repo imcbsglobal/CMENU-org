@@ -69,7 +69,7 @@ const Category = () => {
         onValue(categoryRef, (snapshot) => {
             const data = snapshot.val();
             if (data) {
-                const categoryList = Object.keys(data).map((key) => ({
+                const categoryList = Object.keys(data).filter((key)=>data[key].adminId===adminId).map((key) => ({
                     id: key,
                     ...data[key],
                     items: data[key].items || [], // Ensure items are part of the category data

@@ -37,10 +37,7 @@ const EditItemPopUP = ({ setItemEditPopUp, itemData, handleUpdateItem }) => {
         toast.error("Error updating item: " + error.message);
       });
   };
-
-
-
-
+  
   return (
     <div className='fixed bottom-0 top-0 left-0 right-0 bg-[#006aff79] z-50 BgBlur flex justify-center items-center'>
       <motion.div
