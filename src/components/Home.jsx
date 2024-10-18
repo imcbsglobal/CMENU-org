@@ -84,7 +84,7 @@ const Home = () => {
           <div className=' absolute top-5 right-5 text-2xl' >
             <IoClose onClick={handleOpenAdminPanel} className='cursor-pointer'/>
           </div>
-          <div className='text-center mb-20 text-xl font-bold flex justify-center items-center gap-2 text-[#082114]'>Admin Panel <span className='text-xl text-[#6d8040]'><FaUser/></span></div>
+          <div className='text-center mb-20 text-xl font-bold flex justify-center items-center gap-2 text-[#082114] cursor-pointer'>Admin Panel <span className='text-xl text-[#6d8040]'><FaUser/></span></div>
           <ul className='flex flex-col justify-center items-start gap-6 font-semibold text-lg mb-20'>
             <li className='cursor-pointer' onClick={()=>{document.getElementById("uploadLogo").scrollIntoView({ behavior:"smooth" });setOPenAdminPanel(!openAdminPanel)}}>Upload Logo</li>
             <li className='cursor-pointer' onClick={()=>{document.getElementById("uploadBanner").scrollIntoView({ behavior:'smooth' }); setOPenAdminPanel(!openAdminPanel)}}>Upload Banner</li>
@@ -111,7 +111,7 @@ const Home = () => {
         {/* First Div (Side Navbar) */}
         <div className='md:w-[20%] md:h-screen hidden md:block'>
           <div className=' md:fixed flex-col gap-16 w-[20%] h-screen bg-[#fff] md:flex justify-center items-center'>
-            <div className='text-center font-bold text-[#fff] flex justify-center items-center px-8 py-3 rounded-3xl bg-[#082114] drop-shadow-md' onClick={()=>setOpenAdminProfile(!openAdminProfile)}>Admin Pannel
+            <div className='text-center font-bold text-[#fff] flex justify-center items-center px-8 py-3 rounded-3xl bg-[#082114] drop-shadow-md cursor-pointer' onClick={()=>setOpenAdminProfile(!openAdminProfile)}>Admin Pannel
               <span><FaUser/></span>
             </div>
             <ul className='flex flex-col justify-center gap-5 font-semibold text-lg w-full text-center'>

@@ -14,6 +14,8 @@ import { FaFacebook } from "react-icons/fa";
 import { IoLogoWhatsapp } from "react-icons/io";
 import { FcGoogle } from "react-icons/fc";
 import {useNavigate} from "react-router-dom"
+import { get } from "firebase/database";
+
 
 const CustomerView = () => {
     const { adminId } = useParams();
@@ -27,6 +29,7 @@ const CustomerView = () => {
     const [searchTerm2, setSearchTerm2] = useState('');
     const [allItems, setAllItems] = useState([]); // Store all items
     const [displayedItems, setDisplayedItems] = useState([]); // Items to display
+    const [socialLinks, setSocialLinks] = useState({});
     const navigate = useNavigate()
 
 
@@ -184,6 +187,26 @@ const CustomerView = () => {
         arrows: false
     };
 
+    useEffect(() => {
+        const loadSocialLinks = async () => {
+            const socialLinksRef = ref(db, `socialLinks/${adminId}`);
+            const snapshot = await get(socialLinksRef);
+            
+            if (snapshot.exists()) {
+                // Only store links that are not empty strings
+                const links = snapshot.val();
+                const filteredLinks = Object.fromEntries(
+                    Object.entries(links).filter(([_, value]) => value && value.trim() !== '')
+                );
+                setSocialLinks(filteredLinks);
+            }
+        };
+    
+        if (adminId) {
+            loadSocialLinks();
+        }
+    }, [adminId]);
+
     return (
         <div className=''>
             {/* Logo Section */}
@@ -193,18 +216,26 @@ const CustomerView = () => {
                         <img src={logoUrl} alt="Logo" className="w-[100px] h-[80px] object-contain" />
                     )}
                     <div className='flex justify-center items-center gap-2'>
-                        <a href="https://www.instagram.com/imcbusinesssolution/">
-                            <div className='text-[#d62976] cursor-pointer'><AiFillInstagram/></div>
-                        </a>
-                        <a href="https://www.facebook.com/profile.php?id=100069040622427">
-                            <div className='text-[#4267B2] cursor-pointer'><FaFacebook/></div>
-                        </a>
-                        <a href="https://wa.me/917593820005">
-                            <div className='text-[#25D366] cursor-pointer'><IoLogoWhatsapp/></div>
-                        </a>
-                        <a href="https://g.page/r/CfP34a8t_eLlEAI/review">
-                            <div className='cursor-pointer'><FcGoogle/></div>
-                        </a>
+                        {socialLinks.instagram && (
+                            <a href={socialLinks.instagram} target="_blank" rel="noopener noreferrer">
+                                <div className='text-[#d62976] cursor-pointer'><AiFillInstagram/></div>
+                            </a>
+                        )}
+                        {socialLinks.facebook && (
+                            <a href={socialLinks.facebook} target="_blank" rel="noopener noreferrer">
+                                <div className='text-[#4267B2] cursor-pointer'><FaFacebook/></div>
+                            </a>
+                        )}
+                        {socialLinks.whatsapp && (
+                            <a href={socialLinks.whatsapp} target="_blank" rel="noopener noreferrer">
+                                <div className='text-[#25D366] cursor-pointer'><IoLogoWhatsapp/></div>
+                            </a>
+                        )}
+                        {socialLinks.google && (
+                            <a href={socialLinks.google} target="_blank" rel="noopener noreferrer">
+                                <div className='cursor-pointer'><FcGoogle/></div>
+                            </a>
+                        )}
                     </div>
                 </div>
             </header>
