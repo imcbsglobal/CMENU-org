@@ -15,6 +15,7 @@ import { toast } from 'react-hot-toast';
 import { FaUser } from "react-icons/fa";
 import { IoClose } from "react-icons/io5";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
+import AdminProfilePage from './AdminProfilePage';
 
 const Home = () => {
   // const { adminId } = useParams(); 
@@ -27,6 +28,7 @@ const Home = () => {
   const adminUrl = `http://52.66.196.77/${adminId}`; // The URL that includes the admin ID
   const qrRef = useRef(); // Create a ref to the QR code element
   const [openAdminPanel, setOPenAdminPanel] = useState(false)
+  const [openAdminProfile, setOpenAdminProfile] = useState(false)
 
   useEffect(() => {
     // Check for authentication state
@@ -109,7 +111,7 @@ const Home = () => {
         {/* First Div (Side Navbar) */}
         <div className='md:w-[20%] md:h-screen hidden md:block'>
           <div className=' md:fixed flex-col gap-16 w-[20%] h-screen bg-[#fff] md:flex justify-center items-center'>
-            <div className='text-center font-bold text-[#fff] flex justify-center items-center px-8 py-3 rounded-3xl bg-[#082114] drop-shadow-md'>Admin Pannel
+            <div className='text-center font-bold text-[#fff] flex justify-center items-center px-8 py-3 rounded-3xl bg-[#082114] drop-shadow-md' onClick={()=>setOpenAdminProfile(!openAdminProfile)}>Admin Pannel
               <span><FaUser/></span>
             </div>
             <ul className='flex flex-col justify-center gap-5 font-semibold text-lg w-full text-center'>
@@ -198,6 +200,14 @@ const Home = () => {
         </div>
       </div>
     </div>
+    {openAdminProfile && (
+      <div className=' fixed top-0 bottom-0 right-0 left-0 bg-[#000] SocialMediaBackground z-[999] GlassBackground flex justify-center items-center'>
+            <div className=' h-[370px] w-full px-2 rounded-3xl lg:w-[700px] bg-[#fff]'>
+              <AdminProfilePage setOpenAdminProfile={setOpenAdminProfile}/>
+            </div>
+      </div>
+    )}
+    
     </div>
   );
 }

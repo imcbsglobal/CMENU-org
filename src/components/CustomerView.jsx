@@ -92,7 +92,7 @@ const CustomerView = () => {
                     imageUrl: allItemsImage
                 };
                 
-                const categoryList = Object.keys(data).map((key) => ({
+                const categoryList = Object.keys(data).filter((key)=>data[key].adminId===adminId).map((key) => ({
                     id: key,
                     ...data[key],
                 }));
@@ -101,7 +101,9 @@ const CustomerView = () => {
 
                 // Collect all visible items across categories
                 let allItemsList = [];
-                Object.keys(data).forEach((categoryId) => {
+                Object.keys(data)
+                .filter((categoryId) => data[categoryId].adminId === adminId) // Filter by adminId
+                .forEach((categoryId) => {
                     console.log(`Data for category ${categoryId}:`, data[categoryId]);
                     // console.log("items is",categoryId)
                     if (data[categoryId].items) {

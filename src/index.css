@@ -74,3 +74,13 @@ tbody tr td{
   background-color: #ffffff;
   border: 1px solid #d6eda1;
 }
+.SocialMediaBackground{
+  backdrop-filter: blur(10px);
+  background-color: rgba(0, 0, 0, 0.777);
+}
+.inputBg{
+  background-color: #d6eda1;
+  border-radius: 10px;
+  border: none;
+  outline: none;
+}
