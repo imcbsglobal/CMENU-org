@@ -200,7 +200,7 @@ const CustomerView = () => {
                         <a href="https://wa.me/917593820005">
                             <div className='text-[#25D366] cursor-pointer'><IoLogoWhatsapp/></div>
                         </a>
-                        <a href="https://www.google.com/search?q=imc+business+solutions&oq=imc&gs_lcrp=EgZjaHJvbWUqDggCEEUYJxg7GIAEGIoFMgYIABBFGDwyBggBEEUYPDIOCAIQRRgnGDsYgAQYigUyCQgDEEUYORiABDIGCAQQRRg7MgYIBRBFGDwyBggGEEUYPDIGCAcQRRg80gEINDI4MGoxajeoAgCwAgA&sourceid=chrome&ie=UTF-8&lqi=ChZpbWMgYnVzaW5lc3Mgc29sdXRpb25zSMCL34HOsoCACFokEAAQARACGAAYARgCIhZpbWMgYnVzaW5lc3Mgc29sdXRpb25zkgEQc29mdHdhcmVfY29tcGFueaoBPhABMh4QASIaVe_Eom4p08vaVPiOQBQUPZMbSmbN_1JQqfEyGhACIhZpbWMgYnVzaW5lc3Mgc29sdXRpb25z#lkt=LocalPoiReviews&lrd=0x84f992636da1e2d:0xe5e2fd2dafe1f7f3,3,,,,&rlimm=16565080752088283123">
+                        <a href="https://g.page/r/CfP34a8t_eLlEAI/review">
                             <div className='cursor-pointer'><FcGoogle/></div>
                         </a>
                     </div>
