@@ -58,10 +58,10 @@ const Login = () => {
               navigate(`/admin/${adminId}`);
             }
           } else {
-            toast.error('Admin account not found');
+            // toast.error('Admin account not found');
           }
         } else {
-          toast.error('No admin data found');
+          // toast.error('No admin data found');
         }
       }
 

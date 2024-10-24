@@ -12,7 +12,7 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import CustomerView from "./components/CustomerView";
 import DisbaleStatus from "./components/DisbaleStatus";
 import CustomerDisable from "./components/CustomerDisable"
-
+import Intro from "./components/Intro";
 
 function App() {
   const [loader, setLoader] = useState(true);
@@ -53,6 +53,7 @@ function App() {
             <Route path="/disableStatus"  element={<DisbaleStatus />} />
             <Route path="/pageNotFound"  element={<CustomerDisable />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/" element={<Login />} />
             <Route path="/editAdmin/:adminId" element={<ProtectedRoute element={<EditAdmin />} />} />
             <Route path="/category/:category" element={<ProtectedRoute element={<CategoryPage />} />} />
           </Routes>

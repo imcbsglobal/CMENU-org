@@ -25,7 +25,7 @@ const Home = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false); // Authentication state
   const currentAdminId = localStorage.getItem('adminUid'); // Get currently logged-in admin ID
   const adminId = localStorage.getItem('adminUid'); 
-  const adminUrl = `http://52.66.196.77/${adminId}`; // The URL that includes the admin ID
+  const adminUrl = `http://cmenu.store/${adminId}`; // The URL that includes the admin ID
   const qrRef = useRef(); // Create a ref to the QR code element
   const [openAdminPanel, setOPenAdminPanel] = useState(false)
   const [openAdminProfile, setOpenAdminProfile] = useState(false)
