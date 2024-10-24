@@ -26,6 +26,8 @@ const Category = () => {
     const [itemDeletePopUp, setItemDeletePopUp] = useState(false);
     const [itemName, setItemName] = useState('');
     const [itemPrice, setItemPrice] = useState('');
+    const [itemPrice2, setItemPrice2] = useState('');
+    const [itemPrice3, setItemPrice3] = useState('');
     const [selectedCategory, setSelectedCategory] = useState(''); // To hold the selected category
     const [itemImage, setItemImage] = useState(null); 
     const [items, setItems] = useState([]); // To store items for the selected category
@@ -210,10 +212,14 @@ const Category = () => {
         set(newItemRef, {
             name: itemName,
             price: itemPrice,
+            price2 :itemPrice2,
+            price3 :itemPrice3,
             imageUrl: imageUrl,
         }).then(() => {
             setItemName('');
             setItemPrice('');
+            setItemPrice2('');
+            setItemPrice3('');
             setItemImage(null);
             toast.success("Item Added Successfully", {position: 'top-center'});
         }).catch(error => {
@@ -390,214 +396,325 @@ const handleToggleItemVisibility = (itemId, isHidden) => {
     // const openItemDeletePopUp = () => setItemDeletePopUp(!itemDeletePopUp);
 
     return (
-        <div className='px-6' id='addCategory'>
-            <div className='flex justify-between items-center mt-10 flex-col gap-5 overflow-hidden'>
-                {/* <div className='relative flex justify-center items-center'>
+      <div className="px-6" id="addCategory">
+        <div className="flex justify-between items-center mt-10 flex-col gap-5 overflow-hidden">
+          {/* <div className='relative flex justify-center items-center'>
                     <input type="text" className='outline-none border-none rounded-lg py-2 px-8' value={searchTerm} 
                     onChange={handleSearchChange}  placeholder='Search Categories..' />
                     <span className='absolute text-2xl right-2 text-[#80964c] drop-shadow-md flex items-center justify-center'><FiSearch /></span>
                 </div> */}
-                {user ? (
-                    <div className='text-2xl font-bold'>Add Categories</div>
-                ):(
-                    <div className='text-2xl font-bold'>Categories</div>
-                )}
-                
-                <div className='text-2xl font-bold'>Categories</div>
-                    
-                { user && (
-                    <div className='w-full mb-5'>
-                        <input
-                            type="text"
-                            placeholder='Category Name'
-                            value={categoryName}
-                            onChange={(e) => setCategoryName(e.target.value)}
-                            className='w-full px-8 mb-5 py-3 rounded-xl border-none outline-none'
-                        />
-                        <input type="file" onChange={handleFileInput} ref={inRef1} className='mb-5 hidden' />
-                        <div className='flex justify-center items-center gap-10'>
-                            <button className='px-8 py-2 rounded-xl bg-[#fff4] GlassBg font-bold text-[#80964c]' onClick={handleFileInputTrigger}>Select</button>
-                            <button onClick={addCategory} className='px-8 py-2 rounded-xl bg-[#fff4] GlassBg font-bold text-[#80964c]'>Upload</button>
-                        </div>
-                    </div>
-                )}
-                
+          {user ? (
+            <div className="text-2xl font-bold">Add Categories</div>
+          ) : (
+            <div className="text-2xl font-bold">Categories</div>
+          )}
 
-                {/* Categories Display */}
-                <div className='flex justify-start items-start'>
-                    <div className='relative flex justify-start items-center'>
-                        <input type="text" className='outline-none border-none rounded-lg py-2 px-8' value={searchTerm} 
-                        onChange={handleSearchChange}  placeholder='Search Categories..' />
-                        <span className='absolute text-2xl right-2 text-[#80964c] drop-shadow-md flex items-center justify-center'><FiSearch /></span>
-                    </div>
-                </div>
-                <div className="flex gap-10 overflow-x-auto whitespace-nowrap w-full HideScrollBar">
-                    {filteredCategories.length > 0 ? (
-                        filteredCategories.map((category) => (
-                            <div
-                                key={category.id}
-                                className={`flex flex-col justify-center items-center flex-shrink-0 cursor-pointer ${activeCategoryId === category.id ? 'active-category text-[#1eb5ad]' : ''}`}
-                                onClick={() => handleCategoryClick(category.id)}
-                            >
-                                <div className="w-[80px] h-[80px] bg-[#80964c] flex justify-center items-center rounded-lg overflow-hidden">
-                                    <img src={category.imageUrl} alt={category.name} className='object-cover w-full h-full' />
-                                </div>
-                                <div className='mt-2 font-bold text-[13px] lg:text-lg'>{category.name}</div>
-                                {user && (
-                                    <div className='flex items-center gap-2'>
-                                        <div className='cursor-pointer text-[#80964c]' onClick={() => handleCategoryEditClick(category)}>
-                                            <MdModeEdit />
-                                        </div>
-                                        <div className='cursor-pointer text-[#80964c]' onClick={(e) => { e.stopPropagation(); openCategoryDeletePopUp(category); }}>
-                                            <MdDelete />
-                                        </div>
-                                    </div>
-                                )}
-                                
-                            </div>
-                        ))
-                    ) : (
-                        <p>No categories found</p>
-                    )}
-                </div>
+          <div className="text-2xl font-bold">Categories</div>
 
-                    {/* Adding Items */}
-                    {user ? (
-                        <div className='text-2xl font-bold' id='addItems'>Add Items</div>
-
-                    ): (
-                        <div className='text-2xl font-bold' id='addItems'>Available Dishes</div>
-                    )}
-
-                    {user && (
-                        <div className='mb-2 flex flex-col gap-5 w-full'>
-                            <input
-                                type="text"
-                                placeholder='Item Name'
-                                value={itemName}
-                                onChange={(e) => setItemName(e.target.value)}
-                                className='py-3 px-8 outline-none border-none rounded-xl w-full'
-                            />
-                            <select
-                                value={selectedCategory}
-                                onChange={(e) => setSelectedCategory(e.target.value)}
-                                className='py-3 px-8 rounded-xl border-none outline-none text-sm'
-                            >
-                                <option value="" selected disabled>Select Category</option>
-                                {categories.map((category) => (
-                                    <option key={category.id} value={category.id}>{category.name}</option>
-                                ))}
-                            </select>
-                            <input
-                                type="number"
-                                placeholder='Item Price'
-                                value={itemPrice}
-                                onChange={(e) => setItemPrice(e.target.value)}
-                                className='px-8 py-3 rounded-xl border-none outline-none'
-                            />
-                            <div className='flex justify-center items-center gap-10 text-sm'>
-                                <input type="file" onChange={handleItemImage} ref={inRef2} className='hidden' />
-                                <button onClick={handleFileInputTrigger2} className='px-8 py-2 rounded-xl bg-[#fff4] GlassBg font-bold text-[#80964c]'>Select Item Image</button>
-                                <button onClick={addItem} className='px-8 py-2 rounded-xl bg-[#fff4] GlassBg font-bold text-[#80964c]'>Add Item</button>
-                            </div>
-                        </div>
-                    )}
-                
-
-                
-
-                <div className='relative flex justify-center items-center'>
-                    <input type="text" className='outline-none border-none rounded-lg py-2 px-8' value={searchTerm2} 
-                    onChange={handleSearchChange2} placeholder='Search items...' />
-                    <span className='absolute text-2xl right-2 text-[#80964c] drop-shadow-md flex items-center justify-center'><FiSearch /></span>
-                </div>
-
-                {/* Items Display */}
-                <div className='mt-5 w-full'>
-                    {filteredItems.length > 0 ? (
-                        filteredItems.map((item) => (
-                            <div key={item.id} className='flex justify-between items-center mb-5 GlassBackground px-2 h-[100px] rounded-2xl'>
-                                <div className='flex items-center gap-4'>
-                                    <img
-                                        src={item.imageUrl}
-                                        alt={item.name}
-                                        className='w-16 h-16 rounded-lg object-cover GlassBackground'
-                                    />
-                                    <div>
-                                        <div className='text-xl font-bold'>{item.name}</div>
-                                        <div className='text-lg flex items-center gap-1 font-bold'>
-                                            <TbCurrencyRupee />
-                                            {item.price}
-                                        </div>
-                                    </div>
-                                </div>
-                                {user && (
-                                    <div className='flex items-center gap-3'>
-                                        {hiddenItems[item.id] ? (
-                                            <button 
-                                                onClick={() => handleToggleItemVisibility(item.id, false)}
-                                                className='px-6 py-2 rounded-xl bg-[#fff] text-sm font-bold cursor-pointer text-[#80964c]'
-                                            >
-                                                Display
-                                            </button>
-                                        ) : (
-                                            <button 
-                                                onClick={() => handleToggleItemVisibility(item.id, true)}
-                                                className='px-6 py-2 rounded-xl bg-[#fff] text-sm font-bold cursor-pointer text-[#80964c]'
-                                            >
-                                                Hide
-                                            </button>
-                                        )}
-                                        <MdModeEdit
-                                            className='cursor-pointer text-xl text-[#80964c]'
-                                            onClick={() => openItemEditPopUp(item)}
-                                        />
-                                        <MdDelete
-                                            className='cursor-pointer text-xl text-red-500'
-                                            onClick={() => deleteItem(item)}
-                                        />
-                                    </div>
-                                )}
-                                
-                            </div>
-                        ))
-                    ) : (
-                        <div className=' text-center'>No items found for this category.</div>
-                    )}
-                </div>
-
+          {user && (
+            <div className="w-full mb-5">
+              <input
+                type="text"
+                placeholder="Category Name"
+                value={categoryName}
+                onChange={(e) => setCategoryName(e.target.value)}
+                className="w-full px-8 mb-5 py-3 rounded-xl border-none outline-none"
+              />
+              <input
+                type="file"
+                onChange={handleFileInput}
+                ref={inRef1}
+                className="mb-5 hidden"
+              />
+              <div className="flex justify-center items-center gap-10">
+                <button
+                  className="px-8 py-2 rounded-xl bg-[#fff4] GlassBg font-bold text-[#80964c]"
+                  onClick={handleFileInputTrigger}
+                >
+                  Select
+                </button>
+                <button
+                  onClick={addCategory}
+                  className="px-8 py-2 rounded-xl bg-[#fff4] GlassBg font-bold text-[#80964c]"
+                >
+                  Upload
+                </button>
+              </div>
             </div>
+          )}
 
-            {/* Category Popups Edit */}
-            {categoryEditPopUp && (
-                <EditPopUp1
-                    setCategoryEditPopUp={setCategoryEditPopUp}
-                    category={selectedCategoryForEdit} // Pass the selected category as props
-                />
+          {/* Categories Display */}
+          <div className="flex justify-start items-start">
+            <div className="relative flex justify-start items-center">
+              <input
+                type="text"
+                className="outline-none border-none rounded-lg py-2 px-8"
+                value={searchTerm}
+                onChange={handleSearchChange}
+                placeholder="Search Categories.."
+              />
+              <span className="absolute text-2xl right-2 text-[#80964c] drop-shadow-md flex items-center justify-center">
+                <FiSearch />
+              </span>
+            </div>
+          </div>
+          <div className="flex gap-10 overflow-x-auto whitespace-nowrap w-full HideScrollBar">
+            {filteredCategories.length > 0 ? (
+              filteredCategories.map((category) => (
+                <div
+                  key={category.id}
+                  className={`flex flex-col justify-center items-center flex-shrink-0 cursor-pointer ${
+                    activeCategoryId === category.id
+                      ? "active-category text-[#1eb5ad]"
+                      : ""
+                  }`}
+                  onClick={() => handleCategoryClick(category.id)}
+                >
+                  <div className="w-[80px] h-[80px] bg-[#80964c] flex justify-center items-center rounded-lg overflow-hidden">
+                    <img
+                      src={category.imageUrl}
+                      alt={category.name}
+                      className="object-cover w-full h-full"
+                    />
+                  </div>
+                  <div className="mt-2 font-bold text-[13px] lg:text-lg">
+                    {category.name}
+                  </div>
+                  {user && (
+                    <div className="flex items-center gap-2">
+                      <div
+                        className="cursor-pointer text-[#80964c]"
+                        onClick={() => handleCategoryEditClick(category)}
+                      >
+                        <MdModeEdit />
+                      </div>
+                      <div
+                        className="cursor-pointer text-[#80964c]"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openCategoryDeletePopUp(category);
+                        }}
+                      >
+                        <MdDelete />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))
+            ) : (
+              <p>No categories found</p>
             )}
-            {categoryDeletePopUp && (
-                <DeleteAlert 
-                    setCategoryDeletePopUp={setCategoryDeletePopUp} 
-                    category={categoryToDelete} 
-                    deleteCategory={deleteCategory} 
-                />
-            )}
-            {itemEditPopUp && selectedItem && (
-                <EditItemPopUP 
-                    setItemEditPopUp={setItemEditPopUp}
-                    itemData={selectedItem}
-                    handleUpdateItem={handleUpdateItem}
-                />
-            )}
-            {itemDeletePopUp && (
-                <DeleteItem 
-                    setItemDeletePopUp={setItemDeletePopUp} 
-                    itemToDelete={itemToDelete} 
-                    deleteItem={deleteItem} 
-                />
-            )}
+          </div>
 
+          {/* Adding Items */}
+          {user ? (
+            <div className="text-2xl font-bold" id="addItems">
+              Add Items
+            </div>
+          ) : (
+            <div className="text-2xl font-bold" id="addItems">
+              Available Dishes
+            </div>
+          )}
+
+          {user && (
+            <div className="mb-2 flex flex-col gap-5 w-full">
+              <input
+                type="text"
+                placeholder="Item Name"
+                value={itemName}
+                onChange={(e) => setItemName(e.target.value)}
+                className="py-3 px-8 outline-none border-none rounded-xl w-full"
+              />
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="py-3 px-8 rounded-xl border-none outline-none text-sm"
+              >
+                <option value="" selected disabled>
+                  Select Category
+                </option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+              <input
+                type="number"
+                placeholder="Normal Price"
+                value={itemPrice}
+                onChange={(e) => setItemPrice(e.target.value)}
+                className="px-8 py-3 rounded-xl border-none outline-none"
+              />
+              <input
+                type="number"
+                placeholder="A/C"
+                value={itemPrice2}
+                onChange={(e) => setItemPrice2(e.target.value)}
+                className="px-8 py-3 rounded-xl border-none outline-none"
+              />
+              <input
+                type="number"
+                placeholder="Parcel"
+                value={itemPrice3}
+                onChange={(e) => setItemPrice3(e.target.value)}
+                className="px-8 py-3 rounded-xl border-none outline-none"
+              />
+              <div className="flex justify-center items-center gap-10 text-sm">
+                <input
+                  type="file"
+                  onChange={handleItemImage}
+                  ref={inRef2}
+                  className="hidden"
+                />
+                <button
+                  onClick={handleFileInputTrigger2}
+                  className="px-8 py-2 rounded-xl bg-[#fff4] GlassBg font-bold text-[#80964c]"
+                >
+                  Select Item Image
+                </button>
+                <button
+                  onClick={addItem}
+                  className="px-8 py-2 rounded-xl bg-[#fff4] GlassBg font-bold text-[#80964c]"
+                >
+                  Add Item
+                </button>
+              </div>
+            </div>
+          )}
+
+          <div className="relative flex justify-center items-center">
+            <input
+              type="text"
+              className="outline-none border-none rounded-lg py-2 px-8"
+              value={searchTerm2}
+              onChange={handleSearchChange2}
+              placeholder="Search items..."
+            />
+            <span className="absolute text-2xl right-2 text-[#80964c] drop-shadow-md flex items-center justify-center">
+              <FiSearch />
+            </span>
+          </div>
+
+          {/* Items Display */}
+          <div className="mt-5 w-full">
+            {filteredItems.length > 0 ? (
+              filteredItems.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex justify-between items-center mb-5 GlassBackground px-2 h-[100px] rounded-2xl"
+                >
+                  <div className="flex items-center gap-4">
+                    <img
+                      src={item.imageUrl}
+                      alt={item.name}
+                      className="w-16 h-16 rounded-lg object-cover GlassBackground"
+                    />
+                    <div>
+                      <div className="text-xl font-bold">{item.name}</div>
+                      {/* Price */}
+                      <div className="flex gap-4">
+                        {item.price && (
+                          <div className=" flex flex-col justify-center items-center">
+                            <div className="text-sm font-semibold">Norm</div>
+                            <div className="text-sm flex items-center gap-1 font-bold ItemText">
+                              <TbCurrencyRupee />
+                              {item.price}
+                            </div>
+                          </div>
+                        )}
+                        {item.price2 && (
+                          <div className=" flex flex-col justify-center items-center">
+                            <div className="text-sm font-semibold">A/C</div>
+                            <div className="text-sm flex items-center gap-1 font-bold ItemText">
+                              <TbCurrencyRupee />
+                              {item.price2}
+                            </div>
+                          </div>
+                        )}
+                        {item.price3 && (
+                          <div className=" flex flex-col justify-center items-center">
+                            <div className="text-sm font-semibold">Parcel</div>
+                            <div className="text-sm flex items-center gap-1 font-bold ItemText">
+                              <TbCurrencyRupee />
+                              {item.price3}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  {user && (
+                    <div className="flex items-center gap-3">
+                      {hiddenItems[item.id] ? (
+                        <button
+                          onClick={() =>
+                            handleToggleItemVisibility(item.id, false)
+                          }
+                          className="px-6 py-2 rounded-xl bg-[#fff] text-sm font-bold cursor-pointer text-[#80964c]"
+                        >
+                          Display
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() =>
+                            handleToggleItemVisibility(item.id, true)
+                          }
+                          className="px-6 py-2 rounded-xl bg-[#fff] text-sm font-bold cursor-pointer text-[#80964c]"
+                        >
+                          Hide
+                        </button>
+                      )}
+                      <MdModeEdit
+                        className="cursor-pointer text-xl text-[#80964c]"
+                        onClick={() => openItemEditPopUp(item)}
+                      />
+                      <MdDelete
+                        className="cursor-pointer text-xl text-red-500"
+                        onClick={() => deleteItem(item)}
+                      />
+                    </div>
+                  )}
+                </div>
+              ))
+            ) : (
+              <div className=" text-center">
+                No items found for this category.
+              </div>
+            )}
+          </div>
         </div>
+
+        {/* Category Popups Edit */}
+        {categoryEditPopUp && (
+          <EditPopUp1
+            setCategoryEditPopUp={setCategoryEditPopUp}
+            category={selectedCategoryForEdit} // Pass the selected category as props
+          />
+        )}
+        {categoryDeletePopUp && (
+          <DeleteAlert
+            setCategoryDeletePopUp={setCategoryDeletePopUp}
+            category={categoryToDelete}
+            deleteCategory={deleteCategory}
+          />
+        )}
+        {itemEditPopUp && selectedItem && (
+          <EditItemPopUP
+            setItemEditPopUp={setItemEditPopUp}
+            itemData={selectedItem}
+            handleUpdateItem={handleUpdateItem}
+          />
+        )}
+        {itemDeletePopUp && (
+          <DeleteItem
+            setItemDeletePopUp={setItemDeletePopUp}
+            itemToDelete={itemToDelete}
+            deleteItem={deleteItem}
+          />
+        )}
+      </div>
     );
 };
 

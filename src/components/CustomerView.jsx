@@ -211,149 +211,229 @@ const CustomerView = () => {
     }, [adminId]);
 
     return (
-        <div>
-            {isLoading ? (
-                <Loader/>
-            ): (
-                <div>
-                <div className=''>
-                {/* Logo Section */}
-                <header className='flex justify-center fixed items-center w-full py-2 px-5 bg-[#fff] z-50 rounded-b mb-5'>
-                    <div className='flex items-center justify-between w-full'>
-                        {logoUrl && (
-                            <img src={logoUrl} alt="Logo" className="w-[100px] h-[80px] object-contain" />
-                        )}
-                        <div className='flex justify-center items-center gap-5 text-2xl'>
-                            {socialLinks.instagram && (
-                                <a href={socialLinks.instagram} target="_blank" rel="noopener noreferrer">
-                                    <div className='text-[#d62976] cursor-pointer'><AiFillInstagram/></div>
-                                </a>
-                            )}
-                            {socialLinks.facebook && (
-                                <a href={socialLinks.facebook} target="_blank" rel="noopener noreferrer">
-                                    <div className='text-[#4267B2] cursor-pointer'><FaFacebook/></div>
-                                </a>
-                            )}
-                            {socialLinks.whatsapp && (
-                                <a href={socialLinks.whatsapp} target="_blank" rel="noopener noreferrer">
-                                    <div className='text-[#25D366] cursor-pointer'><IoLogoWhatsapp/></div>
-                                </a>
-                            )}
-                            {socialLinks.google && (
-                                <a href={socialLinks.google} target="_blank" rel="noopener noreferrer">
-                                    <div className='cursor-pointer'><FcGoogle/></div>
-                                </a>
-                            )}
+      <div>
+        {isLoading ? (
+          <Loader />
+        ) : (
+          <div>
+            <div className="">
+              {/* Logo Section */}
+              <header className="flex justify-center fixed items-center w-full py-2 px-5 bg-[#fff] z-50 rounded-b mb-5">
+                <div className="flex items-center justify-between w-full">
+                  {logoUrl && (
+                    <img
+                      src={logoUrl}
+                      alt="Logo"
+                      className="w-[100px] h-[80px] object-contain"
+                    />
+                  )}
+                  <div className="flex justify-center items-center gap-5 text-2xl">
+                    {socialLinks.instagram && (
+                      <a
+                        href={socialLinks.instagram}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <div className="text-[#d62976] cursor-pointer">
+                          <AiFillInstagram />
                         </div>
-                    </div>
-                </header>
-
-                {/* Banner Section */}
-                <div className='pt-28 mb-10'>
-                    {banners.length > 0 ? (
-                        <Slider {...settings} className="mx-auto">
-                            {banners.map((banner, index) => (
-                                <div
-                                    key={index}
-                                    className="w-full relative h-[150px] px-2 rounded-3xl shadow-[0_3px_10px_rgb(0,0,0,0.2)] lg:h-[400px]"
-                                >
-                                    <img
-                                        src={banner.url}
-                                        className="w-full h-full rounded-3xl object-cover"
-                                        alt={`offer-poster-${index + 1}`}
-                                    />
-                                </div>
-                            ))}
-                        </Slider>
-                    ) : (
-                        <div className="grid place-items-center text-center">No banners available</div>
+                      </a>
                     )}
-                </div>
-
-                {/* Categories Section */}
-                <div className='flex justify-start items-start mb-5 px-2'>
-                    <div className='relative flex justify-start items-center'>
-                        <input 
-                            type="text" 
-                            className='outline-none border-none rounded-lg py-2 px-8'
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            placeholder='Search Categories..'
-                        />
-                        <span className='absolute text-2xl right-2 text-[#80964c] drop-shadow-md flex items-center justify-center'>
-                            <FiSearch />
-                        </span>
-                    </div>
-                </div>
-
-                <div className="flex gap-10 overflow-x-auto whitespace-nowrap w-full HideScrollBar mb-10 px-2">
-                    {filteredCategories.map((category) => (
-                        <div
-                            key={category.id}
-                            className={`flex flex-col justify-center items-center flex-shrink-0 cursor-pointer 
-                                ${activeCategoryId === category.id ? 'active-category text-[#1eb5ad]' : ''}`}
-                            onClick={() => handleCategoryClick(category.id)}
-                        >
-                            <div className="w-[80px] h-[80px] bg-[#80964c] flex justify-center items-center rounded-lg overflow-hidden">
-                                <img src={category.imageUrl} alt={category.name} className='object-cover w-full h-full' />
-                            </div>
-                            <div className='mt-2 font-bold text-[11px] lg:text-lg ItemText'>{category.name}</div>
+                    {socialLinks.facebook && (
+                      <a
+                        href={socialLinks.facebook}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <div className="text-[#4267B2] cursor-pointer">
+                          <FaFacebook />
                         </div>
+                      </a>
+                    )}
+                    {socialLinks.whatsapp && (
+                      <a
+                        href={socialLinks.whatsapp}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <div className="text-[#25D366] cursor-pointer">
+                          <IoLogoWhatsapp />
+                        </div>
+                      </a>
+                    )}
+                    {socialLinks.google && (
+                      <a
+                        href={socialLinks.google}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <div className="cursor-pointer">
+                          <FcGoogle />
+                        </div>
+                      </a>
+                    )}
+                  </div>
+                </div>
+              </header>
+
+              {/* Banner Section */}
+              <div className="pt-28 mb-10">
+                {banners.length > 0 ? (
+                  <Slider {...settings} className="mx-auto">
+                    {banners.map((banner, index) => (
+                      <div
+                        key={index}
+                        className="w-full relative h-[150px] px-2 rounded-3xl shadow-[0_3px_10px_rgb(0,0,0,0.2)] lg:h-[400px]"
+                      >
+                        <img
+                          src={banner.url}
+                          className="w-full h-full rounded-3xl object-cover"
+                          alt={`offer-poster-${index + 1}`}
+                        />
+                      </div>
                     ))}
-                </div>
+                  </Slider>
+                ) : (
+                  <div className="grid place-items-center text-center">
+                    No banners available
+                  </div>
+                )}
+              </div>
 
-                {/* Items Section */}
-                <div className='flex justify-start items-start mb-5 px-2'>
-                    <div className='relative flex justify-start items-center'>
-                        <input 
-                            type="text" 
-                            className='outline-none border-none rounded-lg py-2 px-8'
-                            value={searchTerm2}
-                            onChange={(e) => setSearchTerm2(e.target.value)}
-                            placeholder='Search items...'
+              {/* Categories Section */}
+              <div className="flex justify-start items-start mb-5 px-2">
+                <div className="relative flex justify-start items-center">
+                  <input
+                    type="text"
+                    className="outline-none border-none rounded-lg py-2 px-8"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder="Search Categories.."
+                  />
+                  <span className="absolute text-2xl right-2 text-[#80964c] drop-shadow-md flex items-center justify-center">
+                    <FiSearch />
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex gap-10 overflow-x-auto whitespace-nowrap w-full HideScrollBar mb-10 px-2">
+                {filteredCategories.map((category) => (
+                  <div
+                    key={category.id}
+                    className={`flex flex-col justify-center items-center flex-shrink-0 cursor-pointer 
+                                ${
+                                  activeCategoryId === category.id
+                                    ? "active-category text-[#1eb5ad]"
+                                    : ""
+                                }`}
+                    onClick={() => handleCategoryClick(category.id)}
+                  >
+                    <div className="w-[80px] h-[80px] bg-[#80964c] flex justify-center items-center rounded-lg overflow-hidden">
+                      <img
+                        src={category.imageUrl}
+                        alt={category.name}
+                        className="object-cover w-full h-full"
+                      />
+                    </div>
+                    <div className="mt-2 font-bold text-[11px] lg:text-lg ItemText">
+                      {category.name}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Items Section */}
+              <div className="flex justify-start items-start mb-5 px-2">
+                <div className="relative flex justify-start items-center">
+                  <input
+                    type="text"
+                    className="outline-none border-none rounded-lg py-2 px-8"
+                    value={searchTerm2}
+                    onChange={(e) => setSearchTerm2(e.target.value)}
+                    placeholder="Search items..."
+                  />
+                  <span className="absolute text-2xl right-2 text-[#80964c] drop-shadow-md flex items-center justify-center">
+                    <FiSearch />
+                  </span>
+                </div>
+              </div>
+
+              <div className="mt-5 w-full px-2 mb-20">
+                {displayedItems.length > 0 ? (
+                  displayedItems.map((item) => (
+                    <div
+                      key={item.id}
+                      className="flex justify-between items-center mb-5 GlassBackground px-2 h-[80px] rounded-2xl"
+                    >
+                      <div className="flex items-center gap-4">
+                        <img
+                          src={item.imageUrl}
+                          alt={item.name}
+                          className="w-16 h-16 rounded-lg object-cover GlassBackground"
                         />
-                        <span className='absolute text-2xl right-2 text-[#80964c] drop-shadow-md flex items-center justify-center'>
-                            <FiSearch />
-                        </span>
-                    </div>
-                </div>
-
-                <div className='mt-5 w-full px-2 mb-20'>
-                    {displayedItems.length > 0 ? (
-                        displayedItems.map((item) => (
-                            <div key={item.id} className='flex justify-between items-center mb-5 GlassBackground px-2 h-[80px] rounded-2xl'>
-                                <div className='flex items-center gap-4'>
-                                    <img
-                                        src={item.imageUrl}
-                                        alt={item.name}
-                                        className='w-16 h-16 rounded-lg object-cover GlassBackground'
-                                    />
-                                    <div>
-                                        <div className='text-md font-bold ItemText'>{item.name}</div>
-                                        <div className='text-md flex items-center gap-1 font-bold ItemText'>
-                                            <TbCurrencyRupee />
-                                            {item.price}
-                                        </div>
-                                    </div>
+                        <div>
+                          <div className="text-md font-bold ItemText">
+                            {item.name}
+                          </div>
+                          {/* Price */}
+                          <div className="flex gap-4">
+                            {item.price && (
+                              <div className=" flex flex-col justify-center items-center">
+                                <div className="text-sm font-semibold">
+                                  Norm
                                 </div>
-                            </div>
-                        ))
-                    ) : (
-                        <div className='text-center'>No items found.</div>
-                    )}
-                </div>
-                {/* Footer */}
-                <div className='bg-[#fff] w-full py-2 px-2 flex flex-col justify-center items-center fixed bottom-0'>
-                    <div className='text-center flex flex-col justify-center items-center text-[10px] text-[#383636] ItemText'>Design and Developed by <span className='block text-sm font-semibold text-[#80964c]'>IMC Business Solutions</span>
-                    <span className=' flex justify-center items-center gap-2 font-bold text-[#383636]'><FaPhoneAlt className='text-[#80964c]'/>+91 7593820007</span>
+                                <div className="text-sm flex items-center gap-1 font-bold ItemText">
+                                  <TbCurrencyRupee />
+                                  {item.price}
+                                </div>
+                              </div>
+                            )}
+                            {item.price2 && (
+                              <div className=" flex flex-col justify-center items-center">
+                                <div className="text-sm font-semibold">A/C</div>
+                                <div className="text-sm flex items-center gap-1 font-bold ItemText">
+                                  <TbCurrencyRupee />
+                                  {item.price2}
+                                </div>
+                              </div>
+                            )}
+                            {item.price3 && (
+                              <div className=" flex flex-col justify-center items-center">
+                                <div className="text-sm font-semibold">
+                                  Parc
+                                </div>
+                                <div className="text-sm flex items-center gap-1 font-bold ItemText">
+                                  <TbCurrencyRupee />
+                                  {item.price3}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
                     </div>
+                  ))
+                ) : (
+                  <div className="text-center">No items found.</div>
+                )}
+              </div>
+              {/* Footer */}
+              <div className="bg-[#fff] w-full py-2 px-2 flex flex-col justify-center items-center fixed bottom-0">
+                <div className="text-center flex flex-col justify-center items-center text-[10px] text-[#383636] ItemText">
+                  Design and Developed by{" "}
+                  <span className="block text-sm font-semibold text-[#80964c]">
+                    IMC Business Solutions
+                  </span>
+                  <span className=" flex justify-center items-center gap-2 font-bold text-[#383636]">
+                    <FaPhoneAlt className="text-[#80964c]" />
+                    +91 7593820007
+                  </span>
                 </div>
+              </div>
             </div>
-            </div>
-            )}
-            
-
-        </div>
+          </div>
+        )}
+      </div>
     );
 };
 
