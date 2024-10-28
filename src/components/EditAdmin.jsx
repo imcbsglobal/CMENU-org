@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { ref, update, get } from "firebase/database";
-import { db, auth } from './Firebase';
+import { db } from './Firebase';
 import { toast } from 'react-hot-toast';
 import { useNavigate, useParams } from "react-router-dom";
 import { 
-    updateEmail, 
+    getAuth,
+    updateEmail,
+    signInWithEmailAndPassword,
     fetchSignInMethodsForEmail
 } from "firebase/auth";
 import ChangePassword from './ChangePassword';
@@ -21,8 +23,12 @@ const EditAdmin = () => {
     });
     const [openPasswordChange, setOpenPasswordChange] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [currentPassword, setCurrentPassword] = useState('');
+    const [showPasswordPrompt, setShowPasswordPrompt] = useState(false);
+    const [originalEmail, setOriginalEmail] = useState('');
 
     const navigate = useNavigate();
+    const auth = getAuth();
 
     useEffect(() => {
         const fetchAdminData = async () => {
@@ -36,11 +42,11 @@ const EditAdmin = () => {
                         ...prevState,
                         ...adminData,
                     }));
+                    setOriginalEmail(adminData.userName);
                     
-                    // Verify if email exists in authentication
                     const signInMethods = await fetchSignInMethodsForEmail(auth, adminData.userName);
                     if (signInMethods.length === 0) {
-                        // toast.error("Admin email not found in authentication");
+                        toast.error("Admin email not found in authentication");
                     }
                 } else {
                     toast.error("Admin not found");
@@ -48,30 +54,90 @@ const EditAdmin = () => {
                 }
             } catch (error) {
                 console.error("Error fetching admin data:", error);
-                // toast.error("Error loading admin data");
+                toast.error("Error loading admin data");
             }
         };
 
         fetchAdminData();
-    }, [adminId, navigate]);
+    }, [adminId, navigate, auth]);
 
     const handleChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value
-        });
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+
+        if (name === 'userName' && value !== originalEmail) {
+            setShowPasswordPrompt(true);
+        }
+    };
+
+    const handleEmailUpdate = async () => {
+        if (!currentPassword) {
+            toast.error("Please enter the current password");
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            // First sign in with the original email and password
+            const userCredential = await signInWithEmailAndPassword(
+                auth,
+                originalEmail,
+                currentPassword
+            );
+
+            // Now we can update the email
+            await updateEmail(userCredential.user, formData.userName);
+
+            // Update in database
+            const updates = {
+                ...formData
+            };
+            await update(ref(db, `admins/${adminId}`), updates);
+
+            // Clear password and hide prompt
+            setCurrentPassword('');
+            setShowPasswordPrompt(false);
+            setOriginalEmail(formData.userName);
+            
+            toast.success("Email updated successfully! Please log in with your new email.");
+            
+            // Sign out the user to force them to sign in with new email
+            await auth.signOut();
+            navigate('/login');
+            
+        } catch (error) {
+            console.error("Error updating email:", error);
+            if (error.code === 'auth/wrong-password') {
+                toast.error("Current password is incorrect");
+            } else if (error.code === 'auth/email-already-in-use') {
+                toast.error("Email is already in use by another account");
+            } else if (error.code === 'auth/invalid-login-credentials') {
+                toast.error("Invalid login credentials");
+            } else {
+                toast.error(`Error updating email: ${error.message}`);
+            }
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setIsLoading(true);
         
         try {
-            // Update in database
+            if (formData.userName !== originalEmail) {
+                await handleEmailUpdate();
+                return;
+            }
+
+            // If email hasn't changed, just update other fields
+            setIsLoading(true);
             const updates = {
                 ...formData,
             };
-
             await update(ref(db, `admins/${adminId}`), updates);
             
             toast.success("Admin updated successfully!");
@@ -100,13 +166,27 @@ const EditAdmin = () => {
                     <input type="text" name="location" placeholder='Location' value={formData.location} onChange={handleChange} className='w-full py-3 pl-3 outline-none border-none rounded-xl' />
                     <input type="number" name="phoneNumber" placeholder='Phone Number' value={formData.phoneNumber} onChange={handleChange} className='w-full py-3 pl-3 outline-none border-none rounded-xl' />
                     <input type="number" name="amount" placeholder='Amount / Price' value={formData.amount} onChange={handleChange} className='w-full py-3 pl-3 outline-none border-none rounded-xl' />
-                    <input type="email" name="userName" placeholder='User Email' value={formData.userName} onChange={handleChange} className='w-full py-3 pl-3 outline-none border-none rounded-xl' readOnly />
+                    <input type="email" name="userName" placeholder='User Email' value={formData.userName} onChange={handleChange} className='w-full py-3 pl-3 outline-none border-none rounded-xl' />
+                    
+                    {showPasswordPrompt && (
+                        <div className='w-full'>
+                            <input 
+                                type="password" 
+                                placeholder="Enter current password to update email"
+                                value={currentPassword}
+                                onChange={(e) => setCurrentPassword(e.target.value)}
+                                className='w-full py-3 pl-3 outline-none border-none rounded-xl'
+                            />
+                        </div>
+                    )}
                     
                     <div>
-                    <button
-                        type="button"
-                        onClick={handleOpenPasswordChange}
-                        className='px-8 py-2 rounded-2xl text-[#fff] bg-[#ff1f1f] font-semibold'>Change Password</button>
+                        <button
+                            type="button"
+                            onClick={handleOpenPasswordChange}
+                            className='px-8 py-2 rounded-2xl text-[#fff] bg-[#ff1f1f] font-semibold'>
+                            Change Password
+                        </button>
                     </div>
 
                     <div className='flex justify-center gap-10 items-center'>

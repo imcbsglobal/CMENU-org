@@ -541,21 +541,21 @@ const handleToggleItemVisibility = (itemId, isHidden) => {
                 ))}
               </select>
               <input
-                type="number"
+                type="text"
                 placeholder="Normal Price"
                 value={itemPrice}
                 onChange={(e) => setItemPrice(e.target.value)}
                 className="px-8 py-3 rounded-xl border-none outline-none"
               />
               <input
-                type="number"
+                type="text"
                 placeholder="A/C"
                 value={itemPrice2}
                 onChange={(e) => setItemPrice2(e.target.value)}
                 className="px-8 py-3 rounded-xl border-none outline-none"
               />
               <input
-                type="number"
+                type="text"
                 placeholder="Parcel"
                 value={itemPrice3}
                 onChange={(e) => setItemPrice3(e.target.value)}
