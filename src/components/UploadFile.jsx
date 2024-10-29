@@ -32,10 +32,10 @@ const UploadFile = ({ user }) => {
       const fileData = e.target.files[0];
       // Check if file size exceeds 50KB
       const fileSizeInKB = fileData.size / 1024; // Convert size from bytes to KB
-      if (fileSizeInKB > 50) {
+      if (fileSizeInKB > 1000) {
         // Show an error or pop-up message here
         // alert('File size exceeds the 50KB limit. Please select a smaller file.');
-        toast.error("File size exceeds the 50KB limit. Please select a smaller file.")
+        toast.error("File size exceeds the 1MB limit. Please select a smaller file.")
         setIsError(true); // Set error state to true
         return; // Exit the function, do not set the file
       }

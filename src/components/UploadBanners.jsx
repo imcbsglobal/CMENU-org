@@ -34,10 +34,10 @@ const UploadBanners = ({ storagePath, dbPath }) => {
     if (e.target.files && e.target.files[0]) {
       let fileData = e.target.files[0];
       const fileSizeInKB = fileData.size / 1024; // Convert size from bytes to KB
-      if (fileSizeInKB > 50) {
+      if (fileSizeInKB > 500) {
         // Show an error or pop-up message here
         // alert('File size exceeds the 50KB limit. Please select a smaller file.');
-        toast.error("File size must be under 50KB!",{position:'top-center'})
+        toast.error("File size must be under 500KB!",{position:'top-center'})
         setIsError(true); // Set error state to true
         return; // Exit the function, do not set the file
       }
