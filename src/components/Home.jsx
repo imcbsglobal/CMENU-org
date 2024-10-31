@@ -244,9 +244,9 @@ const Home = () => {
             <div className='text-center font-bold text-[#fff] flex justify-center items-center px-8 py-3 rounded-3xl bg-[#082114] drop-shadow-md cursor-pointer' onClick={()=>setOpenAdminProfile(!openAdminProfile)}>Admin Pannel
               <span><FaUser/></span>
             </div>
-            <div>
+            {/* <div>
               <div className='text-center font-bold text-[#fff] flex justify-center items-center px-8 py-3 rounded-3xl bg-[#082114] drop-shadow-md cursor-pointer' onClick={()=>setOpenForgotPassword(!openForgotPassword)}>Reset Password</div>
-            </div>
+            </div> */}
             <ul className='flex flex-col justify-center gap-5 font-semibold text-lg w-full text-center'>
               <li className='w-full p-2 bg-[#6d8040] text-[#fff] drop-shadow-sm cursor-pointer' onClick={()=> document.getElementById('uploadLogo').scrollIntoView({ behavior:'smooth'})}>Upload Logo</li>
               <li className='w-full p-2 bg-[#6d8040] text-[#fff] drop-shadow-sm cursor-pointer'onClick={()=> document.getElementById('uploadBanner').scrollIntoView({behavior:'smooth'})}>Upload Banners</li>
