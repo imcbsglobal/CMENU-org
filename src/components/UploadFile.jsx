@@ -20,7 +20,7 @@ const UploadFile = ({ user }) => {
     if (!user) {
       setIsError(true);
     }
-    console.log("user is",user)
+    // console.log("user is",user)
   }, [user]);
 
   const selectImage = () => {

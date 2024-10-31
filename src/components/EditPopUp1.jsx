@@ -48,7 +48,7 @@ const EditPopUp1 = ({ setCategoryEditPopUp, category }) => {
             <motion.div
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1, transition: { duration: .5, ease: 'backInOut' } }}
-                className='w-full h-[300px] mx-6 bg-[#ffffffb7] rounded-3xl px-6 GlassBg relative'>
+                className='w-full lg:w-[600px] h-[300px] mx-6 bg-[#ffffffb7] rounded-3xl px-6 GlassBg relative'>
                 <div className='absolute right-5 top-5 cursor-pointer text-2xl text-[#80964c]' onClick={() => setCategoryEditPopUp(false)}>
                     <IoIosClose />
                 </div>

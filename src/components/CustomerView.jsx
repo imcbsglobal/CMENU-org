@@ -34,8 +34,8 @@ const CustomerView = () => {
   const navigate = useNavigate();
   const categoryRef = useRef(null);
   const [isSticky, setIsSticky] = useState(false);
-
-  console.log("AdminId Is", adminId);
+  
+  // console.log("AdminId Is", adminId);
   useEffect(() => {
     const adminData = ref(db, `admins/${adminId}`);
     onValue(adminData, (snapshot) => {
@@ -52,13 +52,13 @@ const CustomerView = () => {
   // Fetch logo
   useEffect(() => {
     const logoRef = ref(db, `logos/${adminId}`);
-    console.log("admin id", adminId);
-    console.log("logo display", logoRef);
+    // console.log("admin id", adminId);
+    // console.log("logo display", logoRef);
     onValue(logoRef, (snapshot) => {
-      console.log("snapshot", snapshot.val());
+      // console.log("snapshot", snapshot.val());
       if (snapshot.exists()) {
         const logos = snapshot.val();
-        console.log("logo only", logos);
+        // console.log("logo only", logos);
         const logoKeys = Object.keys(logos);
         console.log("logo keys", logoKeys);
         if (logoKeys.length > 0) {
@@ -307,7 +307,7 @@ const CustomerView = () => {
 
             {/* Banner Section */}
             <div className="pt-28 mb-10">
-              {banners.length > 0 ? (
+              {banners.length > 0 && (
                 <Slider {...settings} className="mx-auto">
                   {banners.map((banner, index) => (
                     <div
@@ -322,10 +322,10 @@ const CustomerView = () => {
                     </div>
                   ))}
                 </Slider>
-              ) : (
-                <div className="grid place-items-center text-center">
-                  No banners available
-                </div>
+              // ) : (
+              //   <div className="grid place-items-center text-center">
+              //     No banners available
+              //   </div>
               )}
             </div>
 
@@ -451,7 +451,7 @@ const CustomerView = () => {
             {/* Footer */}
             <div className="bg-[#fff] w-full py-2 px-2 flex flex-col justify-center items-center fixed bottom-0 z-50">
               <div className="text-center flex flex-col justify-center items-center text-[10px] text-[#383636] ItemText">
-                Design and Developed by{" "}
+                Powered by{" "}
                 <span className="block text-sm font-semibold text-[#80964c]">
                   IMC Business Solutions
                 </span>

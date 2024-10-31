@@ -8,6 +8,7 @@ import { ref, get, onValue, remove } from 'firebase/database';
 import { getStorage, ref as storageRef, deleteObject, getDownloadURL } from 'firebase/storage'; 
 import { MdDelete } from "react-icons/md";
 import { IoIosMenu } from "react-icons/io";
+import { IoHandLeftSharp } from "react-icons/io5";
 
 const Navbar = ({setOPenAdminPanel, handleOpenAdminPanel}) => {
   const navigate = useNavigate();
@@ -15,26 +16,30 @@ const Navbar = ({setOPenAdminPanel, handleOpenAdminPanel}) => {
   const [randomKey, setRandomKey] = useState('');
   const [logoUrl, setLogoUrl] = useState('');
   const [logoKey, setLogoKey] = useState('');
+  const [shopName, setShopName] = useState(""); // State to store shop name
 
   useEffect(() => {
     setPersistence(auth, browserLocalPersistence)
       .then(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-          console.log("current user",currentUser)
           if (currentUser) {
             setUser(currentUser);
+
+            // Fetch admin data for the logged-in user
             const adminRef = ref(db, `admins/${currentUser.uid}`);
             get(adminRef).then((snapshot) => {
               if (snapshot.exists()) {
-                setRandomKey(snapshot.val().randomKey);
+                const adminData = snapshot.val();
+                console.log("Admin Data:", adminData); // Log admin data to check values
+                setRandomKey(adminData.randomKey);
+                setShopName(adminData.shopName); // Set shop name from Firebase
               }
             }).catch((error) => {
               console.error("Error fetching admin data:", error);
             });
 
-            // Fetch logos for the user
+            // Fetch logo for the user
             const logoRef = ref(db, `logos/${currentUser.uid}`);
-            console.log("current user is",currentUser.uid)
             onValue(logoRef, (snapshot) => {
               if (snapshot.exists()) {
                 const logos = snapshot.val();
@@ -45,12 +50,12 @@ const Navbar = ({setOPenAdminPanel, handleOpenAdminPanel}) => {
                   setLogoUrl(`${freshLogoUrl}?t=${new Date().getTime()}`); // Cache-busting
                 }
               } else {
-                setLogoUrl('');
+                setLogoUrl("");
               }
             });
           } else {
             setUser(null);
-            navigate('/login');
+            navigate("/login");
           }
         });
         return () => unsubscribe();
@@ -105,23 +110,24 @@ const Navbar = ({setOPenAdminPanel, handleOpenAdminPanel}) => {
     <div id='uploadLogo'>
       <header className='flex justify-center fixed items-center w-full py-5  px-5 bg-[#fff]  z-50 rounded-b mb-5'>
         {/* Logo and Logout Button Section */}
-        
+        <div className='text-lg font-medium w-full flex gap-1 items-center'>Hello : <span className='text-[#72b114] font-bold'>{shopName}....</span>
+          <span className='text-[#ffdc43]'><IoHandLeftSharp/></span>
+        </div>
           <div className='flex items-center justify-between md:justify-start w-full md:gap-10'> {/* Use full width for the flex container */}
-            <div className='flex items-center'>
+            {/* <div className='flex items-center'>
               {logoUrl && (
-                <div className='relative flex items-center gap-2'> {/* Add margin-right for spacing */}
+                <div className='relative flex items-center gap-2'> 
                   <img src={logoUrl} alt="Logo" className="w-[100px] object-contain" />
                   {user &&(
                     <button onClick={handleDeleteLogo} className=' top-0 right-0 bg-red-500 p-1'>
                       <MdDelete className='text-white' />
                     </button>
                   )}
-                  
                 </div>
               )}
-            </div>
+            </div> */}
             {user && (
-              <div className=' flex flex-col items-end gap-5'>
+              <div className=' flex items-end gap-5'>
                 <button onClick={handleLogout} className='flex items-center relative text-red-600 z-50'>
                   <FaUserAltSlash className='mr-2' />
                   Logout
@@ -129,10 +135,10 @@ const Navbar = ({setOPenAdminPanel, handleOpenAdminPanel}) => {
                 <button className='md:hidden text-3xl' onClick={handleOpenAdminPanel}>
                   <IoIosMenu/>
                 </button>
+                
               </div>
             )}
           </div>
-        
           {/* <button onClick={() => navigate('/login')} className='bg-blue-500 text-white px-4 py-2 rounded'>
             Login
           </button> */}

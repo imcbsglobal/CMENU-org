@@ -9,11 +9,15 @@ import { db } from './Firebase'; // Make sure you're importing your Firebase set
 const EditItemPopUP = ({ setItemEditPopUp, itemData, handleUpdateItem }) => {
   const [editedItemName, setEditedItemName] = useState(itemData.name);
   const [editedItemPrice, setEditedItemPrice] = useState(itemData.price);
+  const [editedItemPrice2, setEditedItemPrice2] = useState(itemData.price2 || '');
+  const [editedItemPrice3, setEditedItemPrice3] = useState(itemData.price3 || '');
   const [editedItemImage, setEditedItemImage] = useState(null);
 
   useEffect(() => {
     setEditedItemName(itemData.name);
     setEditedItemPrice(itemData.price);
+    setEditedItemPrice2(itemData.price2 || '');
+    setEditedItemPrice3(itemData.price3 || '');
     // Don't reset image selection here
   }, [itemData]);
 
@@ -28,9 +32,11 @@ const EditItemPopUP = ({ setItemEditPopUp, itemData, handleUpdateItem }) => {
   };
 
   const handleSaveChanges = () => {
-    console.log("Saving Changes:", editedItemName, editedItemPrice, editedItemImage);
-    handleUpdateItem(editedItemName, editedItemPrice, editedItemImage)
+    console.log("Saving Changes:", editedItemName, editedItemPrice, editedItemPrice2, editedItemPrice3, editedItemImage);
+    
+    handleUpdateItem(editedItemName, editedItemPrice, editedItemPrice2, editedItemPrice3, editedItemImage)
       .then(() => {
+        toast.success("Item updated successfully!");
         setItemEditPopUp(false); // Close the popup only after success
       })
       .catch((error) => {
@@ -38,18 +44,19 @@ const EditItemPopUP = ({ setItemEditPopUp, itemData, handleUpdateItem }) => {
       });
   };
   
+  
   return (
     <div className='fixed bottom-0 top-0 left-0 right-0 bg-[#006aff79] z-50 BgBlur flex justify-center items-center'>
       <motion.div
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1, transition: { duration: .5, ease: 'backInOut' } }}
-        className='w-full h-[370px] rounded-3xl mx-6 bg-[#ffffffb7] GlassBg relative px-6'
+        className='w-full lg:w-[600px] h-[500px] rounded-3xl mx-6 bg-[#ffffffb7] GlassBg relative px-6'
       >
         <div className='absolute right-5 top-5 text-2xl text-[#80964c] cursor-pointer' onClick={() => setItemEditPopUp(false)}>
           <IoIosClose />
         </div>
         <div className='text-[28px] px-6 pt-10 text-center font-bold mb-5'>Edit Item</div>
-        <div className='w-full flex flex-col justify-center items-center gap-5 mb-10'>
+        <div className='w-full flex flex-col justify-center items-center gap-5 mb-5'>
           <input
             type="text"
             value={editedItemName}
@@ -61,6 +68,20 @@ const EditItemPopUP = ({ setItemEditPopUp, itemData, handleUpdateItem }) => {
             type="number"
             value={editedItemPrice}
             onChange={(e) => setEditedItemPrice(e.target.value)}
+            className='w-full py-3 pl-3 rounded-xl border-none outline-none'
+            placeholder='Item Price'
+          />
+          <input
+            type="number"
+            value={editedItemPrice2}
+            onChange={(e) => setEditedItemPrice2(e.target.value)}
+            className='w-full py-3 pl-3 rounded-xl border-none outline-none'
+            placeholder='Item Price'
+          />
+          <input
+            type="number"
+            value={editedItemPrice3}
+            onChange={(e) => setEditedItemPrice3(e.target.value)}
             className='w-full py-3 pl-3 rounded-xl border-none outline-none'
             placeholder='Item Price'
           />

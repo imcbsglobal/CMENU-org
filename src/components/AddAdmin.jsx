@@ -46,8 +46,8 @@ const AddAdmin = () => {
     // Calculate validity period
     const startDate = new Date();
     const endDate = new Date(startDate.getFullYear() + 1, startDate.getMonth(), startDate.getDate());
-    const validityStart = startDate.toLocaleDateString('en-US', { month: '2-digit', year: 'numeric' });
-    const validityEnd = endDate.toLocaleDateString('en-US', { month: '2-digit', year: 'numeric' });
+    const validityStart = startDate.toLocaleDateString('en-US', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    const validityEnd = endDate.toLocaleDateString('en-US', { day: '2-digit', month: '2-digit', year: 'numeric' });
     const validity = `${validityStart} - ${validityEnd}`;
 
     try {
@@ -85,14 +85,14 @@ const AddAdmin = () => {
         <div className='w-[600px] rounded-3xl h-[96vh] GlassBg bg-[#ffffff58]'>
           <div className='text-center text-2xl font-bold mt-5 mb-5 text-[#322f2f]'>Create Admin</div>
           <form onSubmit={handleSubmit} className='w-full px-6 flex flex-col justify-center items-center gap-5'>
-            <input type="text" name="customerName" placeholder='Customer Name' value={formData.customerName} onChange={handleChange} className='w-full py-3 pl-3 outline-none border-none rounded-xl' />
-            <input type="text" name="shopName" placeholder='Shop Name' value={formData.shopName} onChange={handleChange} className='w-full py-3 pl-3 outline-none border-none rounded-xl' />
-            <input type="text" name="location" placeholder='Location' value={formData.location} onChange={handleChange} className='w-full py-3 pl-3 outline-none border-none rounded-xl' />
-            <input type="number" name="phoneNumber" placeholder='Phone Number' value={formData.phoneNumber} onChange={handleChange} className='w-full py-3 pl-3 outline-none border-none rounded-xl' />
-            <input type="number" name="amount" placeholder='Amount / Price' value={formData.amount} onChange={handleChange} className='w-full py-3 pl-3 outline-none border-none rounded-xl' />
-            <input type="email" name="userName" placeholder='User Email' value={formData.userName} onChange={handleChange} className='w-full py-3 pl-3 outline-none border-none rounded-xl' />
-            <input type="password" name="password" placeholder='Password' value={formData.password} onChange={handleChange} className='w-full py-3 pl-3 outline-none border-none rounded-xl' />
-            <input type="password" name="confirmPassword" placeholder='Confirm Password' value={formData.confirmPassword} onChange={handleChange} className='w-full py-3 pl-3 outline-none border-none rounded-xl' />
+            <input type="text" name="customerName" placeholder='Customer Name' value={formData.customerName} onChange={handleChange} className='w-full py-3 pl-3 outline-none border-none rounded-xl' required/>
+            <input type="text" name="shopName" placeholder='Shop Name' value={formData.shopName} onChange={handleChange} className='w-full py-3 pl-3 outline-none border-none rounded-xl' required/>
+            <input type="text" name="location" placeholder='Location' value={formData.location} onChange={handleChange} className='w-full py-3 pl-3 outline-none border-none rounded-xl' required/>
+            <input type="number" name="phoneNumber" placeholder='Phone Number' value={formData.phoneNumber} onChange={handleChange} className='w-full py-3 pl-3 outline-none border-none rounded-xl' required/>
+            <input type="number" name="amount" placeholder='Amount / Price' value={formData.amount} onChange={handleChange} className='w-full py-3 pl-3 outline-none border-none rounded-xl' required/>
+            <input type="email" name="userName" placeholder='User Email' value={formData.userName} onChange={handleChange} className='w-full py-3 pl-3 outline-none border-none rounded-xl' required/>
+            <input type="password" name="password" placeholder='Password' value={formData.password} onChange={handleChange} className='w-full py-3 pl-3 outline-none border-none rounded-xl' required/>
+            <input type="password" name="confirmPassword" placeholder='Confirm Password' value={formData.confirmPassword} onChange={handleChange} className='w-full py-3 pl-3 outline-none border-none rounded-xl' required/>
             <div className='flex justify-center gap-10 items-center'>
               <Link to='/superAdminIndex'>
                 <button className='px-8 py-2 bg-[#ffc400] text-[#fff] GlassBg rounded-2xl font-bold'>Cancel</button>

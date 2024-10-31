@@ -13,6 +13,7 @@ import CustomerView from "./components/CustomerView";
 import DisbaleStatus from "./components/DisbaleStatus";
 import CustomerDisable from "./components/CustomerDisable"
 import Intro from "./components/Intro";
+import SecurityCodeDialog from "./components/SecurityCodeDialog";
 
 function App() {
   const [loader, setLoader] = useState(true);
@@ -49,6 +50,7 @@ function App() {
             <Route path="/:adminId" element={<CustomerView />} /> {/* Changed from Home to CustomerView */}
             <Route path="/admin/:adminId" element={<Home />} /> {/* New route for admin view */}
             <Route path="/superAdminIndex" element={<ProtectedRoute element={<SuperAdminIndex />} />} />
+            <Route path="/securityCodeDialog" element={<ProtectedRoute element={<SecurityCodeDialog />} />} />
             <Route path="/addAdmin" element={<ProtectedRoute element={<AddAdmin />} />} />
             <Route path="/disableStatus"  element={<DisbaleStatus />} />
             <Route path="/pageNotFound"  element={<CustomerDisable />} />

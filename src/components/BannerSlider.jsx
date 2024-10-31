@@ -72,7 +72,7 @@ const BannerSlider = () => {
   return (
     <div id='uploadBanner'>
       <section className="mt-10 mb-5">
-        <div className="flex justify-center items-center font-bold text-2xl mb-5">
+        <div className="flex justify-center items-center font-bold text-2xl mb-5 ItemText">
           Upload Your Banners
         </div>
         <Slider {...settings} className="mx-auto">

@@ -16,6 +16,15 @@ import { FaUser } from "react-icons/fa";
 import { IoClose } from "react-icons/io5";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import AdminProfilePage from './AdminProfilePage';
+import { db } from "./Firebase";
+// import { ref, onValue } from "firebase/database";
+import { ref, get, onValue, remove } from 'firebase/database';
+import { getStorage, ref as storageRef, deleteObject, getDownloadURL } from 'firebase/storage'; 
+import { MdDelete } from "react-icons/md";
+import { useNavigate } from "react-router-dom";
+import {  setPersistence, browserLocalPersistence } from 'firebase/auth';
+import ForgotPassword from './ForgotPassword';
+
 
 const Home = () => {
   // const { adminId } = useParams(); 
@@ -29,6 +38,14 @@ const Home = () => {
   const qrRef = useRef(); // Create a ref to the QR code element
   const [openAdminPanel, setOPenAdminPanel] = useState(false)
   const [openAdminProfile, setOpenAdminProfile] = useState(false)
+  const [logoUrl, setLogoUrl] = useState("");
+  const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+  const [randomKey, setRandomKey] = useState('');
+  const [logoKey, setLogoKey] = useState('');
+  const [openForgotPassword, setOpenForgotPassword] = useState(false)
+  const auth = getAuth();
+
 
   useEffect(() => {
     // Check for authentication state
@@ -73,6 +90,107 @@ const Home = () => {
     setOPenAdminPanel(!openAdminPanel);
   };
 
+  // Fetch logo
+  useEffect(() => {
+    const logoRef = ref(db, `logos/${adminId}`);
+    // console.log("admin id", adminId);
+    // console.log("logo display", logoRef);
+    onValue(logoRef, (snapshot) => {
+      // console.log("snapshot", snapshot.val());
+      if (snapshot.exists()) {
+        const logos = snapshot.val();
+        // console.log("logo only", logos);
+        const logoKeys = Object.keys(logos);
+        // console.log("logo keys", logoKeys);
+        if (logoKeys.length > 0) {
+          setLogoUrl(logos[logoKeys[0]].url);
+        }
+      }
+    });
+  }, [adminId]);
+
+  useEffect(() => {
+    setPersistence(auth, browserLocalPersistence)
+      .then(() => {
+        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+          // console.log("current user",currentUser)
+          if (currentUser) {
+            setUser(currentUser);
+            const adminRef = ref(db, `admins/${currentUser.uid}`);
+            get(adminRef).then((snapshot) => {
+              if (snapshot.exists()) {
+                setRandomKey(snapshot.val().randomKey);
+              }
+            }).catch((error) => {
+              console.error("Error fetching admin data:", error);
+            });
+
+            // Fetch logos for the user
+            const logoRef = ref(db, `logos/${currentUser.uid}`);
+            // console.log("current user is",currentUser.uid)
+            onValue(logoRef, (snapshot) => {
+              if (snapshot.exists()) {
+                const logos = snapshot.val();
+                const logoKeys = Object.keys(logos);
+                if (logoKeys.length > 0) {
+                  const freshLogoUrl = logos[logoKeys[0]].url;
+                  setLogoKey(logoKeys[0]);
+                  setLogoUrl(`${freshLogoUrl}?t=${new Date().getTime()}`); // Cache-busting
+                }
+              } else {
+                setLogoUrl('');
+              }
+            });
+          } else {
+            setUser(null);
+            navigate('/login');
+          }
+        });
+        return () => unsubscribe();
+      })
+      .catch((error) => {
+        console.error("Error setting persistence:", error);
+      });
+  }, [navigate]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('adminUid');
+    auth.signOut().then(() => navigate('/login')); // Ensure navigation happens after sign out
+  };
+
+  const handleDeleteLogo = async () => {
+    if (user && logoKey) {
+      const storage = getStorage();
+      const logoStorageRef = storageRef(storage, `logos/${user.uid}/${logoKey}`);
+  
+      console.log("Attempting to delete logo from storage at path:", logoStorageRef.fullPath);
+  
+      try {
+        // Check if the logo exists before deleting
+        await getDownloadURL(logoStorageRef);
+        await deleteObject(logoStorageRef);
+        console.log("Logo deleted from storage.");
+  
+        const logoDbRef = ref(db, `logos/${user.uid}/${logoKey}`);
+        await remove(logoDbRef);
+        console.log("Logo reference removed from database.");
+        setLogoUrl(''); // Clear the logo URL in state
+        setLogoKey(''); // Clear the logo key
+      } catch (error) {
+        console.error("Error deleting logo:", error);
+        if (error.code === 'storage/object-not-found') {
+          console.log("Logo does not exist, unable to delete.");
+          
+          // Clean up the database entry if it does not exist in storage
+          const logoDbRef = ref(db, `logos/${user.uid}/${logoKey}`);
+          await remove(logoDbRef); // Remove the entry from the database
+          console.log("Removed invalid logo reference from database.");
+        }
+      }
+    } else {
+      console.log("No user or logo key found.");
+    }
+  };
 
   return (
     <div className=' w-full overflow-hidden'>
@@ -110,9 +228,24 @@ const Home = () => {
       <div className='md:flex justify-center w-full'>
         {/* First Div (Side Navbar) */}
         <div className='md:w-[20%] md:h-screen hidden md:block'>
-          <div className=' md:fixed flex-col gap-16 w-[20%] h-screen bg-[#fff] md:flex justify-center items-center'>
+          <div className=' md:fixed flex-col gap-5 w-[20%] h-screen bg-[#fff] md:flex justify-center items-center'>
+            <div className='flex justify-center items-center'>
+              {logoUrl && (
+                <div className=' flex justify-center flex-col items-center gap-3'>
+                  <div className='w-[100px]'>
+                    <img src={logoUrl} className='w-full h-full object-contain' alt="" />
+                  </div>
+                  <button onClick={handleDeleteLogo} className=' text-[#fff] p-2 bg-[#f00] rounded-full'>
+                    <MdDelete className='' />
+                  </button>
+                </div>
+              )}
+            </div>
             <div className='text-center font-bold text-[#fff] flex justify-center items-center px-8 py-3 rounded-3xl bg-[#082114] drop-shadow-md cursor-pointer' onClick={()=>setOpenAdminProfile(!openAdminProfile)}>Admin Pannel
               <span><FaUser/></span>
+            </div>
+            <div>
+              <div className='text-center font-bold text-[#fff] flex justify-center items-center px-8 py-3 rounded-3xl bg-[#082114] drop-shadow-md cursor-pointer' onClick={()=>setOpenForgotPassword(!openForgotPassword)}>Reset Password</div>
             </div>
             <ul className='flex flex-col justify-center gap-5 font-semibold text-lg w-full text-center'>
               <li className='w-full p-2 bg-[#6d8040] text-[#fff] drop-shadow-sm cursor-pointer' onClick={()=> document.getElementById('uploadLogo').scrollIntoView({ behavior:'smooth'})}>Upload Logo</li>
@@ -207,7 +340,11 @@ const Home = () => {
             </div>
       </div>
     )}
-    
+    {openForgotPassword && (
+      <div>
+        <ForgotPassword setOpenForgotPassword = {setOpenForgotPassword}/>
+      </div>
+    )}
     </div>
   );
 }
