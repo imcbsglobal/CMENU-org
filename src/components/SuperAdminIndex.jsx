@@ -24,13 +24,33 @@ const SuperAdminIndex = () => {
     const unsubscribe = onValue(adminRef, (snapshot) => {
       if (snapshot.exists()) {
         const data = snapshot.val();
-        const adminArray = Object.keys(data).map((key) => ({
-          id: key,
-          ...data[key],
-          pendingStatus: data[key].pendingStatus || false,
-          pendingStatusTime: data[key].pendingStatusTime || null,
-        }));
+        const adminArray = Object.keys(data).map((key) => {
+          const admin = data[key];
+          // Calculate days since creation
+          const createdAt = admin.createdAt || new Date().getTime();
+          const daysSinceCreation = Math.min(
+            90,
+            Math.ceil((new Date().getTime() - createdAt) / (1000 * 60 * 60 * 24))
+          );
+
+          return {
+            id: key,
+            ...admin,
+            dayCount: daysSinceCreation,
+            pendingStatus: admin.pendingStatus || false,
+            pendingStatusTime: admin.pendingStatusTime || null,
+          };
+        });
         setAdminData(adminArray);
+
+        // Update day counts in Firebase
+        adminArray.forEach(async (admin) => {
+          if (admin.dayCount !== data[admin.id].dayCount) {
+            await update(ref(db, `admins/${admin.id}`), {
+              dayCount: admin.dayCount
+            });
+          }
+        });
 
         // Check and update pending statuses
         adminArray.forEach((admin) => {
@@ -234,6 +254,7 @@ const SuperAdminIndex = () => {
               <th>Amount</th>
               <th>Location</th>
               <th>Status</th>
+              <th>No. Days</th>
               <th>Validity</th>
               <th>Edit</th>
               <th>Delete</th>
@@ -276,6 +297,7 @@ const SuperAdminIndex = () => {
                                         </span>
                                     )} */}
                   </td>
+                  <td className="text-center">{admin.dayCount}</td>
                   <td className="w-full text-nowrap">{admin.validity}</td>
                   <td className="text-[#1e8ca5]">
                     <FaEdit

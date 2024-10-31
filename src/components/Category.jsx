@@ -7,6 +7,7 @@ import { MdModeEdit, MdDelete } from "react-icons/md";
 import { getDatabase, ref as dbRef, set, push, onValue, remove, update, get } from 'firebase/database';
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db } from './Firebase'; 
+import { ref } from 'firebase/database';
 import DeleteAlert from './DeleteAlert';
 import EditPopUp1 from './EditPopUp1';
 import EditItemPopUP from './EditItemPopUP';

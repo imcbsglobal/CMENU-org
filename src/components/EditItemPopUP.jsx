@@ -65,21 +65,21 @@ const EditItemPopUP = ({ setItemEditPopUp, itemData, handleUpdateItem }) => {
             placeholder='Item Name'
           />
           <input
-            type="number"
+            type="text"
             value={editedItemPrice}
             onChange={(e) => setEditedItemPrice(e.target.value)}
             className='w-full py-3 pl-3 rounded-xl border-none outline-none'
             placeholder='Item Price'
           />
           <input
-            type="number"
+            type="text"
             value={editedItemPrice2}
             onChange={(e) => setEditedItemPrice2(e.target.value)}
             className='w-full py-3 pl-3 rounded-xl border-none outline-none'
             placeholder='Item Price'
           />
           <input
-            type="number"
+            type="text"
             value={editedItemPrice3}
             onChange={(e) => setEditedItemPrice3(e.target.value)}
             className='w-full py-3 pl-3 rounded-xl border-none outline-none'

@@ -45,7 +45,7 @@ const AddAdmin = () => {
 
     // Calculate validity period
     const startDate = new Date();
-    const endDate = new Date(startDate.getFullYear() + 1, startDate.getMonth(), startDate.getDate());
+    const endDate = new Date(startDate.getFullYear(), startDate.getMonth() + 3, startDate.getDate());
     const validityStart = startDate.toLocaleDateString('en-US', { day: '2-digit', month: '2-digit', year: 'numeric' });
     const validityEnd = endDate.toLocaleDateString('en-US', { day: '2-digit', month: '2-digit', year: 'numeric' });
     const validity = `${validityStart} - ${validityEnd}`;
@@ -67,6 +67,8 @@ const AddAdmin = () => {
         randomKey, // Store the random key
         status: 'Disable', // Default status
         validity: validity, // Set Year-Month
+        createdAt: new Date().getTime(), // Add creation timestamp
+        dayCount: 1 // Initialize day count
       };
 
       // Save admin data to Firebase Realtime Database

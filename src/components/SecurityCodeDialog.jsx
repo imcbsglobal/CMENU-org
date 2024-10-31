@@ -12,7 +12,7 @@ const SecurityCodeDialog = () => {
 
   // Retrieve the adminId from the location state
   const { adminId } = location.state || {};
-  const correctSecurityCode = "12345"; // Replace with your actual security code logic
+  const correctSecurityCode = "313@imcbsglobal"; // Replace with your actual security code logic
 
   const handleSecurityCodeChange = (e) => {
     setEnteredSecurityCode(e.target.value);
