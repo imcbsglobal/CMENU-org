@@ -239,6 +239,17 @@ const CustomerView = () => {
     };
   }, []);
 
+  document.addEventListener("scroll", function () {
+    const stickyCategory = document.getElementById("stickyCategory");
+    const isSticky = stickyCategory.getBoundingClientRect().top <= 0;
+  
+    if (isSticky) {
+      stickyCategory.classList.add("border-visible");
+    } else {
+      stickyCategory.classList.remove("border-visible");
+    }
+  });
+
   return (
     <div>
       {isLoading ? (
@@ -346,10 +357,7 @@ const CustomerView = () => {
             </div>
 
             <div
-              // ref={categoryRef}
-              className={`flex gap-10 overflow-x-auto whitespace-nowrap w-full HideScrollBar mb-10 px-2 ${
-                isSticky ? "bg-white mt-52" : ""
-              }`}
+              className={"flex gap-10 overflow-x-auto whitespace-nowrap w-full HideScrollBar mb-10 px-2 bg-[#d6eda1] backdrop-blur-xl sticky top-0 z-50"}
               id="stickyCategory"
             >
               {filteredCategories.map((category) => (
