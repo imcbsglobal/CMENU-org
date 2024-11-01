@@ -44,8 +44,7 @@ const Category = () => {
   const [selectedItemToDelete, setSelectedItemToDelete] = useState(null); // Item to delete state 
   const [itemToDelete, setItemToDelete] = useState(null); // State to hold the item to delete
   const auth = getAuth();
-
-  console.log("auth.currentUser",auth)
+  // console.log("auth.currentUser",auth)
   const adminId = auth.currentUser ? auth.currentUser.uid : null; // Safely access uid
   const [searchTerm, setSearchTerm] = useState(''); // State for search input
   const [searchTerm2, setSearchTerm2] = useState(''); // State for item search input
@@ -58,11 +57,11 @@ const Category = () => {
   useEffect(() => {
       // Listen for auth state changes
       const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-          console.log("Auth is",auth.currentUser)
+          // console.log("Auth is",auth.currentUser)
           setUser(currentUser);
           // Set adminId only if user is authenticated
           const id = currentUser ? currentUser.uid : null;
-          setAdminId(id); // Assuming you have setAdminId to manage adminId state
+          setAdminId(id); 
       });
   
       return () => unsubscribe();
@@ -258,7 +257,7 @@ const Category = () => {
   const deleteCategory = (categoryId) => {
       remove(ref(db, `categories/${categoryId}`))
           .then(() => {
-              console.log('Category deleted successfully');
+              // console.log('Category deleted successfully');
               setSelectedCategory('');
               setItems([]);
           })

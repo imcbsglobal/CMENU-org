@@ -260,13 +260,15 @@ const CustomerView = () => {
             {/* Logo Section */}
             <header className="flex justify-center fixed items-center w-full py-2 px-5 bg-[#fff] z-50 rounded-b mb-5">
               <div className="flex items-center justify-between w-full">
-                {logoUrl && (
-                  <img
-                    src={logoUrl}
-                    alt="Logo"
-                    className="w-[100px] h-[80px] object-contain"
-                  />
-                )}
+                <div className="w-[120px] h-[70px]">
+                  {logoUrl && (
+                    <img
+                      src={logoUrl}
+                      alt="Logo"
+                      className="w-full h-full object-contain"
+                    />
+                  )}
+                </div>
                 <div className="flex justify-center items-center gap-5 text-2xl">
                   {socialLinks.instagram && (
                     <a
@@ -317,7 +319,7 @@ const CustomerView = () => {
             </header>
 
             {/* Banner Section */}
-            <div className="pt-28 mb-10">
+            <div className="pt-24 mb-10">
               {banners.length > 0 && (
                 <Slider {...settings} className="mx-auto">
                   {banners.map((banner, index) => (

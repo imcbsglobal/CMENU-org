@@ -20,12 +20,14 @@ const EditAdmin = () => {
         phoneNumber: '',
         amount: '',
         userName: '',
+        password: '', // Add password field
     });
     const [openPasswordChange, setOpenPasswordChange] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [currentPassword, setCurrentPassword] = useState('');
     const [showPasswordPrompt, setShowPasswordPrompt] = useState(false);
     const [originalEmail, setOriginalEmail] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
 
     const navigate = useNavigate();
     const auth = getAuth();
@@ -46,15 +48,16 @@ const EditAdmin = () => {
                     
                     const signInMethods = await fetchSignInMethodsForEmail(auth, adminData.userName);
                     if (signInMethods.length === 0) {
-                        toast.error("Admin email not found in authentication");
+                        // toast.error("Admin email not found in authentication");
+
                     }
                 } else {
-                    toast.error("Admin not found");
+                    // toast.error("Admin not found");
                     navigate('/superAdminIndex');
                 }
             } catch (error) {
-                console.error("Error fetching admin data:", error);
-                toast.error("Error loading admin data");
+                // console.error("Error fetching admin data:", error);
+                // toast.error("Error loading admin data");
             }
         };
 
@@ -81,30 +84,25 @@ const EditAdmin = () => {
 
         setIsLoading(true);
         try {
-            // First sign in with the original email and password
             const userCredential = await signInWithEmailAndPassword(
                 auth,
                 originalEmail,
                 currentPassword
             );
 
-            // Now we can update the email
             await updateEmail(userCredential.user, formData.userName);
 
-            // Update in database
             const updates = {
                 ...formData
             };
             await update(ref(db, `admins/${adminId}`), updates);
 
-            // Clear password and hide prompt
             setCurrentPassword('');
             setShowPasswordPrompt(false);
             setOriginalEmail(formData.userName);
             
             toast.success("Email updated successfully! Please log in with your new email.");
             
-            // Sign out the user to force them to sign in with new email
             await auth.signOut();
             navigate('/login');
             
@@ -115,7 +113,7 @@ const EditAdmin = () => {
             } else if (error.code === 'auth/email-already-in-use') {
                 toast.error("Email is already in use by another account");
             } else if (error.code === 'auth/invalid-login-credentials') {
-                toast.error("Invalid login credentials");
+                // toast.error("Invalid login credentials");
             } else {
                 toast.error(`Error updating email: ${error.message}`);
             }
@@ -133,7 +131,6 @@ const EditAdmin = () => {
                 return;
             }
 
-            // If email hasn't changed, just update other fields
             setIsLoading(true);
             const updates = {
                 ...formData,
@@ -166,7 +163,24 @@ const EditAdmin = () => {
                     <input type="text" name="location" placeholder='Location' value={formData.location} onChange={handleChange} className='w-full py-3 pl-3 outline-none border-none rounded-xl' />
                     <input type="number" name="phoneNumber" placeholder='Phone Number' value={formData.phoneNumber} onChange={handleChange} className='w-full py-3 pl-3 outline-none border-none rounded-xl' />
                     <input type="number" name="amount" placeholder='Amount / Price' value={formData.amount} onChange={handleChange} className='w-full py-3 pl-3 outline-none border-none rounded-xl' />
-                    <input type="email" name="userName" placeholder='User Email' value={formData.userName} onChange={handleChange} className='w-full py-3 pl-3 outline-none border-none rounded-xl' />
+                    <input type="email" name="userName" placeholder='User Email' value={formData.userName} onChange={handleChange} className='w-full py-3 pl-3 outline-none border-none rounded-xl' readOnly/>
+                    
+                    {/* Password display field (read-only) */}
+                    <div className='w-full relative'>
+                        <input 
+                            type={showPassword ? "text" : "password"} 
+                            value={formData.password} 
+                            className='w-full py-3 pl-3 outline-none border-none rounded-xl bg-gray-100' 
+                            readOnly 
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-gray-800'
+                        >
+                            {showPassword ? "Hide" : "Show"}
+                        </button>
+                    </div>
                     
                     {showPasswordPrompt && (
                         <div className='w-full'>
@@ -180,14 +194,14 @@ const EditAdmin = () => {
                         </div>
                     )}
                     
-                    <div>
+                    {/* <div>
                         <button
                             type="button"
                             onClick={handleOpenPasswordChange}
                             className='px-8 py-2 rounded-2xl text-[#fff] bg-[#ff1f1f] font-semibold'>
                             Change Password
                         </button>
-                    </div>
+                    </div> */}
 
                     <div className='flex justify-center gap-10 items-center'>
                         <button 

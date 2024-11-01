@@ -63,6 +63,7 @@ const AddAdmin = () => {
         phoneNumber: formData.phoneNumber,
         amount: formData.amount,
         userName: formData.userName.trim(),
+        password: formData.password, // Add this line
         adminId: user.uid, // Use Firebase UID as adminId
         randomKey, // Store the random key
         status: 'Disable', // Default status
