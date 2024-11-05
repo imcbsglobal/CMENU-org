@@ -108,12 +108,12 @@ const Navbar = ({setOPenAdminPanel, handleOpenAdminPanel}) => {
 
   return (
     <div id='uploadLogo'>
-      <header className='flex justify-center fixed items-center w-full py-5  px-5 bg-[#fff]  z-50 rounded-b mb-5'>
+      <header className='flex justify-between gap-5 fixed items-center w-full py-5 px-2  md:px-5 bg-[#fff]  z-50 rounded-b mb-5'>
         {/* Logo and Logout Button Section */}
-        <div className='text-lg font-medium w-full flex gap-1 items-center'>Hello : <span className='text-[#72b114] font-bold'>{shopName}....</span>
-          <span className='text-[#ffdc43]'><IoHandLeftSharp/></span>
+        <div className='text-lg font-medium w-full flex gap-1 items-center'><span className='hidden md:block'>Hello</span> <span className='hidden md:block'>:</span><span className='text-[#72b114] font-bold'>{shopName}....</span>
+          <span className='text-[#ffdc43]'><IoHandLeftSharp className='hidden md:block'/></span>
         </div>
-          <div className='flex items-center justify-between md:justify-start w-full md:gap-10'> {/* Use full width for the flex container */}
+          <div className='flex items-center justify-center md:justify-start w-full md:gap-10'> {/* Use full width for the flex container */}
             {/* <div className='flex items-center'>
               {logoUrl && (
                 <div className='relative flex items-center gap-2'> 
@@ -127,7 +127,7 @@ const Navbar = ({setOPenAdminPanel, handleOpenAdminPanel}) => {
               )}
             </div> */}
             {user && (
-              <div className=' flex items-end gap-5'>
+              <div className=' flex md:items-end items-center gap-5'>
                 <button onClick={handleLogout} className='flex items-center relative text-red-600 z-50'>
                   <FaUserAltSlash className='mr-2' />
                   Logout

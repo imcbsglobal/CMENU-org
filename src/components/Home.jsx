@@ -202,7 +202,7 @@ const Home = () => {
           <div className=' absolute top-5 right-5 text-2xl' >
             <IoClose onClick={handleOpenAdminPanel} className='cursor-pointer'/>
           </div>
-          <div className='text-center mb-20 text-xl font-bold flex justify-center items-center gap-2 text-[#082114] cursor-pointer'>Admin Panel <span className='text-xl text-[#6d8040]'><FaUser/></span></div>
+          <div className='text-center mb-20 text-xl font-bold flex justify-center items-center gap-2 text-[#082114] cursor-pointer' onClick={()=>setOpenAdminProfile(!openAdminProfile)}>Admin Panel <span className='text-xl text-[#6d8040]'><FaUser/></span></div>
           <ul className='flex flex-col justify-center items-start gap-6 font-semibold text-lg mb-20'>
             <li className='cursor-pointer' onClick={()=>{document.getElementById("uploadLogo").scrollIntoView({ behavior:"smooth" });setOPenAdminPanel(!openAdminPanel)}}>Upload Logo</li>
             <li className='cursor-pointer' onClick={()=>{document.getElementById("uploadBanner").scrollIntoView({ behavior:'smooth' }); setOPenAdminPanel(!openAdminPanel)}}>Upload Banner</li>
@@ -245,7 +245,7 @@ const Home = () => {
               <span><FaUser/></span>
             </div>
             {/* <div>
-              <div className='text-center font-bold text-[#fff] flex justify-center items-center px-8 py-3 rounded-3xl bg-[#082114] drop-shadow-md cursor-pointer' onClick={()=>setOpenForgotPassword(!openForgotPassword)}>Reset Password</div>
+                <div className='text-center font-bold text-[#fff] flex justify-center items-center px-8 py-3 rounded-3xl bg-[#082114] drop-shadow-md cursor-pointer' onClick={()=>setOpenForgotPassword(!openForgotPassword)}>Reset Password</div>
             </div> */}
             <ul className='flex flex-col justify-center gap-5 font-semibold text-lg w-full text-center'>
               <li className='w-full p-2 bg-[#6d8040] text-[#fff] drop-shadow-sm cursor-pointer' onClick={()=> document.getElementById('uploadLogo').scrollIntoView({ behavior:'smooth'})}>Upload Logo</li>
@@ -334,7 +334,7 @@ const Home = () => {
       </div>
     </div>
     {openAdminProfile && (
-      <div className=' fixed top-0 bottom-0 right-0 left-0 bg-[#000] SocialMediaBackground z-[999] GlassBackground flex justify-center items-center'>
+      <div className=' fixed top-0 bottom-0 px-2 md:px-0 right-0 left-0 bg-[#000] SocialMediaBackground z-[999] GlassBackground flex justify-center items-center'>
             <div className=' h-[370px] w-full px-2 rounded-3xl lg:w-[700px] bg-[#fff]'>
               <AdminProfilePage setOpenAdminProfile={setOpenAdminProfile}/>
             </div>

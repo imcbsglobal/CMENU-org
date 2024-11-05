@@ -631,13 +631,13 @@ const handleToggleItemVisibility = (itemId, isHidden) => {
                       className="w-16 h-16 rounded-lg object-cover GlassBackground"
                     />
                     <div>
-                      <div className="text-xl font-bold">{item.name}</div>
+                      <div className="md:text-xl font-bold">{item.name}</div>
                       {/* Price */}
                       <div className="flex gap-4">
                         {item.price && (
                           <div className=" flex flex-col justify-center items-center">
-                            <div className="text-sm font-semibold">Norm</div>
-                            <div className="text-sm flex items-center gap-1 font-bold ItemText">
+                            <div className="md:text-sm text-[10px] font-semibold">Norm</div>
+                            <div className="md:text-sm text-[10px]  flex items-center gap-1 font-bold ItemText">
                               <TbCurrencyRupee />
                               {item.price}
                             </div>
@@ -645,8 +645,8 @@ const handleToggleItemVisibility = (itemId, isHidden) => {
                         )}
                         {item.price2 && (
                           <div className=" flex flex-col justify-center items-center">
-                            <div className="text-sm font-semibold">A/C</div>
-                            <div className="text-sm flex items-center gap-1 font-bold ItemText">
+                            <div className="md:text-sm text-[10px] font-semibold">A/C</div>
+                            <div className="md:text-sm text-[10px] flex items-center gap-1 font-bold ItemText">
                               <TbCurrencyRupee />
                               {item.price2}
                             </div>
@@ -654,8 +654,8 @@ const handleToggleItemVisibility = (itemId, isHidden) => {
                         )}
                         {item.price3 && (
                           <div className=" flex flex-col justify-center items-center">
-                            <div className="text-sm font-semibold">Parcel</div>
-                            <div className="text-sm flex items-center gap-1 font-bold ItemText">
+                            <div className="md:text-sm text-[10px] font-semibold">Parcel</div>
+                            <div className="md:text-sm text-[10px] flex items-center gap-1 font-bold ItemText">
                               <TbCurrencyRupee />
                               {item.price3}
                             </div>
@@ -665,13 +665,13 @@ const handleToggleItemVisibility = (itemId, isHidden) => {
                     </div>
                   </div>
                   {user && (
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 bg-[#fff] rounded-[5px] px-2 py-1 absolute md:relative md:bg-[#fff0] top-2 right-2">
                       {hiddenItems[item.id] ? (
                         <button
                           onClick={() =>
                             handleToggleItemVisibility(item.id, false)
                           }
-                          className="px-6 py-2 rounded-xl bg-[#fff] text-sm font-bold cursor-pointer text-[#80964c]"
+                          className="md:px-6 md:py-2 rounded-xl bg-[#fff] text-[10px] md:text-sm font-bold cursor-pointer text-[#80964c]"
                         >
                           Display
                         </button>
@@ -680,7 +680,7 @@ const handleToggleItemVisibility = (itemId, isHidden) => {
                           onClick={() =>
                             handleToggleItemVisibility(item.id, true)
                           }
-                          className="px-6 py-2 rounded-xl bg-[#fff] text-sm font-bold cursor-pointer text-[#80964c]"
+                          className="md:px-6 md:py-2 text-[10px] rounded-xl bg-[#fff] md:text-sm font-bold cursor-pointer text-[#80964c]"
                         >
                           Hide
                         </button>
