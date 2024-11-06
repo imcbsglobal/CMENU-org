@@ -622,7 +622,7 @@ const handleToggleItemVisibility = (itemId, isHidden) => {
               filteredItems.map((item) => (
                 <div
                   key={item.id}
-                  className="flex justify-between items-center mb-5 GlassBackground px-2 h-[100px] rounded-2xl"
+                  className="flex justify-between items-center mb-5 GlassBackground px-2 h-[125px] md:h-[100px] rounded-2xl"
                 >
                   <div className="flex items-center gap-4">
                     <img
