@@ -5,12 +5,14 @@ import { X, ZoomIn, ZoomOut } from 'lucide-react';
 const BannerSection = ({ banners }) => {
     const [showModal, setShowModal] = useState(false);
     const [currentSlide, setCurrentSlide] = useState(0);
-    const [zoomLevels, setZoomLevels] = useState(banners.map(() => 1)); // Array for each image zoom state
+    const [zoomLevels, setZoomLevels] = useState(banners.map(() => 1));
     const [offsetX, setOffsetX] = useState(0);
     const [offsetY, setOffsetY] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
     const [startX, setStartX] = useState(0);
     const [startY, setStartY] = useState(0);
+    const [lastTap, setLastTap] = useState(0);
+    const [initialDistance, setInitialDistance] = useState(0);
     const sliderRef = useRef();
 
     const sliderSettings = {
@@ -94,83 +96,123 @@ const BannerSection = ({ banners }) => {
         setIsDragging(false);
     };
 
+    // Handle pinch-to-zoom
+    const handleTouchStart = (e) => {
+        if (e.touches.length === 2) {
+            const distance = calculateDistance(e.touches[0], e.touches[1]);
+            setInitialDistance(distance);
+        }
+    };
+
+    const handleTouchMove = (e) => {
+        if (e.touches.length === 2) {
+            const distance = calculateDistance(e.touches[0], e.touches[1]);
+            const zoomChange = (distance - initialDistance) / 200;
+            updateZoomLevel(currentSlide, Math.max(1, Math.min(zoomLevels[currentSlide] + zoomChange, 3)));
+            setInitialDistance(distance);
+        }
+    };
+
+    const calculateDistance = (touch1, touch2) => {
+        return Math.sqrt(
+            Math.pow(touch2.clientX - touch1.clientX, 2) + Math.pow(touch2.clientY - touch1.clientY, 2)
+        );
+    };
+
+    // Handle double-tap to zoom in
+    const handleDoubleTap = () => {
+        const now = Date.now();
+        if (now - lastTap < 300) {
+            if (zoomLevels[currentSlide] === 1) {
+                updateZoomLevel(currentSlide, 2);
+            } else {
+                resetZoom(currentSlide);
+            }
+        }
+        setLastTap(now);
+    };
+
     return (
-        <>
-            <div className="pt-24 mb-10">
-                {banners.length > 0 && (
-                    <Slider {...sliderSettings} className="mx-auto">
-                        {banners.map((banner, index) => (
-                            <div
-                                key={index}
-                                className="w-full relative h-[150px] px-2 rounded-3xl shadow-lg lg:h-[400px] cursor-pointer"
-                                onClick={() => {
-                                    setCurrentSlide(index);
-                                    setShowModal(true);
-                                    resetZoom(index);
-                                }}
-                            >
-                                <img
-                                    src={banner.url}
-                                    className="w-full h-full rounded-3xl object-cover"
-                                    alt={`offer-poster-${index + 1}`}
-                                />
-                            </div>
-                        ))}
-                    </Slider>
-                )}
-            </div>
-
-            {showModal && (
-                <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-75">
-                    <button
-                        onClick={() => {
-                            setShowModal(false);
-                            resetZoom(currentSlide);
-                        }}
-                        className="absolute right-2 top-2 z-10 p-2 bg-gray-800 rounded-full"
-                    >
-                        <X className="h-6 w-6 text-white" />
-                    </button>
-
-                    <div className="relative w-full max-w-4xl mx-4">
-                        <Slider {...modalSliderSettings} className="mx-auto">
+            <>
+                <div className="pt-24 mb-10">
+                    {banners.length > 0 && (
+                        <Slider {...sliderSettings} className="mx-auto">
                             {banners.map((banner, index) => (
                                 <div
                                     key={index}
-                                    className="w-full h-[80vh] overflow-hidden"
-                                    onMouseDown={handleDragStart}
-                                    onMouseMove={handleDragMove}
-                                    onMouseUp={handleDragEnd}
-                                    onMouseLeave={handleDragEnd}
-                                    style={{ touchAction: 'none' }}
+                                    className="w-full relative h-[150px] px-2 rounded-3xl shadow-lg lg:h-[400px] cursor-pointer"
+                                    onClick={() => {
+                                        setCurrentSlide(index);
+                                        setShowModal(true);
+                                        resetZoom(index);
+                                    }}
                                 >
                                     <img
                                         src={banner.url}
-                                        className="w-full h-full object-contain transition-transform duration-200"
+                                        className="w-full h-full rounded-3xl object-cover"
                                         alt={`offer-poster-${index + 1}`}
-                                        style={{
-                                            transform: `scale(${zoomLevels[index]}) translate(${offsetX}px, ${offsetY}px)`,
-                                            transformOrigin: 'center',
-                                        }}
-                                        draggable="false"
                                     />
                                 </div>
                             ))}
                         </Slider>
-
-                        <div className="flex justify-center gap-4 mt-4">
-                            <button onClick={handleZoomIn} className="p-2 bg-gray-800 rounded-full text-white">
-                                <ZoomIn />
-                            </button>
-                            <button onClick={handleZoomOut} className="p-2 bg-gray-800 rounded-full text-white">
-                                <ZoomOut />
-                            </button>
+                    )}
+                </div>
+    
+                {showModal && (
+                    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black">
+                        <button
+                            onClick={() => {
+                                setShowModal(false);
+                                resetZoom(currentSlide);
+                            }}
+                            className="absolute right-2 top-2 z-10 p-2 bg-gray-800 rounded-full"
+                        >
+                            <X className="h-6 w-6 text-white" />
+                        </button>
+    
+                        <div className="relative w-full max-w-4xl mx-4">
+                            <Slider {...modalSliderSettings} className="mx-auto backdrop-blur-lg">
+                                {banners.map((banner, index) => (
+                                    <div
+                                        key={index}
+                                        className="w-full h-[80vh] overflow-hidden"
+                                        onMouseDown={handleDragStart}
+                                        onMouseMove={handleDragMove}
+                                        onMouseUp={handleDragEnd}
+                                        onMouseLeave={handleDragEnd}
+                                        onTouchStart={handleTouchStart}
+                                        onTouchMove={handleTouchMove}
+                                        onTouchEnd={handleDragEnd}
+                                        onDoubleClick={handleDoubleTap}
+                                        style={{ touchAction: 'none' }}
+                                    >
+                                        <img
+                                            src={banner.url}
+                                            className="w-full h-full object-contain transition-transform duration-200"
+                                            alt={`offer-poster-${index + 1}`}
+                                            style={{
+                                                transform: `scale(${zoomLevels[index]}) translate(${offsetX}px, ${offsetY}px)`,
+                                                transformOrigin: 'center',
+                                            }}
+                                            draggable="false"
+                                        />
+                                    </div>
+                                ))}
+                            </Slider>
+    
+                            <div className="flex justify-center gap-4 mt-4">
+                                <button onClick={handleZoomIn} className="p-2 bg-gray-800 rounded-full text-white">
+                                    <ZoomIn />
+                                </button>
+                                <button onClick={handleZoomOut} className="p-2 bg-gray-800 rounded-full text-white">
+                                    <ZoomOut />
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
-        </>
-    );
-};
+                )}
+            </>
+        );
+    };
 
 export default BannerSection;
