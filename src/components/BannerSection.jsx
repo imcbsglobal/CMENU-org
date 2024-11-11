@@ -6,8 +6,7 @@ const BannerSection = ({ banners }) => {
     const [showModal, setShowModal] = useState(false);
     const [currentSlide, setCurrentSlide] = useState(0);
     const [zoomLevels, setZoomLevels] = useState(banners.map(() => 1));
-    const [offsetX, setOffsetX] = useState(0);
-    const [offsetY, setOffsetY] = useState(0);
+    const [offsets, setOffsets] = useState(banners.map(() => ({ x: 0, y: 0 })));
     const [isDragging, setIsDragging] = useState(false);
     const [startX, setStartX] = useState(0);
     const [startY, setStartY] = useState(0);
@@ -25,7 +24,6 @@ const BannerSection = ({ banners }) => {
         arrows: false,
         beforeChange: (_, next) => {
             setCurrentSlide(next);
-            resetZoom(next);
         },
         swipe: zoomLevels[currentSlide] === 1,
         touchMove: zoomLevels[currentSlide] === 1,
@@ -39,29 +37,30 @@ const BannerSection = ({ banners }) => {
     };
 
     const handleZoomIn = () => {
-        updateZoomLevel(currentSlide, Math.min(zoomLevels[currentSlide] + 0.5, 3));
+        setZoomLevels((prev) => {
+            const newZoomLevels = [...prev];
+            newZoomLevels[currentSlide] = Math.min(newZoomLevels[currentSlide] + 0.5, 3);
+            return newZoomLevels;
+        });
     };
 
     const handleZoomOut = () => {
-        const newZoom = Math.max(zoomLevels[currentSlide] - 0.5, 1);
-        updateZoomLevel(currentSlide, newZoom);
-        if (newZoom === 1) {
-            setOffsetX(0);
-            setOffsetY(0);
-        }
+        setZoomLevels((prev) => {
+            const newZoomLevels = [...prev];
+            const newZoom = Math.max(newZoomLevels[currentSlide] - 0.5, 1);
+            newZoomLevels[currentSlide] = newZoom;
+            if (newZoom === 1) {
+                resetOffsets();
+            }
+            return newZoomLevels;
+        });
     };
 
-    const resetZoom = (index) => {
-        updateZoomLevel(index, 1);
-        setOffsetX(0);
-        setOffsetY(0);
-    };
-
-    const updateZoomLevel = (index, newZoom) => {
-        setZoomLevels((prevZoomLevels) => {
-            const updatedZoomLevels = [...prevZoomLevels];
-            updatedZoomLevels[index] = newZoom;
-            return updatedZoomLevels;
+    const resetOffsets = () => {
+        setOffsets((prev) => {
+            const newOffsets = [...prev];
+            newOffsets[currentSlide] = { x: 0, y: 0 };
+            return newOffsets;
         });
     };
 
@@ -82,13 +81,17 @@ const BannerSection = ({ banners }) => {
         const deltaX = (x - startX) / zoomLevels[currentSlide];
         const deltaY = (y - startY) / zoomLevels[currentSlide];
 
-        // Calculate maximum offset based on zoom level
         const maxOffsetX = (zoomLevels[currentSlide] - 1) * 200;
         const maxOffsetY = (zoomLevels[currentSlide] - 1) * 200;
 
-        // Update offsets, clamping them to the max offset limits
-        setOffsetX((prev) => Math.max(Math.min(prev + deltaX, maxOffsetX), -maxOffsetX));
-        setOffsetY((prev) => Math.max(Math.min(prev + deltaY, maxOffsetY), -maxOffsetY));
+        setOffsets((prev) => {
+            const newOffsets = [...prev];
+            newOffsets[currentSlide] = {
+                x: Math.max(Math.min(prev[currentSlide].x + deltaX, maxOffsetX), -maxOffsetX),
+                y: Math.max(Math.min(prev[currentSlide].y + deltaY, maxOffsetY), -maxOffsetY),
+            };
+            return newOffsets;
+        });
 
         setStartX(x);
         setStartY(y);
@@ -110,7 +113,6 @@ const BannerSection = ({ banners }) => {
                                 onClick={() => {
                                     setCurrentSlide(index);
                                     setShowModal(true);
-                                    resetZoom(index);
                                 }}
                             >
                                 <img
@@ -129,7 +131,8 @@ const BannerSection = ({ banners }) => {
                     <button
                         onClick={() => {
                             setShowModal(false);
-                            resetZoom(currentSlide);
+                            setZoomLevels(banners.map(() => 1));
+                            setOffsets(banners.map(() => ({ x: 0, y: 0 })));
                         }}
                         className="absolute right-2 top-2 z-10 p-2 bg-gray-800 rounded-full"
                     >
@@ -156,7 +159,7 @@ const BannerSection = ({ banners }) => {
                                         className="w-full h-full object-contain transition-transform duration-200"
                                         alt={`offer-poster-${index + 1}`}
                                         style={{
-                                            transform: `scale(${zoomLevels[index]}) translate(${offsetX}px, ${offsetY}px)`,
+                                            transform: `scale(${zoomLevels[index]}) translate(${offsets[index].x}px, ${offsets[index].y}px)`,
                                             transformOrigin: 'center',
                                         }}
                                         draggable="false"
