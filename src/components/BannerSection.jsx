@@ -171,7 +171,7 @@ const BannerSection = ({ banners }) => {
                         </button>
     
                         <div className="relative w-full max-w-4xl mx-4">
-                            <Slider {...modalSliderSettings} className="mx-auto backdrop-blur-lg">
+                            <Slider {...modalSliderSettings} className="mx-4 backdrop-blur-lg">
                                 {banners.map((banner, index) => (
                                     <div
                                         key={index}
