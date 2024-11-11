@@ -94,3 +94,6 @@ tbody tr td{
   padding-top:10px ;
   padding-bottom: 10px;
 }
+.GlassBack{
+  backdrop-filter: blur(20px);
+}

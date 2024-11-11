@@ -16,6 +16,7 @@ import { FcGoogle } from "react-icons/fc";
 import { useNavigate } from "react-router-dom";
 import { get } from "firebase/database";
 import Loader from "./Loader";
+import BannerSection from "./BannerSection";
 
 const CustomerView = () => {
   const { adminId } = useParams();
@@ -319,7 +320,7 @@ const CustomerView = () => {
             </header>
 
             {/* Banner Section */}
-            <div className="pt-24 mb-10">
+            {/* <div className="pt-24 mb-10">
               {banners.length > 0 && (
                 <Slider {...settings} className="mx-auto">
                   {banners.map((banner, index) => (
@@ -335,11 +336,11 @@ const CustomerView = () => {
                     </div>
                   ))}
                 </Slider>
-              // ) : (
-              //   <div className="grid place-items-center text-center">
-              //     No banners available
-              //   </div>
               )}
+            </div> */}
+
+            <div>
+              <BannerSection banners = {banners}/>
             </div>
 
             {/* Categories Section */}
