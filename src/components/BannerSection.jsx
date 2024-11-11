@@ -12,6 +12,7 @@ const BannerSection = ({banners}) => {
     const [isDragging, setIsDragging] = useState(false);
     const [startX, setStartX] = useState(0);
     const [startY, setStartY] = useState(0);
+    const [initialPinchDistance, setInitialPinchDistance] = useState(null);
 
     const sliderSettings = {
         dots: true,
@@ -25,7 +26,7 @@ const BannerSection = ({banners}) => {
         arrows: false,
         beforeChange: (_, next) => setCurrentSlide(next),
         accessibility: true,
-        swipe: scale === 1, // Only allow sliding when not zoomed
+        swipe: scale === 1,
         touchMove: scale === 1,
     };
 
@@ -36,88 +37,45 @@ const BannerSection = ({banners}) => {
         arrows: true,
     };
 
-    const handleDoubleTap = (e) => {
-        const currentTime = new Date().getTime();
-        const tapGap = currentTime - lastTap;
-
-        if (tapGap < 300 && tapGap > 0) {
-            if (scale === 1) {
-                // Zoom in to where the user double-tapped
-                const rect = e.target.getBoundingClientRect();
-                const x = (e.clientX || e.touches[0].clientX) - rect.left;
-                const y = (e.clientY || e.touches[0].clientY) - rect.top;
-                setOffsetX((window.innerWidth / 2 - x) * 2);
-                setOffsetY((window.innerHeight / 2 - y) * 2);
-                setScale(2);
-            } else {
-                // Reset zoom
-                setScale(1);
-                setOffsetX(0);
-                setOffsetY(0);
-            }
-        }
-        setLastTap(currentTime);
-    };
-
-    const handleZoomIn = () => {
-        setScale(prev => {
-            const newScale = Math.min(prev + 0.5, 3);
-            if (prev === 1 && newScale > 1) {
-                // Center the zoom
-                setOffsetX(0);
-                setOffsetY(0);
-            }
-            return newScale;
-        });
-    };
-
-    const handleZoomOut = () => {
-        setScale(prev => {
-            const newScale = Math.max(prev - 0.5, 1);
-            if (newScale === 1) {
-                // Reset position when fully zoomed out
-                setOffsetX(0);
-                setOffsetY(0);
-            }
-            return newScale;
-        });
-    };
-
-    const handleDragStart = (e) => {
-        if (scale > 1) {
+    const handleTouchStart = (e) => {
+        if (e.touches.length === 2) {
+            const distance = getDistance(e.touches);
+            setInitialPinchDistance(distance);
+        } else if (scale > 1 && e.touches.length === 1) {
             setIsDragging(true);
-            setStartX(e.clientX || e.touches[0].clientX);
-            setStartY(e.clientY || e.touches[0].clientY);
+            setStartX(e.touches[0].clientX);
+            setStartY(e.touches[0].clientY);
         }
     };
 
-    const handleDragMove = (e) => {
-        if (!isDragging) return;
-        const x = e.clientX || e.touches[0].clientX;
-        const y = e.clientY || e.touches[0].clientY;
-        
-        const deltaX = x - startX;
-        const deltaY = y - startY;
-
-        // Calculate boundaries based on zoom level
-        const maxOffset = (scale - 1) * 150; // Adjust this value based on your needs
-        
-        setOffsetX(prev => {
-            const newOffset = prev + deltaX;
-            return Math.max(Math.min(newOffset, maxOffset), -maxOffset);
-        });
-        
-        setOffsetY(prev => {
-            const newOffset = prev + deltaY;
-            return Math.max(Math.min(newOffset, maxOffset), -maxOffset);
-        });
-        
-        setStartX(x);
-        setStartY(y);
+    const handleTouchMove = (e) => {
+        if (e.touches.length === 2) {
+            const distance = getDistance(e.touches);
+            if (initialPinchDistance) {
+                const newScale = Math.max(1, Math.min((distance / initialPinchDistance) * scale, 3));
+                setScale(newScale);
+            }
+        } else if (isDragging && e.touches.length === 1) {
+            const deltaX = e.touches[0].clientX - startX;
+            const deltaY = e.touches[0].clientY - startY;
+            setOffsetX(prev => prev + deltaX);
+            setOffsetY(prev => prev + deltaY);
+            setStartX(e.touches[0].clientX);
+            setStartY(e.touches[0].clientY);
+        }
     };
 
-    const handleDragEnd = () => {
+    const handleTouchEnd = () => {
         setIsDragging(false);
+        setInitialPinchDistance(null);
+    };
+
+    const getDistance = (touches) => {
+        const [touch1, touch2] = touches;
+        return Math.sqrt(
+            Math.pow(touch2.clientX - touch1.clientX, 2) +
+            Math.pow(touch2.clientY - touch1.clientY, 2)
+        );
     };
 
     const resetZoom = () => {
@@ -164,21 +122,16 @@ const BannerSection = ({banners}) => {
                         >
                             <X className="h-6 w-6 text-[#fff]" />
                         </button>
-                        
+
                         <div className="p-4 rounded-lg">
                             <Slider {...modalSliderSettings} className="mx-auto">
                                 {banners.map((banner, index) => (
                                     <div 
                                         key={index} 
                                         className="w-full h-[80vh] overflow-hidden touch-none"
-                                        onTouchStart={handleDragStart}
-                                        onTouchMove={handleDragMove}
-                                        onTouchEnd={handleDragEnd}
-                                        onMouseDown={handleDragStart}
-                                        onMouseMove={handleDragMove}
-                                        onMouseUp={handleDragEnd}
-                                        onMouseLeave={handleDragEnd}
-                                        onDoubleClick={handleDoubleTap}
+                                        onTouchStart={handleTouchStart}
+                                        onTouchMove={handleTouchMove}
+                                        onTouchEnd={handleTouchEnd}
                                         style={{ touchAction: 'none' }}
                                     >
                                         <img
@@ -195,15 +148,6 @@ const BannerSection = ({banners}) => {
                                     </div>
                                 ))}
                             </Slider>
-                        </div>
-
-                        <div className="justify-center items-center flex gap-10 text-[#fff]">
-                            <button onClick={handleZoomIn} className="p-2">
-                                <ZoomIn />
-                            </button>
-                            <button onClick={handleZoomOut} className="p-2">
-                                <ZoomOut />
-                            </button>
                         </div>
                     </div>
                 </div>
