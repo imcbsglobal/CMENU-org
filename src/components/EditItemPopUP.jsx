@@ -8,36 +8,49 @@ import { db } from './Firebase'; // Make sure you're importing your Firebase set
 
 const EditItemPopUP = ({ setItemEditPopUp, itemData, handleUpdateItem }) => {
   const [editedItemName, setEditedItemName] = useState(itemData.name);
-  const [editedItemPrice, setEditedItemPrice] = useState(itemData.price);
+  const [editedItemPrice, setEditedItemPrice] = useState(itemData.price || '');
   const [editedItemPrice2, setEditedItemPrice2] = useState(itemData.price2 || '');
   const [editedItemPrice3, setEditedItemPrice3] = useState(itemData.price3 || '');
   const [editedItemImage, setEditedItemImage] = useState(null);
 
   useEffect(() => {
-    setEditedItemName(itemData.name);
-    setEditedItemPrice(itemData.price);
+    // Initialize state with existing values or empty strings
+    setEditedItemName(itemData.name || '');
+    setEditedItemPrice(itemData.price || '');
     setEditedItemPrice2(itemData.price2 || '');
     setEditedItemPrice3(itemData.price3 || '');
-    // Don't reset image selection here
   }, [itemData]);
 
   const handleImageChange = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile && selectedFile.size > 50 * 1024) {
       toast.error('File size must be under 50KB!');
-      setEditedItemImage(null); // Reset the image if too large
+      setEditedItemImage(null);
     } else {
       setEditedItemImage(selectedFile);
     }
   };
 
   const handleSaveChanges = () => {
-    console.log("Saving Changes:", editedItemName, editedItemPrice, editedItemPrice2, editedItemPrice3, editedItemImage);
-    
-    handleUpdateItem(editedItemName, editedItemPrice, editedItemPrice2, editedItemPrice3, editedItemImage)
+    // Create an object with the updates, including empty strings for cleared prices
+    const updates = {
+      name: editedItemName,
+      price: editedItemPrice || '',
+      price2: editedItemPrice2 || '',
+      price3: editedItemPrice3 || '',
+      image: editedItemImage
+    };
+
+    handleUpdateItem(
+      updates.name,
+      updates.price,
+      updates.price2,
+      updates.price3,
+      updates.image
+    )
       .then(() => {
         toast.success("Item updated successfully!");
-        setItemEditPopUp(false); // Close the popup only after success
+        setItemEditPopUp(false);
       })
       .catch((error) => {
         toast.error("Error updating item: " + error.message);
@@ -69,21 +82,21 @@ const EditItemPopUP = ({ setItemEditPopUp, itemData, handleUpdateItem }) => {
             value={editedItemPrice}
             onChange={(e) => setEditedItemPrice(e.target.value)}
             className='w-full py-3 pl-3 rounded-xl border-none outline-none'
-            placeholder='Item Price'
+            placeholder='Normal Price'
           />
           <input
             type="text"
             value={editedItemPrice2}
             onChange={(e) => setEditedItemPrice2(e.target.value)}
             className='w-full py-3 pl-3 rounded-xl border-none outline-none'
-            placeholder='Item Price'
+            placeholder='A/C Price'
           />
           <input
             type="text"
             value={editedItemPrice3}
             onChange={(e) => setEditedItemPrice3(e.target.value)}
             className='w-full py-3 pl-3 rounded-xl border-none outline-none'
-            placeholder='Item Price'
+            placeholder='Parcel Price'
           />
           <div className='flex justify-center gap-10'>
             <input type="file" onChange={handleImageChange} className='hidden' id="editItemImage" />

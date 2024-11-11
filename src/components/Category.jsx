@@ -291,18 +291,18 @@ const Category = () => {
         `categories/${selectedCategory}/items/${selectedItem.id}`
       );
   
-      // Fetch the existing item data first
       get(itemRef)
         .then((snapshot) => {
           const existingData = snapshot.val();
   
           // Create an object to hold the updated item data
+          // Preserve empty strings for cleared prices
           const updatedItemData = {
             name: name || existingData.name,
-            price: price || existingData.price,
-            price2: price2 || existingData.price2,
-            price3: price3 || existingData.price3,
-            imageUrl: existingData.imageUrl, // Keep the old image URL by default
+            price: price !== undefined ? price : existingData.price,
+            price2: price2 !== undefined ? price2 : existingData.price2,
+            price3: price3 !== undefined ? price3 : existingData.price3,
+            imageUrl: existingData.imageUrl,
           };
   
           if (image) {
@@ -312,33 +312,20 @@ const Category = () => {
               `categories/${selectedCategory}/items/${image.name}`
             );
             uploadBytes(imageRef, image)
-              .then((snapshot) => {
-                return getDownloadURL(snapshot.ref);
-              })
+              .then((snapshot) => getDownloadURL(snapshot.ref))
               .then((downloadURL) => {
-                updatedItemData.imageUrl = downloadURL; // Set new image URL
+                updatedItemData.imageUrl = downloadURL;
                 return set(itemRef, updatedItemData);
               })
-              .then(() => {
-                resolve(); // Resolve the promise after successful update
-              })
-              .catch((error) => {
-                reject("Error uploading image: " + error.message);
-              });
+              .then(resolve)
+              .catch((error) => reject("Error uploading image: " + error.message));
           } else {
-            // If there's no new image, just update the name and price
             set(itemRef, updatedItemData)
-              .then(() => {
-                resolve(); // Resolve the promise after successful update
-              })
-              .catch((error) => {
-                reject("Error updating item: " + error.message);
-              });
+              .then(resolve)
+              .catch((error) => reject("Error updating item: " + error.message));
           }
         })
-        .catch((error) => {
-          reject("Error fetching item: " + error.message);
-        });
+        .catch((error) => reject("Error fetching item: " + error.message));
     });
   };
   
