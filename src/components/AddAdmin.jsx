@@ -45,10 +45,19 @@ const AddAdmin = () => {
 
     // Calculate validity period
     const startDate = new Date();
-    const endDate = new Date(startDate.getFullYear(), startDate.getMonth() + 3, startDate.getDate());
-    const validityStart = startDate.toLocaleDateString('en-US', { day: '2-digit', month: '2-digit', year: 'numeric' });
-    const validityEnd = endDate.toLocaleDateString('en-US', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    const endDate = new Date(startDate.getFullYear() + 1, startDate.getMonth(), startDate.getDate());
+
+    const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+    const validityStart = startDate.toLocaleDateString('en-GB', options);
+    const validityEnd = endDate.toLocaleDateString('en-GB', options);
+
     const validity = `${validityStart} - ${validityEnd}`;
+
+    console.log(validity);
+
+
+    console.log(validity);
+
 
     try {
       // Create user in Firebase Authentication

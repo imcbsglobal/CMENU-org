@@ -38,7 +38,7 @@ const UploadBanners = ({ storagePath, dbPath }) => {
         // Show an error or pop-up message here
         // alert('File size exceeds the 50KB limit. Please select a smaller file.');
         toast.error("File size must be under 500KB!",{position:'top-center'})
-        setIsError(true); // Set error state to true
+        setIsError(true); 
         return; // Exit the function, do not set the file
       }
       setFile(fileData);
