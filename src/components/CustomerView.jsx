@@ -35,6 +35,9 @@ const CustomerView = () => {
   const navigate = useNavigate();
   const categoryRef = useRef(null);
   const [isSticky, setIsSticky] = useState(false);
+  const [backgroundColor, setBackgroundColor] = useState("#d6eda1"); // Default color
+  const [fontColor, setFontColor] = useState("#000"); // Default color
+
   
   // console.log("AdminId Is", adminId);
   useEffect(() => {
@@ -49,6 +52,53 @@ const CustomerView = () => {
       }
     });
   }, [adminId]);
+
+  // Admin Background Color
+//   useEffect(() => {
+//     if (adminId) {
+        
+//         const colorRef = ref(db, `adminColors/${adminId}`);
+//         onValue(colorRef, (snapshot) => {
+//             if (snapshot.exists()) {
+//                 setBackgroundColor(snapshot.val().color);
+//             }
+//         });
+//     }
+// }, [adminId]);
+
+// Admin Font Color
+// useEffect(() => {
+//   if (adminId) {
+     
+//       const colorRef = ref(db, `adminFontColors/${adminId}`);
+//       onValue(colorRef, (snapshot) => {
+//           if (snapshot.exists()) {
+//               setBackgroundColor(snapshot.val().fontcolor);
+//           }
+//       });
+//   }
+// }, [adminId]);
+
+useEffect(() => {
+  if (adminId) {
+      // Listen for background color changes
+      const colorRef = ref(db, `adminColors/${adminId}`);
+      onValue(colorRef, (snapshot) => {
+          if (snapshot.exists()) {
+              setBackgroundColor(snapshot.val().color);
+          }
+      });
+
+      // Listen for font color changes
+      const fontColorRef = ref(db, `adminFontColors/${adminId}`);
+      onValue(fontColorRef, (snapshot) => {
+          if (snapshot.exists()) {
+              setFontColor(snapshot.val().fontColor); // Note: changed from fontcolor to fontColor
+          }
+      });
+  }
+}, [adminId]);
+
 
   // Fetch logo
   useEffect(() => {
@@ -252,7 +302,7 @@ const CustomerView = () => {
   });
 
   return (
-    <div>
+    <div style={{ backgroundColor }} className=" min-h-screen">
       {isLoading ? (
         <Loader />
       ) : (
@@ -360,9 +410,9 @@ const CustomerView = () => {
             </div>
 
             <div
-              className={"flex gap-10 overflow-x-auto whitespace-nowrap w-full HideScrollBar mb-10 px-2 bg-[#d6eda1] backdrop-blur-xl sticky top-0 z-50"}
+              className={"flex gap-10 overflow-x-auto whitespace-nowrap w-full HideScrollBar mb-10 px-2 backdrop-blur-xl sticky top-0 z-50"}
               id="stickyCategory"
-            >
+             style={{ backgroundColor }}>
               {filteredCategories.map((category) => (
                 <div
                   key={category.id}
@@ -381,7 +431,7 @@ const CustomerView = () => {
                       className="object-cover w-full h-full"
                     />
                   </div>
-                  <div className="mt-2 font-bold text-[11px] lg:text-lg ItemText">
+                  <div className="mt-2 font-bold text-[13px] lg:text-lg ItemText" style={{ color : fontColor}}>
                     {category.name}
                   </div>
                 </div>
@@ -404,7 +454,7 @@ const CustomerView = () => {
               </div>
             </div>
 
-            <div className="mt-5 w-full px-2 mb-20">
+            <div className="mt-5 w-full px-2 pb-16">
               {displayedItems.length > 0 ? (
                 displayedItems.map((item) => (
                   <div

@@ -24,6 +24,7 @@ import { MdDelete } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import {  setPersistence, browserLocalPersistence } from 'firebase/auth';
 import ForgotPassword from './ForgotPassword';
+import ColorPicker from './ColorPicker';
 
 
 const Home = () => {
@@ -202,8 +203,11 @@ const Home = () => {
           <div className=' absolute top-5 right-5 text-2xl' >
             <IoClose onClick={handleOpenAdminPanel} className='cursor-pointer'/>
           </div>
-          <div className='text-center mb-20 text-xl font-bold flex justify-center items-center gap-2 text-[#082114] cursor-pointer' onClick={()=>setOpenAdminProfile(!openAdminProfile)}>Admin Panel <span className='text-xl text-[#6d8040]'><FaUser/></span></div>
-          <ul className='flex flex-col justify-center items-start gap-6 font-semibold text-lg mb-20'>
+          <div className='text-center mb-10 text-xl font-bold flex justify-center items-center gap-2 text-[#082114] cursor-pointer' onClick={()=>setOpenAdminProfile(!openAdminProfile)}>Admin Panel <span className='text-xl text-[#6d8040]'><FaUser/></span></div>
+          <div>
+            <ColorPicker/>
+          </div>
+          <ul className='flex flex-col justify-center items-start gap-6 font-semibold text-lg mb-10'>
             <li className='cursor-pointer' onClick={()=>{document.getElementById("uploadLogo").scrollIntoView({ behavior:"smooth" });setOPenAdminPanel(!openAdminPanel)}}>Upload Logo</li>
             <li className='cursor-pointer' onClick={()=>{document.getElementById("uploadBanner").scrollIntoView({ behavior:'smooth' }); setOPenAdminPanel(!openAdminPanel)}}>Upload Banner</li>
             <li className='cursor-pointer' onClick={()=>{document.getElementById("addCategory").scrollIntoView({ behavior:'smooth' }); setOPenAdminPanel(!openAdminPanel)}} >Add Category</li>
@@ -228,7 +232,10 @@ const Home = () => {
       <div className='md:flex justify-center w-full'>
         {/* First Div (Side Navbar) */}
         <div className='md:w-[20%] md:h-screen hidden md:block'>
-          <div className=' md:fixed flex-col gap-5 w-[20%] h-screen bg-[#fff] md:flex justify-center items-center'>
+          <div className=' md:fixed flex-col gap-5 w-[20%] h-screen bg-[#fff] md:flex justify-center items-center relative'>
+            <div>
+              <ColorPicker/>
+            </div>
             <div className='flex justify-center items-center'>
               {logoUrl && (
                 <div className=' flex justify-center flex-col items-center gap-3'>
