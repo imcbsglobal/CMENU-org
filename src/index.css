@@ -101,3 +101,6 @@ tbody tr td{
   transition: all 2s ease;
   border-radius: 10px;
 }
+.PinchToZoomIn{
+  transition: transform 0.3s ease-out;
+}
