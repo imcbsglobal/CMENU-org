@@ -431,7 +431,10 @@ useEffect(() => {
                       className="object-cover w-full h-full"
                     />
                   </div>
-                  <div className="mt-2 font-bold text-[13px] lg:text-lg ItemText" style={{ color : fontColor}}>
+                  <div className="mt-2 font-bold text-[13px] lg:text-lg ItemText" 
+                  style={{ color : 
+                        activeCategoryId === category.id ? "#1eb5ad" : fontColor
+                  }}>
                     {category.name}
                   </div>
                 </div>

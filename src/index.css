@@ -104,3 +104,6 @@ tbody tr td{
 .PinchToZoomIn{
   transition: transform 0.3s ease-out;
 }
+.active-category {
+  color: #1eb5ad;
+}
