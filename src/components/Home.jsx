@@ -25,6 +25,7 @@ import { useNavigate } from "react-router-dom";
 import {  setPersistence, browserLocalPersistence } from 'firebase/auth';
 import ForgotPassword from './ForgotPassword';
 import ColorPicker from './ColorPicker';
+import GSTAdding from './GSTAdding';
 
 
 const Home = () => {
@@ -330,6 +331,9 @@ const Home = () => {
           </div>
           <div>
             <BannerSlider />
+          </div>
+          <div>
+            <GSTAdding/>
           </div>
           <div>
             <Category />

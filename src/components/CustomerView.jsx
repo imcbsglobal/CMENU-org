@@ -17,6 +17,7 @@ import { useNavigate } from "react-router-dom";
 import { get } from "firebase/database";
 import Loader from "./Loader";
 import BannerSection from "./BannerSection";
+import { HiReceiptTax } from "react-icons/hi";
 
 const CustomerView = () => {
   const { adminId } = useParams();
@@ -37,6 +38,8 @@ const CustomerView = () => {
   const [isSticky, setIsSticky] = useState(false);
   const [backgroundColor, setBackgroundColor] = useState("#d6eda1"); // Default color
   const [fontColor, setFontColor] = useState("#000"); // Default color
+  const [gstTitle, setGstTitle] = useState(""); // State for GST title
+
 
   
   // console.log("AdminId Is", adminId);
@@ -301,6 +304,21 @@ useEffect(() => {
     }
   });
 
+  // GST 
+
+  // Load saved GST title from Firebase on component mount
+  useEffect(() => {
+    if (adminId) {
+      const gstRef = ref(db, `adminGST/${adminId}`);
+      onValue(gstRef, (snapshot) => {
+        if (snapshot.exists()) {
+          const savedGstTitle = snapshot.val().gstTitle;
+          setGstTitle(savedGstTitle);
+        }
+      });
+    }
+  }, [adminId]);
+
   return (
     <div style={{ backgroundColor }} className=" min-h-screen">
       {isLoading ? (
@@ -390,9 +408,10 @@ useEffect(() => {
             </div> */}
 
             <div>
-              <BannerSection banners = {banners}/>
+              <BannerSection banners={banners} />
             </div>
-
+            {/* GST Display */}
+            <div className="mb-2 px-2 font-semibold text-[#fff] flex justify-start items-center gap-2">{gstTitle}<span><HiReceiptTax/></span></div>
             {/* Categories Section */}
             <div className="flex justify-start items-start mb-5 px-2">
               <div className="relative flex justify-start items-center">
@@ -410,9 +429,12 @@ useEffect(() => {
             </div>
 
             <div
-              className={"flex gap-10 overflow-x-auto whitespace-nowrap w-full HideScrollBar mb-10 px-2 backdrop-blur-xl sticky top-0 z-50"}
+              className={
+                "flex gap-10 overflow-x-auto whitespace-nowrap w-full HideScrollBar mb-10 px-2 backdrop-blur-xl sticky top-0 z-50"
+              }
               id="stickyCategory"
-             style={{ backgroundColor }}>
+              style={{ backgroundColor }}
+            >
               {filteredCategories.map((category) => (
                 <div
                   key={category.id}
@@ -431,10 +453,15 @@ useEffect(() => {
                       className="object-cover w-full h-full"
                     />
                   </div>
-                  <div className="mt-2 font-bold text-[13px] lg:text-lg ItemText" 
-                  style={{ color : 
-                        activeCategoryId === category.id ? "#1eb5ad" : fontColor
-                  }}>
+                  <div
+                    className="mt-2 font-bold text-[13px] lg:text-lg ItemText"
+                    style={{
+                      color:
+                        activeCategoryId === category.id
+                          ? "#1eb5ad"
+                          : fontColor,
+                    }}
+                  >
                     {category.name}
                   </div>
                 </div>
