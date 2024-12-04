@@ -107,3 +107,16 @@ tbody tr td{
 .active-category {
   color: #1eb5ad;
 }
+
+@media screen and (min-width:600px){
+  .BannerHeight{
+    height: 200px;
+  }
+}
+
+
+@media screen and (min-width:700px){
+  .BannerHeight{
+    height: 250px;
+  }
+}
