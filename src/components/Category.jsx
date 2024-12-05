@@ -466,7 +466,7 @@ const handleToggleItemVisibility = (itemId, isHidden) => {
               </span>
             </div>
           </div>
-          <div className="flex gap-10 overflow-x-auto whitespace-nowrap w-full HideScrollBar">
+          <div className="flex gap-10 overflow-x-auto whitespace-nowrap w-full">
           {filteredCategories.length > 0 ? (
                     filteredCategories.map((category) => (
                         <div

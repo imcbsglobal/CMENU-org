@@ -160,7 +160,7 @@ const BannerSection = ({ banners }) => {
               {banners.map((banner, index) => (
                 <div
                   key={index}
-                  className="w-full relative h-[150px] BannerHeight md:h-[300px] px-2 rounded-3xl shadow-lg lg:h-[400px] cursor-pointer"
+                  className="w-full relative h-full BannerHeight md:h-[300px] px-2 rounded-3xl shadow-lg lg:h-[400px] cursor-pointer"
                   onClick={() => {
                     setCurrentSlide(index);
                     setShowModal(true);
