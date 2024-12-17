@@ -88,14 +88,14 @@ const UploadBanners = ({ storagePath, dbPath }) => {
       <input type="file" accept="image/*" ref={inRef} className="hidden" onChange={handleInputFile} />
       <div className="flex justify-center items-center gap-10 mt-5">
         <button
-          className="px-8 py-2 bg-[#ffffff4a] text-white font-bold rounded-lg flex items-center gap-2"
+          className="px-8 py-2 bg-[#ffffff4a] text-[#80964c] font-bold rounded-lg flex items-center gap-2 border border-[#fff]"
           onClick={selectImage}
         >
           Select <BiSolidFileImage />
         </button>
         <button
           onClick={handleImageUpload}
-          className="px-8 py-2 bg-[#ffffff4a] text-white font-bold rounded-lg flex items-center gap-2"
+          className="px-8 py-2 bg-[#ffffff4a] text-[#80964c] font-bold rounded-lg flex items-center gap-2 border border-[#fff]"
         >
           Upload <FaSquarePlus />
         </button>

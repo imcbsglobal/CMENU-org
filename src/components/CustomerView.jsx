@@ -411,7 +411,10 @@ useEffect(() => {
               <BannerSection banners={banners} />
             </div>
             {/* GST Display */}
-            <div className="mb-2 px-2 font-semibold flex justify-start items-center gap-2 ItemText" style={{color : fontColor}}>{gstTitle}<span><HiReceiptTax/></span></div>
+            {gstTitle && (
+              <div className="mb-2 px-2 font-semibold flex justify-start items-center gap-2 ItemText" style={{color : fontColor}}>{gstTitle}<span><HiReceiptTax/></span></div>
+            )}
+            
             {/* Categories Section */}
             <div className="flex justify-start items-start mb-5 px-2">
               <div className="relative flex justify-start items-center">
