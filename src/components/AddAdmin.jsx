@@ -56,9 +56,6 @@ const AddAdmin = () => {
     console.log(validity);
 
 
-    console.log(validity);
-
-
     try {
       // Create user in Firebase Authentication
       const auth = getAuth();

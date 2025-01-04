@@ -154,7 +154,7 @@ const BannerSection = ({ banners }) => {
 
     return (
       <>
-        <div className="pt-24 mb-10">
+        <div className="pt-24 mb-2">
           {banners.length > 0 && (
             <Slider {...sliderSettings} className="mx-auto">
               {banners.map((banner, index) => (

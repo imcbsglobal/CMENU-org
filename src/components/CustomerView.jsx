@@ -416,7 +416,7 @@ useEffect(() => {
             )}
             
             {/* Categories Section */}
-            <div className="flex justify-start items-start mb-5 px-2">
+            <div className="flex justify-start items-start mb-3 px-2">
               <div className="relative flex justify-start items-center">
                 <input
                   type="text"
@@ -433,7 +433,7 @@ useEffect(() => {
 
             <div
               className={
-                "flex gap-10 overflow-x-auto whitespace-nowrap w-full HideScrollBar mb-10 px-2 backdrop-blur-xl sticky top-0 z-50"
+                "flex gap-10 overflow-x-auto whitespace-nowrap w-full HideScrollBar mb-2 px-2 backdrop-blur-xl sticky top-0 z-50"
               }
               id="stickyCategory"
               style={{ backgroundColor }}
@@ -546,13 +546,13 @@ useEffect(() => {
             <div className="bg-[#fff] w-full py-2 px-2 flex flex-col justify-center items-center fixed bottom-0 z-50">
               <div className="text-center flex flex-col justify-center items-center text-[10px] text-[#383636] ItemText">
                 Powered by{" "}
-                <span className="block text-sm font-semibold text-[#80964c]">
+                <a href="https://imcbsglobal.com/"><span className="block text-sm font-semibold text-[#80964c]">
                   IMC Business Solutions
-                </span>
-                <span className=" flex justify-center items-center gap-2 font-bold text-[#383636]">
+                </span></a>
+                {/* <span className=" flex justify-center items-center gap-2 font-bold text-[#383636]">
                   <FaPhoneAlt className="text-[#80964c]" />
                   +91 7593820007
-                </span>
+                </span> */}
               </div>
             </div>
           </div>
