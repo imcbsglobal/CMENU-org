@@ -325,7 +325,7 @@ const Home = () => {
               <IoQrCodeSharp className='drop-shadow-lg text-[#fff] cursor-pointer' onClick={handleGenerateQR} />
             </div>
           )} */}
-
+          
           <div>
             <Navbar handleOpenAdminPanel={handleOpenAdminPanel} setOPenAdminPanel={setOPenAdminPanel}/>
           </div>

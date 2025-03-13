@@ -417,10 +417,10 @@ useEffect(() => {
             
             {/* Categories Section */}
             <div className="flex justify-start items-start mb-3 px-2">
-              <div className="relative flex justify-start items-center">
+              <div className="relative flex justify-start items-center w-full">
                 <input
                   type="text"
-                  className="outline-none border-none rounded-lg py-2 px-8"
+                  className="outline-none border-none rounded-lg py-2 px-8 w-full"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Search Categories.."
@@ -473,10 +473,10 @@ useEffect(() => {
 
             {/* Items Section */}
             <div className="flex justify-start items-start mb-5 px-2">
-              <div className="relative flex justify-start items-center">
+              <div className="relative flex justify-start items-center w-full">
                 <input
                   type="text"
-                  className="outline-none border-none rounded-lg py-2 px-8"
+                  className="outline-none border-none rounded-lg py-2 px-8 w-full"
                   value={searchTerm2}
                   onChange={(e) => setSearchTerm2(e.target.value)}
                   placeholder="Search items..."
@@ -492,16 +492,16 @@ useEffect(() => {
                 displayedItems.map((item) => (
                   <div
                     key={item.id}
-                    className="flex justify-between items-center mb-5 GlassBackground px-2 h-[80px] rounded-2xl"
+                    className="flex justify-between items-center mb-3 GlassBackground px-2 h-[100px] rounded-2xl"
                   >
                     <div className="flex items-center gap-4">
                       <img
                         src={item.imageUrl}
                         alt={item.name}
-                        className="w-16 h-16 rounded-lg object-cover GlassBackground"
+                        className="w-16 h-[85px] rounded-lg object-cover GlassBackground"
                       />
                       <div>
-                        <div className="text-md font-bold ItemText">
+                        <div className="text-base font-semibold ItemText leading-tight">
                           {item.name}
                         </div>
                         {/* Price */}
