@@ -412,9 +412,17 @@ useEffect(() => {
             </div>
             {/* GST Display */}
             {gstTitle && (
-              <div className="mb-2 px-2 font-semibold flex justify-start items-center gap-2 ItemText" style={{color : fontColor}}>{gstTitle}<span><HiReceiptTax/></span></div>
+              <div
+                className="mb-2 px-2 font-semibold flex justify-start items-center gap-2 ItemText"
+                style={{ color: fontColor }}
+              >
+                {gstTitle}
+                <span>
+                  <HiReceiptTax />
+                </span>
+              </div>
             )}
-            
+
             {/* Categories Section */}
             <div className="flex justify-start items-start mb-3 px-2">
               <div className="relative flex justify-start items-center w-full">
@@ -533,6 +541,15 @@ useEffect(() => {
                               </div>
                             </div>
                           )}
+                          {item.price4 && (
+                            <div className=" flex flex-col justify-center items-center">
+                              <div className="text-sm font-semibold">Combo Price</div>
+                              <div className="text-sm flex items-center gap-1 font-bold ItemText">
+                                <TbCurrencyRupee />
+                                {item.price4}
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -546,9 +563,11 @@ useEffect(() => {
             <div className="bg-[#fff] w-full py-2 px-2 flex flex-col justify-center items-center fixed bottom-0 z-50">
               <div className="text-center flex flex-col justify-center items-center text-[10px] text-[#383636] ItemText">
                 Powered by{" "}
-                <a href="https://imcbsglobal.com/"><span className="block text-sm font-semibold text-[#80964c]">
-                  IMC Business Solutions
-                </span></a>
+                <a href="https://imcbsglobal.com/">
+                  <span className="block text-sm font-semibold text-[#80964c]">
+                    IMC Business Solutions
+                  </span>
+                </a>
                 {/* <span className=" flex justify-center items-center gap-2 font-bold text-[#383636]">
                   <FaPhoneAlt className="text-[#80964c]" />
                   +91 7593820007

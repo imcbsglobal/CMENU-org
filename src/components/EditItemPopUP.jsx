@@ -11,6 +11,7 @@ const EditItemPopUP = ({ setItemEditPopUp, itemData, handleUpdateItem }) => {
   const [editedItemPrice, setEditedItemPrice] = useState(itemData.price || '');
   const [editedItemPrice2, setEditedItemPrice2] = useState(itemData.price2 || '');
   const [editedItemPrice3, setEditedItemPrice3] = useState(itemData.price3 || '');
+  const [editedItemPrice4, setEditedItemPrice4] = useState(itemData.price4 || '');
   const [editedItemImage, setEditedItemImage] = useState(null);
 
   useEffect(() => {
@@ -19,6 +20,7 @@ const EditItemPopUP = ({ setItemEditPopUp, itemData, handleUpdateItem }) => {
     setEditedItemPrice(itemData.price || '');
     setEditedItemPrice2(itemData.price2 || '');
     setEditedItemPrice3(itemData.price3 || '');
+    setEditedItemPrice4(itemData.price4 || ''); // Initialize Combo Price
   }, [itemData]);
 
   const handleImageChange = (e) => {
@@ -38,6 +40,7 @@ const EditItemPopUP = ({ setItemEditPopUp, itemData, handleUpdateItem }) => {
       price: editedItemPrice || '',
       price2: editedItemPrice2 || '',
       price3: editedItemPrice3 || '',
+      price4: editedItemPrice4 || '', // Add Combo Price
       image: editedItemImage
     };
 
@@ -46,6 +49,7 @@ const EditItemPopUP = ({ setItemEditPopUp, itemData, handleUpdateItem }) => {
       updates.price,
       updates.price2,
       updates.price3,
+      updates.price4, // Pass Combo Price
       updates.image
     )
       .then(() => {
@@ -97,6 +101,13 @@ const EditItemPopUP = ({ setItemEditPopUp, itemData, handleUpdateItem }) => {
             onChange={(e) => setEditedItemPrice3(e.target.value)}
             className='w-full py-3 pl-3 rounded-xl border-none outline-none'
             placeholder='Parcel Price'
+          />
+          <input
+              type="text"
+              value={editedItemPrice4}
+              onChange={(e) => setEditedItemPrice4(e.target.value)}
+              className='w-full py-3 pl-3 rounded-xl border-none outline-none'
+              placeholder='Combo Price'
           />
           <div className='flex justify-center gap-10'>
             <input type="file" onChange={handleImageChange} className='hidden' id="editItemImage" />

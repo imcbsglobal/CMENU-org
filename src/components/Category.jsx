@@ -32,24 +32,25 @@ const Category = () => {
   const [itemPrice, setItemPrice] = useState('');
   const [itemPrice2, setItemPrice2] = useState('');
   const [itemPrice3, setItemPrice3] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState(''); // To hold the selected category
+  const [selectedCategory, setSelectedCategory] = useState(''); 
   const [itemImage, setItemImage] = useState(null); 
-  const [items, setItems] = useState([]); // To store items for the selected category
+  const [items, setItems] = useState([]);
   const inRef1 = useRef();
   const inRef2 = useRef();
   const [selectedCategoryForEdit, setSelectedCategoryForEdit] = useState(null);
-  const [categoryToDelete, setCategoryToDelete] = useState(null); // Store the category to be deleted
+  const [categoryToDelete, setCategoryToDelete] = useState(null);
   const [activeCategoryId, setActiveCategoryId] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
-  const [selectedItemToDelete, setSelectedItemToDelete] = useState(null); // Item to delete state 
-  const [itemToDelete, setItemToDelete] = useState(null); // State to hold the item to delete
+  const [selectedItemToDelete, setSelectedItemToDelete] = useState(null); 
+  const [itemToDelete, setItemToDelete] = useState(null);
   const auth = getAuth();
   // console.log("auth.currentUser",auth)
-  const adminId = auth.currentUser ? auth.currentUser.uid : null; // Safely access uid
-  const [searchTerm, setSearchTerm] = useState(''); // State for search input
+  const adminId = auth.currentUser ? auth.currentUser.uid : null;
+  const [searchTerm, setSearchTerm] = useState(''); 
   const [searchTerm2, setSearchTerm2] = useState(''); // State for item search input
   const [user, setUser] = useState(null);
   const [hiddenItems, setHiddenItems] = useState({});
+  const [itemPrice4, setItemPrice4] = useState(''); // Combo Price
 
   const DEFAULT_CATEGORY_IMAGE_URL = "https://res.cloudinary.com/dqydgc2ky/image/upload/v1728627745/defaultcategory_a0dy81.png"; // You can replace this with your actual default image URL
   const DEFAULT_ITEM_IMAGE_URL = "https://res.cloudinary.com/dqydgc2ky/image/upload/v1728627756/defaultitem_ko3p04.png"; // You can replace this with your actual default item image URL
@@ -217,12 +218,14 @@ const Category = () => {
           price: itemPrice,
           price2 :itemPrice2,
           price3 :itemPrice3,
+          price4: itemPrice4, // Add Combo Price
           imageUrl: imageUrl,
       }).then(() => {
           setItemName('');
           setItemPrice('');
           setItemPrice2('');
           setItemPrice3('');
+          setItemPrice4(''); // Reset Combo Price
           setItemImage(null);
           toast.success("Item Added Successfully", {position: 'top-center'});
       }).catch(error => {
@@ -284,7 +287,7 @@ const Category = () => {
       setItemEditPopUp(true); // Open the pop-up
   };
 
-  const handleUpdateItem = (name, price, price2, price3, image) => {
+  const handleUpdateItem = (name, price, price2, price3, price4, image) => {
     return new Promise((resolve, reject) => {
       const itemRef = dbRef(
         db,
@@ -302,6 +305,7 @@ const Category = () => {
             price: price !== undefined ? price : existingData.price,
             price2: price2 !== undefined ? price2 : existingData.price2,
             price3: price3 !== undefined ? price3 : existingData.price3,
+            price4: price4 !== undefined ? price4 : existingData.price4,
             imageUrl: existingData.imageUrl,
           };
   
@@ -467,49 +471,51 @@ const handleToggleItemVisibility = (itemId, isHidden) => {
             </div>
           </div>
           <div className="flex gap-10 overflow-x-auto whitespace-nowrap w-full">
-          {filteredCategories.length > 0 ? (
-                    filteredCategories.map((category) => (
-                        <div
-                            key={category.id}
-                            className={`flex flex-col justify-center items-center flex-shrink-0 cursor-pointer ${
-                                activeCategoryId === category.id ? 'active-category text-[#1eb5ad]' : ''
-                            }`}
-                            onClick={() => handleCategoryClick(category.id)}
-                        >
-                            <div className="w-[80px] h-[80px] bg-[#80964c] flex justify-center items-center rounded-lg overflow-hidden">
-                                <img
-                                    src={category.imageUrl}
-                                    alt={category.name}
-                                    className="object-cover w-full h-full"
-                                />
-                            </div>
-                            <div className="mt-2 font-bold text-[13px] lg:text-lg">
-                                {category.name}
-                            </div>
-                            {user && category.id !== 'all' && (
-                                <div className="flex items-center gap-2">
-                                    <div
-                                        className="cursor-pointer text-[#80964c]"
-                                        onClick={() => handleCategoryEditClick(category)}
-                                    >
-                                        <MdModeEdit />
-                                    </div>
-                                    <div
-                                        className="cursor-pointer text-[#80964c]"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            openCategoryDeletePopUp(category);
-                                        }}
-                                    >
-                                        <MdDelete />
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    ))
-                ) : (
-                    <p>No categories found</p>
-                )}
+            {filteredCategories.length > 0 ? (
+              filteredCategories.map((category) => (
+                <div
+                  key={category.id}
+                  className={`flex flex-col justify-center items-center flex-shrink-0 cursor-pointer ${
+                    activeCategoryId === category.id
+                      ? "active-category text-[#1eb5ad]"
+                      : ""
+                  }`}
+                  onClick={() => handleCategoryClick(category.id)}
+                >
+                  <div className="w-[80px] h-[80px] bg-[#80964c] flex justify-center items-center rounded-lg overflow-hidden">
+                    <img
+                      src={category.imageUrl}
+                      alt={category.name}
+                      className="object-cover w-full h-full"
+                    />
+                  </div>
+                  <div className="mt-2 font-bold text-[13px] lg:text-lg">
+                    {category.name}
+                  </div>
+                  {user && category.id !== "all" && (
+                    <div className="flex items-center gap-2">
+                      <div
+                        className="cursor-pointer text-[#80964c]"
+                        onClick={() => handleCategoryEditClick(category)}
+                      >
+                        <MdModeEdit />
+                      </div>
+                      <div
+                        className="cursor-pointer text-[#80964c]"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openCategoryDeletePopUp(category);
+                        }}
+                      >
+                        <MdDelete />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))
+            ) : (
+              <p>No categories found</p>
+            )}
           </div>
 
           {/* Adding Items */}
@@ -565,6 +571,13 @@ const handleToggleItemVisibility = (itemId, isHidden) => {
                 placeholder="Parcel"
                 value={itemPrice3}
                 onChange={(e) => setItemPrice3(e.target.value)}
+                className="px-8 py-3 rounded-xl border-none outline-none"
+              />
+              <input
+                type="text"
+                placeholder="Combo Price"
+                value={itemPrice4}
+                onChange={(e) => setItemPrice4(e.target.value)}
                 className="px-8 py-3 rounded-xl border-none outline-none"
               />
               <div className="flex justify-center items-center gap-10 text-sm">
@@ -623,7 +636,9 @@ const handleToggleItemVisibility = (itemId, isHidden) => {
                       <div className="flex gap-4">
                         {item.price && (
                           <div className=" flex flex-col justify-center items-center">
-                            <div className="md:text-sm text-[10px] font-semibold">Norm</div>
+                            <div className="md:text-sm text-[10px] font-semibold">
+                              Norm
+                            </div>
                             <div className="md:text-sm text-[10px]  flex items-center gap-1 font-bold ItemText">
                               <TbCurrencyRupee />
                               {item.price}
@@ -632,7 +647,9 @@ const handleToggleItemVisibility = (itemId, isHidden) => {
                         )}
                         {item.price2 && (
                           <div className=" flex flex-col justify-center items-center">
-                            <div className="md:text-sm text-[10px] font-semibold">A/C</div>
+                            <div className="md:text-sm text-[10px] font-semibold">
+                              A/C
+                            </div>
                             <div className="md:text-sm text-[10px] flex items-center gap-1 font-bold ItemText">
                               <TbCurrencyRupee />
                               {item.price2}
@@ -641,10 +658,23 @@ const handleToggleItemVisibility = (itemId, isHidden) => {
                         )}
                         {item.price3 && (
                           <div className=" flex flex-col justify-center items-center">
-                            <div className="md:text-sm text-[10px] font-semibold">Parcel</div>
+                            <div className="md:text-sm text-[10px] font-semibold">
+                              Parcel
+                            </div>
                             <div className="md:text-sm text-[10px] flex items-center gap-1 font-bold ItemText">
                               <TbCurrencyRupee />
                               {item.price3}
+                            </div>
+                          </div>
+                        )}
+                        {item.price4 && (
+                          <div className=" flex flex-col justify-center items-center">
+                            <div className="md:text-sm text-[10px] font-semibold">
+                              Combo Price
+                            </div>
+                            <div className="md:text-sm text-[10px] flex items-center gap-1 font-bold ItemText">
+                              <TbCurrencyRupee />
+                              {item.price4}
                             </div>
                           </div>
                         )}
