@@ -7,14 +7,15 @@ import { v4 as uuidv4 } from 'uuid';
 import { toast } from 'react-hot-toast';
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 
-// Countries list including Arab countries + a few others
+// Countries list including Arab countries + a few others (Malaysia added)
 const COUNTRIES = [
   // Non-Arab examples
   { code: "IN", name: "India", currencyCode: "INR", currencyName: "Indian Rupee" },
   { code: "US", name: "United States", currencyCode: "USD", currencyName: "US Dollar" },
   { code: "GB", name: "United Kingdom", currencyCode: "GBP", currencyName: "Pound Sterling" },
+  { code: "MY", name: "Malaysia", currencyCode: "MYR", currencyName: "Malaysian Ringgit" },
 
-  // Arab countries (comprehensive list)
+  // Arab countries
   { code: "SA", name: "Saudi Arabia", currencyCode: "SAR", currencyName: "Saudi Riyal" },
   { code: "AE", name: "United Arab Emirates", currencyCode: "AED", currencyName: "UAE Dirham" },
   { code: "QA", name: "Qatar", currencyCode: "QAR", currencyName: "Qatari Riyal" },
@@ -36,7 +37,6 @@ const COUNTRIES = [
   { code: "MR", name: "Mauritania", currencyCode: "MRU", currencyName: "Mauritanian Ouguiya" },
   { code: "KM", name: "Comoros", currencyCode: "KMF", currencyName: "Comorian Franc" },
   { code: "SDN", name: "South Sudan", currencyCode: "SSP", currencyName: "South Sudanese Pound" }
-  // add more if you want
 ];
 
 const AddAdmin = () => {

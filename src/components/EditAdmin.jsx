@@ -12,11 +12,12 @@ import {
 } from "firebase/auth";
 import ChangePassword from './ChangePassword';
 
-// Countries list same as AddAdmin (keep in sync or extract to common file)
+// Countries list same as AddAdmin (Malaysia added)
 const COUNTRIES = [
   { code: "IN", name: "India", currencyCode: "INR", currencyName: "Indian Rupee" },
   { code: "US", name: "United States", currencyCode: "USD", currencyName: "US Dollar" },
   { code: "GB", name: "United Kingdom", currencyCode: "GBP", currencyName: "Pound Sterling" },
+  { code: "MY", name: "Malaysia", currencyCode: "MYR", currencyName: "Malaysian Ringgit" },
 
   { code: "SA", name: "Saudi Arabia", currencyCode: "SAR", currencyName: "Saudi Riyal" },
   { code: "AE", name: "United Arab Emirates", currencyCode: "AED", currencyName: "UAE Dirham" },

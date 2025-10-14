@@ -10,11 +10,12 @@ import { db, auth } from "./Firebase";
 import { toast } from "react-hot-toast";
 import { signOut } from "firebase/auth";
 
-// Countries list (same as Add/Edit) for display mapping
+// Countries list (same as Add/Edit) including Malaysia
 const COUNTRIES = [
   { code: "IN", name: "India", currencyCode: "INR", currencyName: "Indian Rupee" },
   { code: "US", name: "United States", currencyCode: "USD", currencyName: "US Dollar" },
   { code: "GB", name: "United Kingdom", currencyCode: "GBP", currencyName: "Pound Sterling" },
+  { code: "MY", name: "Malaysia", currencyCode: "MYR", currencyName: "Malaysian Ringgit" },
 
   { code: "SA", name: "Saudi Arabia", currencyCode: "SAR", currencyName: "Saudi Riyal" },
   { code: "AE", name: "United Arab Emirates", currencyCode: "AED", currencyName: "UAE Dirham" },
