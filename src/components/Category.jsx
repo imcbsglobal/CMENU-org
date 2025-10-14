@@ -23,7 +23,7 @@ const CURRENCY_MAP = {
   AE: { symbol: "د.إ", code: "AED" },
   SA: { symbol: "﷼", code: "SAR" },
   QA: { symbol: "﷼", code: "QAR" },
-  KW: { symbol: "د.ك", code: "KWD" }, // ✅ Kuwait Fixed
+  KW: { symbol: "KD", code: "KWD" }, // <- changed to KD
   OM: { symbol: "ر.ع", code: "OMR" },
   BH: { symbol: "ب.د", code: "BHD" },
   JO: { symbol: "د.ا", code: "JOD" },
