@@ -3,19 +3,15 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from "react-router-dom";
 import { ref, set } from "firebase/database";
 import { db } from './Firebase';
-import { v4 as uuidv4 } from 'uuid';
 import { toast } from 'react-hot-toast';
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 
-// Countries list including Arab countries + a few others (Malaysia added)
+// Countries list (same you used)
 const COUNTRIES = [
-  // Non-Arab examples
   { code: "IN", name: "India", currencyCode: "INR", currencyName: "Indian Rupee" },
   { code: "US", name: "United States", currencyCode: "USD", currencyName: "US Dollar" },
   { code: "GB", name: "United Kingdom", currencyCode: "GBP", currencyName: "Pound Sterling" },
   { code: "MY", name: "Malaysia", currencyCode: "MYR", currencyName: "Malaysian Ringgit" },
-
-  // Arab countries
   { code: "SA", name: "Saudi Arabia", currencyCode: "SAR", currencyName: "Saudi Riyal" },
   { code: "AE", name: "United Arab Emirates", currencyCode: "AED", currencyName: "UAE Dirham" },
   { code: "QA", name: "Qatar", currencyCode: "QAR", currencyName: "Qatari Riyal" },
@@ -36,7 +32,7 @@ const COUNTRIES = [
   { code: "YE", name: "Yemen", currencyCode: "YER", currencyName: "Yemeni Rial" },
   { code: "MR", name: "Mauritania", currencyCode: "MRU", currencyName: "Mauritanian Ouguiya" },
   { code: "KM", name: "Comoros", currencyCode: "KMF", currencyName: "Comorian Franc" },
-  { code: "SDN", name: "South Sudan", currencyCode: "SSP", currencyName: "South Sudanese Pound" }
+  { code: "SS", name: "South Sudan", currencyCode: "SSP", currencyName: "South Sudanese Pound" }
 ];
 
 const AddAdmin = () => {
@@ -62,10 +58,8 @@ const AddAdmin = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.country) {
-      toast.error("Please select a country.");
-      return;
-    }
+    // If no country chosen, default to India
+    const countryToSave = formData.country && formData.country.trim() !== "" ? formData.country : "IN";
 
     if (formData.password.length < 6) {
       toast.error("Password must be at least 6 characters long!");
@@ -82,7 +76,7 @@ const AddAdmin = () => {
       const userCredential = await createUserWithEmailAndPassword(auth, formData.userName, formData.password);
       const uid = userCredential.user.uid;
 
-      // validity period
+      // validity period (1 year)
       const startDate = new Date();
       const endDate = new Date(startDate.getFullYear() + 1, startDate.getMonth(), startDate.getDate());
       const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
@@ -93,15 +87,15 @@ const AddAdmin = () => {
         shopName: formData.shopName,
         location: formData.location,
         phoneNumber: formData.phoneNumber,
-        amount: formData.amount ? formData.amount : "", // can be empty
+        amount: formData.amount ? formData.amount : "",
         userName: formData.userName.trim(),
-        password: formData.password, // note: storing plain passwords is insecure
+        password: formData.password, // note: storing plaintext passwords is insecure
         adminId: uid,
         status: 'Disable',
         validity,
         createdAt: new Date().getTime(),
         dayCount: 1,
-        country: formData.country // store country code
+        country: countryToSave
       };
 
       await set(ref(db, `admins/${uid}`), newAdmin);
@@ -114,51 +108,40 @@ const AddAdmin = () => {
   };
 
   return (
-    <div>
-      <div className='flex justify-center items-center w-full h-[100vh]'>
-        <div className='w-[600px] rounded-3xl h-[96vh] GlassBg bg-[#ffffff58] overflow-auto'>
-          <div className='text-center text-2xl font-bold mt-5 mb-5 text-[#322f2f]'>Create Admin</div>
-          <form onSubmit={handleSubmit} className='w-full px-6 flex flex-col justify-center items-center gap-5 pb-6'>
-            <input type="text" name="customerName" placeholder='Customer Name' value={formData.customerName} onChange={handleChange} className='w-full py-3 pl-3 outline-none border-none rounded-xl' required/>
-            <input type="text" name="shopName" placeholder='Shop Name' value={formData.shopName} onChange={handleChange} className='w-full py-3 pl-3 outline-none border-none rounded-xl' required/>
-            <input type="text" name="location" placeholder='Location' value={formData.location} onChange={handleChange} className='w-full py-3 pl-3 outline-none border-none rounded-xl' required/>
-            <input type="number" name="phoneNumber" placeholder='Phone Number' value={formData.phoneNumber} onChange={handleChange} className='w-full py-3 pl-3 outline-none border-none rounded-xl' required/>
+    <div className='flex justify-center items-center w-full h-[100vh]'>
+      <div className='w-[600px] rounded-3xl h-[96vh] GlassBg bg-[#ffffff58] overflow-auto'>
+        <div className='text-center text-2xl font-bold mt-5 mb-5 text-[#322f2f]'>Create Admin</div>
+        <form onSubmit={handleSubmit} className='w-full px-6 flex flex-col justify-center items-center gap-5 pb-6'>
+          <input type="text" name="customerName" placeholder='Customer Name' value={formData.customerName} onChange={handleChange} className='w-full py-3 pl-3 outline-none border-none rounded-xl' required/>
+          <input type="text" name="shopName" placeholder='Shop Name' value={formData.shopName} onChange={handleChange} className='w-full py-3 pl-3 outline-none border-none rounded-xl' required/>
+          <input type="text" name="location" placeholder='Location' value={formData.location} onChange={handleChange} className='w-full py-3 pl-3 outline-none border-none rounded-xl' required/>
+          <input type="number" name="phoneNumber" placeholder='Phone Number' value={formData.phoneNumber} onChange={handleChange} className='w-full py-3 pl-3 outline-none border-none rounded-xl' required/>
 
-            {/* Country dropdown (required) - does NOT change amount */}
-            <div className="w-full">
-              <label className="block text-sm font-medium mb-2">Select Country <span className="text-red-500">*</span></label>
-              <select
-                name="country"
-                value={formData.country}
-                onChange={handleChange}
-                className="w-full py-3 pl-3 outline-none border-none rounded-xl bg-white"
-                required
-              >
-                <option value="">-- Select Country --</option>
-                {COUNTRIES.map((c) => (
-                  <option key={c.code} value={c.code}>
-                    {c.name} ({c.currencyCode})
-                  </option>
-                ))}
-              </select>
-            </div>
+          <div className="w-full">
+            <label className="block text-sm font-medium mb-2">Select Country</label>
+            <select
+              name="country"
+              value={formData.country}
+              onChange={handleChange}
+              className="w-full py-3 pl-3 outline-none border-none rounded-xl bg-white"
+            >
+              <option value="">-- Select Country (defaults to India) --</option>
+              {COUNTRIES.map((c) => (
+                <option key={c.code} value={c.code}>{c.name} ({c.currencyCode})</option>
+              ))}
+            </select>
+          </div>
 
-            {/* Amount stays empty by default and is user-entered */}
-            <input type="number" name="amount" placeholder='Amount / Price' value={formData.amount} onChange={handleChange} className='w-full py-3 pl-3 outline-none border-none rounded-xl' />
-            <input type="email" name="userName" placeholder='User Email' value={formData.userName} onChange={handleChange} className='w-full py-3 pl-3 outline-none border-none rounded-xl' required/>
-            <input type="password" name="password" placeholder='Password' value={formData.password} onChange={handleChange} className='w-full py-3 pl-3 outline-none border-none rounded-xl' required/>
-            <input type="password" name="confirmPassword" placeholder='Confirm Password' value={formData.confirmPassword} onChange={handleChange} className='w-full py-3 pl-3 outline-none border-none rounded-xl' required/>
-            <div className='flex justify-center gap-10 items-center'>
-              <Link to='/superAdminIndex'>
-                <button className='px-8 py-2 bg-[#ffc400] text-[#fff] GlassBg rounded-2xl font-bold'>Cancel</button>
-              </Link>
-              <button type="submit" className='px-8 py-2 bg-[#63c211] text-[#fff] GlassBg rounded-2xl font-bold'>Create Admin</button>
-            </div>
-          </form>
-        </div>
+          <input type="text" name="amount" placeholder='Amount (optional)' value={formData.amount} onChange={handleChange} className='w-full py-3 pl-3 outline-none border-none rounded-xl' />
+          <input type="email" name="userName" placeholder='User Email' value={formData.userName} onChange={handleChange} className='w-full py-3 pl-3 outline-none border-none rounded-xl' required/>
+          <input type="password" name="password" placeholder='Password' value={formData.password} onChange={handleChange} className='w-full py-3 pl-3 outline-none border-none rounded-xl' required/>
+          <input type="password" name="confirmPassword" placeholder='Confirm Password' value={formData.confirmPassword} onChange={handleChange} className='w-full py-3 pl-3 outline-none border-none rounded-xl' required/>
+
+          <button type="submit" className='px-8 py-2 rounded-xl bg-[#80964c] text-white font-bold'>Create Admin</button>
+        </form>
       </div>
     </div>
   );
-}
+};
 
 export default AddAdmin;

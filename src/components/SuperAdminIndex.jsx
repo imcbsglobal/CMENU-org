@@ -10,7 +10,7 @@ import { db, auth } from "./Firebase";
 import { toast } from "react-hot-toast";
 import { signOut } from "firebase/auth";
 
-// Countries list (same as Add/Edit) including Malaysia
+// Countries list (same set used elsewhere)
 const COUNTRIES = [
   { code: "IN", name: "India", currencyCode: "INR", currencyName: "Indian Rupee" },
   { code: "US", name: "United States", currencyCode: "USD", currencyName: "US Dollar" },
@@ -37,7 +37,7 @@ const COUNTRIES = [
   { code: "YE", name: "Yemen", currencyCode: "YER", currencyName: "Yemeni Rial" },
   { code: "MR", name: "Mauritania", currencyCode: "MRU", currencyName: "Mauritanian Ouguiya" },
   { code: "KM", name: "Comoros", currencyCode: "KMF", currencyName: "Comorian Franc" },
-  { code: "SDN", name: "South Sudan", currencyCode: "SSP", currencyName: "South Sudanese Pound" }
+  { code: "SS", name: "South Sudan", currencyCode: "SSP", currencyName: "South Sudanese Pound" }
 ];
 
 const SuperAdminIndex = () => {
@@ -175,12 +175,11 @@ const SuperAdminIndex = () => {
       admin.customerName.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Helper to map country code to display values
-  const getCountryDisplay = (countryCode, amount) => {
-    if (!countryCode || !amount) return "-";
+  // Helper to map country code to country name
+  const getCountryName = (countryCode) => {
+    if (!countryCode) return "-";
     const c = COUNTRIES.find(x => x.code === countryCode);
-    if (!c) return `${countryCode} — ${amount}`;
-    return `${c.name} — ${c.currencyCode} ${amount}`;
+    return c ? c.name : countryCode;
   };
 
   return (
@@ -238,6 +237,7 @@ const SuperAdminIndex = () => {
               <th>User Name</th>
               <th>Phone Number</th>
               <th>Amount</th>
+              <th>Country</th> {/* NEW column */}
               <th>Location</th>
               <th>Status</th>
               <th>No. Days</th>
@@ -249,7 +249,7 @@ const SuperAdminIndex = () => {
           <tbody className="text-[13px] font-semibold w-full">
             {filteredAdminData.length === 0 ? (
               <tr>
-                <td colSpan="13" className="text-center">No admins found.</td>
+                <td colSpan="14" className="text-center">No admins found.</td>
               </tr>
             ) : (
               filteredAdminData.map((admin, index) => (
@@ -261,10 +261,11 @@ const SuperAdminIndex = () => {
                   <td>{admin.userName}</td>
                   <td>{admin.phoneNumber}</td>
 
-                  {/* Show country+currency+amount ONLY if amount exists */}
-                  <td>
-                    { admin.amount ? getCountryDisplay(admin.country, admin.amount) : "-" }
-                  </td>
+                  {/* Amount column shows ONLY the numeric amount (or '-') */}
+                  <td>{ admin.amount ? admin.amount : "-" }</td>
+
+                  {/* NEW: Country column shows the country name (or '-') */}
+                  <td>{ getCountryName(admin.country) }</td>
 
                   <td>{admin.location}</td>
                   <td>
