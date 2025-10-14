@@ -1,22 +1,48 @@
+// SuperAdminIndex.jsx
 import React, { useState, useEffect } from "react";
 import { AiFillPlusSquare } from "react-icons/ai";
 import { LuSearch } from "react-icons/lu";
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import { Link, useNavigate } from "react-router-dom";
-import { ref, onValue } from "firebase/database";
-import { db, auth } from "./Firebase"; // Make sure to import Firebase setup
-import EditAdmin from "./EditAdmin";
+import { ref, onValue, update } from "firebase/database";
+import { db, auth } from "./Firebase";
 import { toast } from "react-hot-toast";
-// import { remove } from "firebase/database";
-import { update, remove } from "firebase/database";
-import { signOut, getAuth } from "firebase/auth"; // Import signOut for logout
-import { getStorage, ref as storageRef, deleteObject } from "firebase/storage"; // Import storage functionalities
+import { signOut } from "firebase/auth";
+
+// Countries list (same as Add/Edit) for display mapping
+const COUNTRIES = [
+  { code: "IN", name: "India", currencyCode: "INR", currencyName: "Indian Rupee" },
+  { code: "US", name: "United States", currencyCode: "USD", currencyName: "US Dollar" },
+  { code: "GB", name: "United Kingdom", currencyCode: "GBP", currencyName: "Pound Sterling" },
+
+  { code: "SA", name: "Saudi Arabia", currencyCode: "SAR", currencyName: "Saudi Riyal" },
+  { code: "AE", name: "United Arab Emirates", currencyCode: "AED", currencyName: "UAE Dirham" },
+  { code: "QA", name: "Qatar", currencyCode: "QAR", currencyName: "Qatari Riyal" },
+  { code: "KW", name: "Kuwait", currencyCode: "KWD", currencyName: "Kuwaiti Dinar" },
+  { code: "OM", name: "Oman", currencyCode: "OMR", currencyName: "Omani Rial" },
+  { code: "BH", name: "Bahrain", currencyCode: "BHD", currencyName: "Bahraini Dinar" },
+  { code: "JO", name: "Jordan", currencyCode: "JOD", currencyName: "Jordanian Dinar" },
+  { code: "LB", name: "Lebanon", currencyCode: "LBP", currencyName: "Lebanese Pound" },
+  { code: "EG", name: "Egypt", currencyCode: "EGP", currencyName: "Egyptian Pound" },
+  { code: "MA", name: "Morocco", currencyCode: "MAD", currencyName: "Moroccan Dirham" },
+  { code: "DZ", name: "Algeria", currencyCode: "DZD", currencyName: "Algerian Dinar" },
+  { code: "TN", name: "Tunisia", currencyCode: "TND", currencyName: "Tunisian Dinar" },
+  { code: "IQ", name: "Iraq", currencyCode: "IQD", currencyName: "Iraqi Dinar" },
+  { code: "PS", name: "Palestine", currencyCode: "ILS", currencyName: "Israeli Shekel" },
+  { code: "SY", name: "Syria", currencyCode: "SYP", currencyName: "Syrian Pound" },
+  { code: "SD", name: "Sudan", currencyCode: "SDG", currencyName: "Sudanese Pound" },
+  { code: "LY", name: "Libya", currencyCode: "LYD", currencyName: "Libyan Dinar" },
+  { code: "YE", name: "Yemen", currencyCode: "YER", currencyName: "Yemeni Rial" },
+  { code: "MR", name: "Mauritania", currencyCode: "MRU", currencyName: "Mauritanian Ouguiya" },
+  { code: "KM", name: "Comoros", currencyCode: "KMF", currencyName: "Comorian Franc" },
+  { code: "SDN", name: "South Sudan", currencyCode: "SSP", currencyName: "South Sudanese Pound" }
+];
 
 const SuperAdminIndex = () => {
   const [adminData, setAdminData] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const navigate = useNavigate(); // Initialize navigate
+  const navigate = useNavigate();
   const [statusTimers, setStatusTimers] = useState({});
 
   useEffect(() => {
@@ -26,7 +52,6 @@ const SuperAdminIndex = () => {
         const data = snapshot.val();
         const adminArray = Object.keys(data).map((key) => {
           const admin = data[key];
-          // Calculate days since creation
           const createdAt = admin.createdAt || new Date().getTime();
           const daysSinceCreation = Math.min(
             90,
@@ -43,16 +68,16 @@ const SuperAdminIndex = () => {
         });
         setAdminData(adminArray);
 
-        // Update day counts in Firebase
+        // Update day counts in Firebase if changed
         adminArray.forEach(async (admin) => {
-          if (admin.dayCount !== data[admin.id].dayCount) {
+          if (data[admin.id] && admin.dayCount !== data[admin.id].dayCount) {
             await update(ref(db, `admins/${admin.id}`), {
               dayCount: admin.dayCount
             });
           }
         });
 
-        // Check and update pending statuses
+        // Check pending statuses
         adminArray.forEach((admin) => {
           if (admin.pendingStatus && admin.pendingStatusTime) {
             const timeLeft = admin.pendingStatusTime - Date.now();
@@ -72,18 +97,15 @@ const SuperAdminIndex = () => {
 
     return () => {
       unsubscribe();
-      // Clear all timers on unmount
       Object.values(statusTimers).forEach((timer) => clearTimeout(timer));
     };
   }, []);
 
   const setTimer = (adminId, duration) => {
-    // Clear existing timer if any
     if (statusTimers[adminId]) {
       clearTimeout(statusTimers[adminId]);
     }
 
-    // Set new timer
     const newTimer = setTimeout(() => {
       const admin = adminData.find((a) => a.id === adminId);
       if (admin) {
@@ -95,10 +117,7 @@ const SuperAdminIndex = () => {
       }
     }, duration);
 
-    setStatusTimers((prev) => ({
-      ...prev,
-      [adminId]: newTimer,
-    }));
+    setStatusTimers(prev => ({ ...prev, [adminId]: newTimer }));
   };
 
   const updateAdminStatus = async (adminId, newStatus, isPending = true) => {
@@ -106,7 +125,7 @@ const SuperAdminIndex = () => {
       const updates = {
         status: newStatus,
         pendingStatus: isPending,
-        pendingStatusTime: isPending ? Date.now() + 60000 : null, // 1 minute = 60000 milliseconds
+        pendingStatusTime: isPending ? Date.now() + 60000 : null,
       };
 
       await update(ref(db, `admins/${adminId}`), updates);
@@ -118,7 +137,6 @@ const SuperAdminIndex = () => {
         toast.success(`Admin status updated to ${newStatus}!`);
       }
     } catch (error) {
-      // console.error("Error updating status:", error);
       toast.error("Error updating status. Please try again.");
     }
   };
@@ -129,74 +147,40 @@ const SuperAdminIndex = () => {
   };
 
   const handleEdit = (adminId) => {
-    navigate(`/editAdmin/${adminId}`); // Navigate to the EditAdmin page
+    navigate(`/editAdmin/${adminId}`);
   };
 
   const handleDelete = (adminId) => {
-    // Navigate to the security code dialog with the adminId
     navigate("/securityCodeDialog", { state: { adminId } });
   };
 
-  // const handleDelete = async (adminId) => {
-  //   const confirmDelete = window.confirm(
-  //     "Are you sure you want to delete this admin?"
-  //   );
-  //   if (!confirmDelete) return;
-
-  //   try {
-  //     await remove(ref(db, `admins/${adminId}`));
-  //     toast.success("Admin deleted successfully from the database!");
-
-     
-  //     setAdminData((prevData) =>
-  //       prevData.filter((admin) => admin.id !== adminId)
-  //     );
-
-      
-  //     const storage = getStorage();
-  //     const fileRef = storageRef(storage, `admins/${adminId}/someFileName.ext`);
-  //     await deleteObject(fileRef); // Delete the file
-
-  //     toast.success("Admin deleted successfully from storage!");
-  //   } catch (error) {
-    
-  //     toast.error("Error deleting admin. Please try again.");
-  //   }
-  // };
-
-  // const handleToggleStatus = async (adminId, currentStatus) => {
-  //     const newStatus = currentStatus === 'Active' ? 'Disable' : 'Active';
-  //     try {
-  //         await update(ref(db, `admins/${adminId}`), { status: newStatus });
-  //         toast.success(`Admin status updated to ${newStatus}!`);
-  //     } catch (error) {
-  //         console.error("Error updating status:", error);
-  //         toast.error('Error updating status. Please try again.');
-  //     }
-  // };
-
   const handleLogout = async () => {
     try {
-      await signOut(auth); // Sign out the current user
+      await signOut(auth);
       toast.success("Logout successful!");
-      navigate("/login"); // Redirect to login page
+      navigate("/login");
     } catch (error) {
-      // console.error("Error during logout:", error);
       toast.error("Error during logout. Please try again.");
     }
   };
 
-  // Function to handle search input change
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
   };
 
-  // Filter admin data based on search term
   const filteredAdminData = adminData.filter(
     (admin) =>
       admin.customerName &&
       admin.customerName.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  // Helper to map country code to display values
+  const getCountryDisplay = (countryCode, amount) => {
+    if (!countryCode || !amount) return "-";
+    const c = COUNTRIES.find(x => x.code === countryCode);
+    if (!c) return `${countryCode} — ${amount}`;
+    return `${c.name} — ${c.currencyCode} ${amount}`;
+  };
 
   return (
     <div>
@@ -241,6 +225,7 @@ const SuperAdminIndex = () => {
           </div>
         </div>
       </div>
+
       <div className="w-[90%] mx-auto bg-[#ffffff72] rounded-3xl overflow-x-auto">
         <table>
           <thead>
@@ -263,22 +248,23 @@ const SuperAdminIndex = () => {
           <tbody className="text-[13px] font-semibold w-full">
             {filteredAdminData.length === 0 ? (
               <tr>
-                <td colSpan="11" className="text-center">
-                  No admins found.
-                </td>
+                <td colSpan="13" className="text-center">No admins found.</td>
               </tr>
             ) : (
               filteredAdminData.map((admin, index) => (
                 <tr key={admin.id}>
                   <td>{index + 1}</td>
                   <td>{admin.customerName}</td>
-                  <td className="">{admin.shopName}</td>
-                  <td className=" overflow-x-auto w-full text-nowrap">
-                    {admin.adminId}
-                  </td>
+                  <td>{admin.shopName}</td>
+                  <td className=" overflow-x-auto w-full text-nowrap">{admin.adminId}</td>
                   <td>{admin.userName}</td>
                   <td>{admin.phoneNumber}</td>
-                  <td>{admin.amount}</td>
+
+                  {/* Show country+currency+amount ONLY if amount exists */}
+                  <td>
+                    { admin.amount ? getCountryDisplay(admin.country, admin.amount) : "-" }
+                  </td>
+
                   <td>{admin.location}</td>
                   <td>
                     <button
@@ -291,25 +277,14 @@ const SuperAdminIndex = () => {
                     >
                       {admin.status}
                     </button>
-                    {/* {admin.pendingStatus && (
-                                        <span className="text-sm text-orange-500 mt-1">
-                                            Pending Payment
-                                        </span>
-                                    )} */}
                   </td>
                   <td className="text-center">{admin.dayCount}</td>
                   <td className="w-full text-nowrap">{admin.validity}</td>
                   <td className="text-[#1e8ca5]">
-                    <FaEdit
-                      className="cursor-pointer"
-                      onClick={() => handleEdit(admin.adminId)}
-                    />
+                    <FaEdit className="cursor-pointer" onClick={() => handleEdit(admin.id)} />
                   </td>
                   <td className="text-[#f00]">
-                    <MdDelete
-                      className="cursor-pointer"
-                      onClick={() => handleDelete(admin.id)}
-                    />
+                    <MdDelete className="cursor-pointer" onClick={() => handleDelete(admin.id)} />
                   </td>
                 </tr>
               ))
