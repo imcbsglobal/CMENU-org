@@ -75,7 +75,7 @@ const CategoryPage = () => {
       return;
     }
 
-    const itemsRef = ref(db, `categories/${category}/items`);
+    const itemsRef = ref(db, `admins/${adminId}/categories/${category}/items`);
     const unsubscribe = onValue(itemsRef, (snapshot) => {
       const data = snapshot.val();
       if (data) {
