@@ -40,13 +40,12 @@ const getCurrencySymbol = (countryCode) => {
   return /^[A-Z]{2,3}$/.test(up) ? up : "₹";
 };
 
-const CategoryPage = () => {
-  const { category } = useParams(); // category ID from URL
+const CustomerView = () => {
+  const { adminId } = useParams(); // adminId from URL
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState('all');
   const [items, setItems] = useState([]);
   const [currencySymbol, setCurrencySymbol] = useState('₹');
-
-  // Attempt to get adminId from localStorage (same pattern used elsewhere)
-  const adminId = localStorage.getItem('adminUid');
 
   useEffect(() => {
     // fetch admin country to determine currency symbol
@@ -69,47 +68,100 @@ const CategoryPage = () => {
     });
   }, [adminId]);
 
+  // Load categories
   useEffect(() => {
-    if (!category) {
-      setItems([]);
-      return;
-    }
+    if (!adminId) return;
+    const categoryRef = ref(db, `categories/`);
+    const unsub = onValue(categoryRef, (snapshot) => {
+      const data = snapshot.val() || {};
+      const categoryList = Object.keys(data)
+        .filter((key) => data[key].adminId === adminId)
+        .map((key) => ({ id: key, ...data[key] }));
 
-    const itemsRef = ref(db, `admins/${adminId}/categories/${category}/items`);
-    const unsubscribe = onValue(itemsRef, (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        const itemList = Object.keys(data).map((key) => ({
-          id: key,
-          ...data[key],
-        }));
-        setItems(itemList);
-      } else {
-        setItems([]);
-      }
+      const allCat = { id: 'all', name: 'All', imageUrl: 'https://res.cloudinary.com/dqydgc2ky/image/upload/v1728627745/all_xtjq8h.jpg' };
+      setCategories([allCat, ...categoryList]);
     });
+    return () => unsub();
+  }, [adminId]);
 
-    return () => unsubscribe();
-  }, [category]);
+  // Load items based on selected category
+  useEffect(() => {
+    if (!adminId) return;
+
+    if (selectedCategory === 'all') {
+      const catRef = ref(db, `categories/`);
+      const unsub = onValue(catRef, (snapshot) => {
+        const data = snapshot.val() || {};
+        let aggregated = [];
+        Object.keys(data)
+          .filter(k => data[k].adminId === adminId)
+          .forEach(catId => {
+            const cat = data[catId];
+            if (cat.items) {
+              Object.keys(cat.items).forEach(itemId => {
+                const item = cat.items[itemId];
+                aggregated.push({ id: itemId, categoryId: catId, ...item });
+              });
+            }
+          });
+        const visible = aggregated.filter(it => !it.isHidden);
+        setItems(visible);
+      });
+      return () => unsub();
+    } else {
+      const itemsRef = ref(db, `categories/${selectedCategory}/items`);
+      const unsub = onValue(itemsRef, (snapshot) => {
+        const data = snapshot.val() || {};
+        const list = Object.keys(data).map(k => ({ id: k, categoryId: selectedCategory, ...data[k] }));
+        setItems(list.filter(it => !it.isHidden));
+      });
+      return () => unsub();
+    }
+  }, [selectedCategory, adminId]);
 
   return (
-    <div className="category-page">
-      <h1>{category} Items</h1>
-      <div>
-        {items.length > 0 ? (
-          items.map((item) => (
-            <div key={item.id} className="item">
-              <h2>{item.name}</h2>
-              <p>Price: {currencySymbol} {item.price}</p>
-              {item.imageUrl && <img src={item.imageUrl} alt={item.name} className="item-image" />}
+    <div className="customer-view">
+      <div className="categories-section">
+        <h2>Categories</h2>
+        <div className="categories-grid">
+          {categories.map(cat => (
+            <div 
+              key={cat.id} 
+              onClick={() => setSelectedCategory(cat.id)} 
+              className={`category-item ${selectedCategory === cat.id ? 'active' : ''}`}
+            >
+              <img src={cat.imageUrl} alt={cat.name} className="category-image" />
+              <span className="category-name">{cat.name}</span>
             </div>
-          ))
-        ) : (
-          <p>No items found for this category.</p>
-        )}
+          ))}
+        </div>
+      </div>
+
+      <div className="items-section">
+        <h2>{selectedCategory === 'all' ? 'All Items' : categories.find(c => c.id === selectedCategory)?.name + ' Items'}</h2>
+        <div className="items-grid">
+          {items.length > 0 ? (
+            items.map((item) => (
+              <div key={item.id} className="item-card">
+                <img src={item.imageUrl || 'https://res.cloudinary.com/dqydgc2ky/image/upload/v1728627756/defaultitem_ko3p04.png'} alt={item.name} className="item-image" />
+                <div className="item-details">
+                  <h3 className="item-name">{item.name}</h3>
+                  <div className="item-prices">
+                    <span className="price">Price: {currencySymbol} {item.price}</span>
+                    {item.price2 && <span className="price">A/C: {currencySymbol} {item.price2}</span>}
+                    {item.price3 && <span className="price">Parcel: {currencySymbol} {item.price3}</span>}
+                    {item.price4 && <span className="price">Combo: {currencySymbol} {item.price4}</span>}
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p>No items found for this category.</p>
+          )}
+        </div>
       </div>
     </div>
   );
 };
 
-export default CategoryPage;
+export default CustomerView;
