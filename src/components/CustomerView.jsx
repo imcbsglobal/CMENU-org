@@ -387,21 +387,23 @@ const CustomerView = () => {
 
           <div className="mt-5 w-full px-2 pb-16 max-w-6xl mx-auto">
             {filteredDisplayedItems.length > 0 ? filteredDisplayedItems.map(item => (
-              <div key={item.id} className="flex justify-between items-center mb-3 GlassBackground px-2 h-[100px] rounded-2xl">
+              <div key={item.id} className="relative flex justify-between items-center mb-3 GlassBackground px-2 h-[100px] rounded-2xl">
+                {/* Info Icon - Top Right */}
+                {item.note && (
+                  <button 
+                    onClick={() => handleShowNote(item.note)} 
+                    className="absolute top-2 right-2 text-blue-600 hover:text-blue-800 bg-white rounded-full p-1 shadow-md z-10"
+                    title="View description"
+                  >
+                    <MdInfo size={22} />
+                  </button>
+                )}
+                
                 <div className="flex items-center gap-4">
                   <img src={item.imageUrl} alt={item.name} className="w-16 h-[85px] rounded-lg object-cover GlassBackground" />
                   <div>
-                    <div className="text-base font-semibold ItemText leading-tight flex items-center gap-2">
+                    <div className="text-base font-semibold ItemText leading-tight pr-8">
                       {item.name}
-                      {item.note && (
-                        <button 
-                          onClick={() => handleShowNote(item.note)} 
-                          className="text-blue-600 hover:text-blue-800 flex-shrink-0"
-                          title="View description"
-                        >
-                          <MdInfo size={20} />
-                        </button>
-                      )}
                     </div>
                     <div className="flex gap-4 mt-1">
                       {item.price && (
