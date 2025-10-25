@@ -4,6 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { db } from "./Firebase";
 import { ref, onValue, get } from "firebase/database";
 import { FiSearch } from "react-icons/fi";
+import { MdInfo } from "react-icons/md";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -74,6 +75,8 @@ const CustomerView = () => {
   const [gstTitle, setGstTitle] = useState("");
   const [currencySymbol, setCurrencySymbol] = useState("₹");
   const categoryRef = useRef(null);
+  const [showNotePopup, setShowNotePopup] = useState(false);
+  const [selectedNote, setSelectedNote] = useState('');
 
   // amount icons state (from amountIcons/{adminId})
   const [amountIcons, setAmountIcons] = useState({});
@@ -295,6 +298,30 @@ const CustomerView = () => {
     return amountIcons.norm || amountIcons.price || null;
   };
 
+  const handleShowNote = (note) => {
+    setSelectedNote(note);
+    setShowNotePopup(true);
+  };
+
+  // Note Popup Modal
+  const NotePopup = ({ note, onClose }) => {
+    if (!note) return null;
+    return (
+      <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/60' onClick={onClose}>
+        <div className='bg-white rounded-xl p-6 w-full max-w-md mx-4' onClick={(e) => e.stopPropagation()}>
+          <div className='flex justify-between items-center mb-4'>
+            <h3 className='text-xl font-semibold'>Description</h3>
+            <button onClick={onClose} className='text-2xl hover:text-red-600'>✕</button>
+          </div>
+          <p className='text-gray-700 whitespace-pre-wrap'>{note}</p>
+          <div className='flex justify-end mt-4'>
+            <button onClick={onClose} className='px-6 py-2 rounded-lg bg-[#80964c] text-white font-semibold'>Close</button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div style={{ backgroundColor }} className="min-h-screen">
       {isLoading ? <Loader /> : (
@@ -364,7 +391,18 @@ const CustomerView = () => {
                 <div className="flex items-center gap-4">
                   <img src={item.imageUrl} alt={item.name} className="w-16 h-[85px] rounded-lg object-cover GlassBackground" />
                   <div>
-                    <div className="text-base font-semibold ItemText leading-tight">{item.name}</div>
+                    <div className="text-base font-semibold ItemText leading-tight flex items-center gap-2">
+                      {item.name}
+                      {item.note && (
+                        <button 
+                          onClick={() => handleShowNote(item.note)} 
+                          className="text-blue-600 hover:text-blue-800 flex-shrink-0"
+                          title="View description"
+                        >
+                          <MdInfo size={20} />
+                        </button>
+                      )}
+                    </div>
                     <div className="flex gap-4 mt-1">
                       {item.price && (
                         <div className="flex flex-col justify-center items-center">
@@ -431,6 +469,13 @@ const CustomerView = () => {
               </a>
             </div>
           </div>
+
+          {showNotePopup && (
+            <NotePopup
+              note={selectedNote}
+              onClose={() => { setShowNotePopup(false); setSelectedNote(''); }}
+            />
+          )}
         </>
       )}
     </div>

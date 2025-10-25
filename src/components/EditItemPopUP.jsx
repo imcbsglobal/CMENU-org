@@ -1,13 +1,14 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { IoIosClose } from "react-icons/io";
 import { motion } from "framer-motion";
 import { toast } from 'react-hot-toast';
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { ref, set } from 'firebase/database';  // Correct import for database reference
-import { db } from './Firebase'; // Make sure you're importing your Firebase setup properly
+import { ref, set } from 'firebase/database';
+import { db } from './Firebase';
 
 const EditItemPopUP = ({ setItemEditPopUp, itemData, handleUpdateItem }) => {
   const [editedItemName, setEditedItemName] = useState(itemData.name);
+  const [editedItemNote, setEditedItemNote] = useState(itemData.note || '');
   const [editedItemPrice, setEditedItemPrice] = useState(itemData.price || '');
   const [editedItemPrice2, setEditedItemPrice2] = useState(itemData.price2 || '');
   const [editedItemPrice3, setEditedItemPrice3] = useState(itemData.price3 || '');
@@ -15,12 +16,12 @@ const EditItemPopUP = ({ setItemEditPopUp, itemData, handleUpdateItem }) => {
   const [editedItemImage, setEditedItemImage] = useState(null);
 
   useEffect(() => {
-    // Initialize state with existing values or empty strings
     setEditedItemName(itemData.name || '');
+    setEditedItemNote(itemData.note || '');
     setEditedItemPrice(itemData.price || '');
     setEditedItemPrice2(itemData.price2 || '');
     setEditedItemPrice3(itemData.price3 || '');
-    setEditedItemPrice4(itemData.price4 || ''); // Initialize Combo Price
+    setEditedItemPrice4(itemData.price4 || '');
   }, [itemData]);
 
   const handleImageChange = (e) => {
@@ -34,22 +35,23 @@ const EditItemPopUP = ({ setItemEditPopUp, itemData, handleUpdateItem }) => {
   };
 
   const handleSaveChanges = () => {
-    // Create an object with the updates, including empty strings for cleared prices
     const updates = {
       name: editedItemName,
+      note: editedItemNote || '',
       price: editedItemPrice || '',
       price2: editedItemPrice2 || '',
       price3: editedItemPrice3 || '',
-      price4: editedItemPrice4 || '', // Add Combo Price
+      price4: editedItemPrice4 || '',
       image: editedItemImage
     };
 
     handleUpdateItem(
       updates.name,
+      updates.note,
       updates.price,
       updates.price2,
       updates.price3,
-      updates.price4, // Pass Combo Price
+      updates.price4,
       updates.image
     )
       .then(() => {
@@ -67,12 +69,12 @@ const EditItemPopUP = ({ setItemEditPopUp, itemData, handleUpdateItem }) => {
       <motion.div
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1, transition: { duration: .5, ease: 'backInOut' } }}
-        className='w-full lg:w-[600px] h-[500px] rounded-3xl mx-6 bg-[#ffffffb7] GlassBg relative px-6'
+        className='w-full lg:w-[600px] max-h-[90vh] overflow-y-auto rounded-3xl mx-6 bg-[#ffffffb7] GlassBg relative px-6 py-10'
       >
         <div className='absolute right-5 top-5 text-2xl text-[#80964c] cursor-pointer' onClick={() => setItemEditPopUp(false)}>
           <IoIosClose />
         </div>
-        <div className='text-[28px] px-6 pt-10 text-center font-bold mb-5'>Edit Item</div>
+        <div className='text-[28px] px-6 text-center font-bold mb-5'>Edit Item</div>
         <div className='w-full flex flex-col justify-center items-center gap-5 mb-5'>
           <input
             type="text"
@@ -80,6 +82,13 @@ const EditItemPopUP = ({ setItemEditPopUp, itemData, handleUpdateItem }) => {
             onChange={(e) => setEditedItemName(e.target.value)}
             className='w-full py-3 pl-2 rounded-xl border-none outline-none'
             placeholder='Item Name'
+          />
+          <textarea
+            value={editedItemNote}
+            onChange={(e) => setEditedItemNote(e.target.value)}
+            className='w-full py-3 pl-2 rounded-xl border-none outline-none resize-none'
+            placeholder='Item Description/Note (optional)'
+            rows="3"
           />
           <input
             type="text"
@@ -103,11 +112,11 @@ const EditItemPopUP = ({ setItemEditPopUp, itemData, handleUpdateItem }) => {
             placeholder='Parcel Price'
           />
           <input
-              type="text"
-              value={editedItemPrice4}
-              onChange={(e) => setEditedItemPrice4(e.target.value)}
-              className='w-full py-3 pl-3 rounded-xl border-none outline-none'
-              placeholder='Combo Price'
+            type="text"
+            value={editedItemPrice4}
+            onChange={(e) => setEditedItemPrice4(e.target.value)}
+            className='w-full py-3 pl-3 rounded-xl border-none outline-none'
+            placeholder='Combo Price'
           />
           <div className='flex justify-center gap-10'>
             <input type="file" onChange={handleImageChange} className='hidden' id="editItemImage" />

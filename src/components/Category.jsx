@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FiSearch } from "react-icons/fi";
-import { MdModeEdit, MdDelete } from "react-icons/md";
+import { MdModeEdit, MdDelete, MdInfo } from "react-icons/md";
 import { getDatabase, ref as dbRef, set, push, onValue, remove, update, get } from 'firebase/database';
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db } from './Firebase';
@@ -59,6 +59,7 @@ const Category = () => {
   const [selectedItem, setSelectedItem] = useState(null);
 
   const [itemName, setItemName] = useState('');
+  const [itemNote, setItemNote] = useState('');
   const [itemPrice, setItemPrice] = useState('');
   const [itemPrice2, setItemPrice2] = useState('');
   const [itemPrice3, setItemPrice3] = useState('');
@@ -72,6 +73,8 @@ const Category = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchTerm2, setSearchTerm2] = useState('');
   const [currencySymbol, setCurrencySymbol] = useState('₹');
+  const [showNotePopup, setShowNotePopup] = useState(false);
+  const [selectedNote, setSelectedNote] = useState('');
 
   const auth = getAuth();
   const [adminId, setAdminId] = useState(null);
@@ -242,6 +245,7 @@ const Category = () => {
     const newItemRef = push(dbRef(db, `categories/${selectedCategory}/items`));
     set(newItemRef, {
       name: itemName,
+      note: itemNote,
       price: itemPrice,
       price2: itemPrice2,
       price3: itemPrice3,
@@ -249,6 +253,7 @@ const Category = () => {
       imageUrl: url,
     }).then(() => {
       setItemName('');
+      setItemNote('');
       setItemPrice('');
       setItemPrice2('');
       setItemPrice3('');
@@ -314,16 +319,15 @@ const Category = () => {
   const openItemEdit = (item) => {
     setSelectedItem(item);
     setItemEditPopUp(true);
-    // Ensure selectedCategoryFor edit is the item's category (if needed)
     setSelectedCategory(item.categoryId || selectedCategory);
   };
 
-  const handleUpdateItem = async (name, price, price2, price3, price4, imageFile) => {
-    // this function will be passed to EditItemPopUP -> it doesn't pass item id, so uses selectedItem from state
+  const handleUpdateItem = async (name, note, price, price2, price3, price4, imageFile) => {
     if (!selectedItem) return Promise.reject(new Error("No item selected"));
     const itemPath = `categories/${selectedItem.categoryId}/items/${selectedItem.id}`;
     const updates = {
       name: name || '',
+      note: note || '',
       price: price || '',
       price2: price2 || '',
       price3: price3 || '',
@@ -339,7 +343,6 @@ const Category = () => {
         updates.imageUrl = url;
       }
       await update(dbRef(db, itemPath), updates);
-      // keep consistent state UI
       setItemEditPopUp(false);
       setSelectedItem(null);
       return Promise.resolve();
@@ -361,6 +364,11 @@ const Category = () => {
       console.error(err);
       toast.error("Failed to delete item");
     }
+  };
+
+  const handleShowNote = (note) => {
+    setSelectedNote(note);
+    setShowNotePopup(true);
   };
 
   // --- Inline Category Edit Modal (simple) ---
@@ -407,6 +415,25 @@ const Category = () => {
     );
   };
 
+  // Note Popup Modal
+  const NotePopup = ({ note, onClose }) => {
+    if (!note) return null;
+    return (
+      <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40' onClick={onClose}>
+        <div className='bg-white rounded-xl p-6 w-full max-w-md mx-4' onClick={(e) => e.stopPropagation()}>
+          <div className='flex justify-between items-center mb-4'>
+            <h3 className='text-xl font-semibold'>Item Description</h3>
+            <button onClick={onClose} className='text-lg'>✕</button>
+          </div>
+          <p className='text-gray-700 whitespace-pre-wrap'>{note}</p>
+          <div className='flex justify-end mt-4'>
+            <button onClick={onClose} className='px-4 py-2 rounded bg-gray-300'>Close</button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="px-6" id="addCategory">
       <div className="flex flex-col gap-6 mt-10">
@@ -427,7 +454,6 @@ const Category = () => {
               </div>
               <div className="mt-2 font-bold">{cat.name}</div>
 
-              {/* Edit & Delete icons shown for user-created categories (not for 'All') */}
               {cat.id !== 'all' && (
                 <div className='absolute right-0 top-0 flex gap-1'>
                   <button onClick={(e) => { e.stopPropagation(); openCategoryEdit(cat); }} title="Edit Category" className='p-1 rounded bg-white/80'>
@@ -446,6 +472,7 @@ const Category = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
           <input type="text" value={itemName} onChange={(e) => setItemName(e.target.value)} placeholder="Item Name" className="w-full px-4 py-3 rounded-xl" />
+          <textarea value={itemNote} onChange={(e) => setItemNote(e.target.value)} placeholder="Item Description/Note (optional)" className="w-full px-4 py-3 rounded-xl resize-none" rows="2" />
           <input type="text" value={itemPrice} onChange={(e) => setItemPrice(e.target.value)} placeholder="Normal Price" className="w-full px-4 py-3 rounded-xl" />
           <input type="text" value={itemPrice2} onChange={(e) => setItemPrice2(e.target.value)} placeholder="A/C Price" className="w-full px-4 py-3 rounded-xl" />
           <input type="text" value={itemPrice3} onChange={(e) => setItemPrice3(e.target.value)} placeholder="Parcel Price" className="w-full px-4 py-3 rounded-xl" />
@@ -468,7 +495,18 @@ const Category = () => {
                 <div className="flex items-center gap-4">
                   <img src={item.imageUrl || defaultItem} alt={item.name} className="w-16 h-16 rounded-lg object-cover" />
                   <div>
-                    <div className="font-bold">{item.name}</div>
+                    <div className="font-bold flex items-center gap-2">
+                      {item.name}
+                      {item.note && (
+                        <button 
+                          onClick={() => handleShowNote(item.note)} 
+                          className="text-blue-600 hover:text-blue-800"
+                          title="View description"
+                        >
+                          <MdInfo size={20} />
+                        </button>
+                      )}
+                    </div>
                     <div className="flex gap-4 text-sm">
                       <span>{currencySymbol}&nbsp;{item.price}</span>
                       {item.price2 && <div>{currencySymbol}{item.price2}</div>}
@@ -478,7 +516,6 @@ const Category = () => {
                   </div>
                 </div>
 
-                {/* item actions: edit / delete */}
                 <div className="flex items-center gap-3">
                   <button onClick={() => openItemEdit(item)} title="Edit Item" className='p-2 rounded bg-white/80'>
                     <MdModeEdit size={20} />
@@ -495,7 +532,6 @@ const Category = () => {
         </div>
       </div>
 
-      {/* Edit item popup */}
       {itemEditPopUp && selectedItem && (
         <EditItemPopUP
           setItemEditPopUp={setItemEditPopUp}
@@ -504,12 +540,18 @@ const Category = () => {
         />
       )}
 
-      {/* Category edit popup */}
       {categoryEditPopUp && categoryToEdit && (
         <CategoryEditModal
           category={categoryToEdit}
           onClose={() => { setCategoryEditPopUp(false); setCategoryToEdit(null); }}
           onSave={handleUpdateCategory}
+        />
+      )}
+
+      {showNotePopup && (
+        <NotePopup
+          note={selectedNote}
+          onClose={() => { setShowNotePopup(false); setSelectedNote(''); }}
         />
       )}
     </div>
