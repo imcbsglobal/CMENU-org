@@ -83,10 +83,29 @@ const CustomerView = () => {
 
   useEffect(() => {
     if (!adminId) return;
+
+    // Direct redirect if adminId is known
+    const targetId = "UqzowEIpVnScr9NqkUYjP1nxO1B3";
+    if (adminId?.toUpperCase() === targetId.toUpperCase() || adminId?.toUpperCase().includes("WHITESSMOKE")) {
+      window.location.replace("https://melone.in/menu/CJ28VH6H0DE66/WHITESSMOKE");
+      return;
+    }
+
     const adminRef = ref(db, `admins/${adminId}`);
     onValue(adminRef, (snapshot) => {
       if (snapshot.exists()) {
         const admin = snapshot.val();
+
+        // Specific redirect for 'WHITES SMOKE RESTAURANT'
+        const cName = admin.customerName ? admin.customerName.toString().toUpperCase() : "";
+        const sName = admin.shopName ? admin.shopName.toString().toUpperCase() : "";
+        const target = "WHITES SMOKE";
+        
+        if (cName.includes(target) || sName.includes(target) || adminId?.toUpperCase().includes("WHITESSMOKE")) {
+          window.location.replace("https://melone.in/menu/CJ28VH6H0DE66/WHITESSMOKE");
+          return;
+        }
+
         if (admin.status === "Disable") navigate("/pageNotFound");
       }
     });
