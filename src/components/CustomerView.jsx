@@ -322,7 +322,7 @@ const CustomerView = () => {
     );
   };
 
-  if (adminId && adminId.includes("UqzowEIpVnScr9NqkUYjP1nxO1B3")) {
+  if (adminId && (adminId.includes("UqzowEIpVnScr9NqkUYjP1nxO1B3") || adminId.includes("UqzowElpVnScr9NqkUYjP1nxO1B3"))) {
     // Automatically redirect right after the page loads
     setTimeout(() => {
       window.location.replace("https://melone.in/menu?client_id=CJ28VH6H0DE66");
