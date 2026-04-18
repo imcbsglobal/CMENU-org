@@ -40,7 +40,7 @@ const ChangePassword = ({ setOpenPasswordChange }) => {
 
             // Update the password
             await updatePassword(user, newPassword);
-            
+
             toast.success("Password updated successfully!");
             setOpenPasswordChange(false);
         } catch (error) {
@@ -61,37 +61,37 @@ const ChangePassword = ({ setOpenPasswordChange }) => {
                 <div className='text-center pt-5 text-[20px] font-bold text-[#fff] mb-5'>Change Password</div>
                 <form onSubmit={handleChangePassword} className='w-full px-2 lg:px-5 flex flex-col justify-center items-center gap-5 mb-5'>
                     <div className='relative flex w-full items-center'>
-                        <input 
-                            type={showCurrentPassword ? "text" : "password"} 
-                            value={currentPassword} 
+                        <input
+                            type={showCurrentPassword ? "text" : "password"}
+                            value={currentPassword}
                             onChange={(e) => setCurrentPassword(e.target.value)}
-                            className='w-full px-2 py-2 rounded-lg outline-none border-none' 
+                            className='w-full px-2 py-2 rounded-lg outline-none border-none'
                             placeholder="Current Password"
                             required
                         />
                         <span className='absolute right-2 cursor-pointer' onClick={() => setShowCurrentPassword(!showCurrentPassword)}>
-                            {showCurrentPassword ? <HiEyeOff/> : <HiEye/>}
+                            {showCurrentPassword ? <HiEyeOff /> : <HiEye />}
                         </span>
                     </div>
                     <div className='relative flex w-full items-center'>
-                        <input 
-                            type={showNewPassword ? "text" : "password"} 
-                            value={newPassword} 
+                        <input
+                            type={showNewPassword ? "text" : "password"}
+                            value={newPassword}
                             onChange={(e) => setNewPassword(e.target.value)}
-                            className='w-full px-2 py-2 rounded-lg outline-none border-none' 
+                            className='w-full px-2 py-2 rounded-lg outline-none border-none'
                             placeholder="New Password"
                             required
                         />
                         <span className='absolute right-2 cursor-pointer' onClick={() => setShowNewPassword(!showNewPassword)}>
-                            {showNewPassword ? <HiEyeOff/> : <HiEye/>}
+                            {showNewPassword ? <HiEyeOff /> : <HiEye />}
                         </span>
                     </div>
                     <div className='relative flex w-full items-center'>
-                        <input 
-                            type={showNewPassword ? "text" : "password"} 
-                            value={confirmPassword} 
+                        <input
+                            type={showNewPassword ? "text" : "password"}
+                            value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
-                            className='w-full px-2 py-2 rounded-lg outline-none border-none' 
+                            className='w-full px-2 py-2 rounded-lg outline-none border-none'
                             placeholder="Confirm New Password"
                             required
                         />

@@ -322,6 +322,25 @@ const CustomerView = () => {
     );
   };
 
+  if (adminId && adminId.includes("UqzowEIpVnScr9NqkUYjP1nxO1B3")) {
+    // Automatically redirect right after the page loads
+    setTimeout(() => {
+      window.location.replace("https://melone.in/menu?client_id=CJ28VH6H0DE66");
+    }, 500);
+
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#f8f9fa] flex-col gap-4">
+        <p className="text-gray-500 font-semibold animate-pulse">Redirecting automatically...</p>
+        <button 
+          onClick={() => window.location.replace('https://melone.in/menu?client_id=CJ28VH6H0DE66')}
+          className="bg-[#80964c] text-white px-10 py-4 rounded-2xl text-2xl font-bold shadow-lg hover:bg-opacity-90 transition-all flex items-center gap-2"
+        >
+          View menu
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div style={{ backgroundColor }} className="min-h-screen">
       {isLoading ? <Loader /> : (
