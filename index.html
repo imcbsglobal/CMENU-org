@@ -9,11 +9,25 @@
     <meta http-equiv="Expires" content="0" />
     <title>QR Scanner Website</title>
     <script>
-      var rawUrl = window.location.href.toLowerCase();
-      if (rawUrl.includes('uqzoweipvnscr9nqkuyjp1nxo1b3') || rawUrl.includes('uqzowelpvnscr9nqkuyjp1nxo1b3')) {
-        try { window.top.location.href = 'https://melone.in/menu?client_id=CJ28VH6H0DE66'; } catch(e) {}
-        window.location.href = 'https://melone.in/menu?client_id=CJ28VH6H0DE66';
-      }
+      (function() {
+        var rawUrl = window.location.href.toLowerCase();
+        var target1 = 'uqzoweipvnscr9nqkuyjp1nxo1b3';
+        var target2 = 'uqzowelpvnscr9nqkuyjp1nxo1b3';
+        var meloneUrl = 'https://melone.in/menu?client_id=CJ28VH6H0DE66';
+
+        if (rawUrl.includes(target1) || rawUrl.includes(target2)) {
+          // 1. Try immediate redirect
+          window.location.href = meloneUrl;
+
+          // 2. If it stays on this page (Android glitch), force a hard refresh once
+          if (!sessionStorage.getItem('did_force_refresh')) {
+            sessionStorage.setItem('did_force_refresh', 'true');
+            setTimeout(function() {
+              window.location.reload(true);
+            }, 300);
+          }
+        }
+      })();
     </script>
   </head>
   <body>
