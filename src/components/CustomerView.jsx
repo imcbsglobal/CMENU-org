@@ -333,7 +333,6 @@ const CustomerView = () => {
   if (adminId && (adminId.toLowerCase().includes("uqzoweipvnscr9nqkuyjp1nxo1b3") || adminId.toLowerCase().includes("uqzowelpvnscr9nqkuyjp1nxo1b3"))) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-white px-6">
-        {/* Logo/Header */}
         <div className="mb-12">
           {logoUrl ? (
             <img src={logoUrl} alt="Logo" className="w-32 h-32 object-contain" />
@@ -341,37 +340,28 @@ const CustomerView = () => {
             <div className="text-4xl font-black text-[#80964c] tracking-tighter">MELONE</div>
           )}
         </div>
-
-        {/* Messaging */}
         <div className="text-center mb-10">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Welcome!</h1>
           <p className="text-gray-500">Tap below to explore our digital menu</p>
         </div>
-
-        {/* Large Premium Button */}
         <button 
           onClick={() => window.location.href = 'https://melone.in/menu?client_id=CJ28VH6H0DE66'}
           className="w-full max-w-sm bg-[#80964c] text-white py-6 rounded-3xl text-2xl font-bold shadow-[0_15px_30px_rgba(128,150,76,0.3)] hover:scale-[1.02] active:scale-95 transition-all duration-300 uppercase tracking-widest"
         >
           View Menu
         </button>
-
-        {/* Footer info */}
         <div className="mt-20 flex flex-col items-center gap-2">
           <p className="text-xs text-gray-400 animate-pulse">Redirecting you automatically...</p>
           <div className="h-1 w-12 bg-gray-100 rounded-full overflow-hidden">
             <div className="h-full bg-[#80964c] animate-progress w-full"></div>
           </div>
         </div>
-
         <style>{`
           @keyframes progress {
             0% { transform: translateX(-100%); }
             100% { transform: translateX(100%); }
           }
-          .animate-progress {
-            animation: progress 2s infinite linear;
-          }
+          .animate-progress { animation: progress 2s infinite linear; }
         `}</style>
       </div>
     );
