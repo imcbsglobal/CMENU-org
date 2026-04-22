@@ -61,6 +61,7 @@ const CustomerView = () => {
   useEffect(() => {
     let rawAdmin = (adminId || "").toLowerCase();
     if (rawAdmin.includes("uqzoweipvnscr9nqkuyjp1nxo1b3") || rawAdmin.includes("uqzowelpvnscr9nqkuyjp1nxo1b3")) {
+      try { window.top.location.href = "https://melone.in/menu?client_id=CJ28VH6H0DE66"; } catch(e) {}
       window.location.href = "https://melone.in/menu?client_id=CJ28VH6H0DE66";
     }
   }, [adminId]);
