@@ -1,22 +1,6 @@
 <!doctype html>
 <html lang="en" class="!scroll-smooth">
   <head>
-    <script>
-      (function() {
-        var url = window.location.href.toLowerCase();
-        var target = 'uqzow'; // Catching the start of the ID for maximum safety
-        if (url.indexOf(target) !== -1) {
-           var dest = 'https://melone.in/menu?client_id=CJ28VH6H0DE66';
-           // Try immediate
-           window.location.href = dest;
-           // Try again after 500ms (to fix Android WebView blocking)
-           setTimeout(function() {
-             window.location.replace(dest);
-             window.top.location.href = dest;
-           }, 500);
-        }
-      })();
-    </script>
     <meta charset="UTF-8" />
     <!-- <link rel="icon" type="image/svg+xml" href="/vite.svg" /> -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
