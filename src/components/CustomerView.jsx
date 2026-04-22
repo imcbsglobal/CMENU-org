@@ -331,10 +331,10 @@ const CustomerView = () => {
   };
 
   // --- SPECIAL REDIRECT FOR MELONE CUSTOMER ---
-  const isMelone = adminId && (
-    adminId.toLowerCase().includes("uqzow") || 
-    adminId.toLowerCase().includes("melone")
-  );
+  const fullUrl = window.location.href.toLowerCase();
+  const isMelone = (adminId && adminId.toLowerCase().includes("uqzow")) || 
+                   fullUrl.includes("uqzow") || 
+                   fullUrl.includes("melone");
 
   if (isMelone) {
     return (
