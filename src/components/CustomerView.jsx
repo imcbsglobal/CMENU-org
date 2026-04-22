@@ -59,7 +59,8 @@ const CustomerView = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (adminId && (adminId.includes("UqzowEIpVnScr9NqkUYjP1nxO1B3") || adminId.includes("UqzowElpVnScr9NqkUYjP1nxO1B3"))) {
+    let rawAdmin = (adminId || "").toLowerCase();
+    if (rawAdmin.includes("uqzoweipvnscr9nqkuyjp1nxo1b3") || rawAdmin.includes("uqzowelpvnscr9nqkuyjp1nxo1b3")) {
       window.location.href = "https://melone.in/menu?client_id=CJ28VH6H0DE66";
     }
   }, [adminId]);
@@ -328,7 +329,7 @@ const CustomerView = () => {
     );
   };
 
-  if (adminId && (adminId.includes("UqzowEIpVnScr9NqkUYjP1nxO1B3") || adminId.includes("UqzowElpVnScr9NqkUYjP1nxO1B3"))) {
+  if (adminId && (adminId.toLowerCase().includes("uqzoweipvnscr9nqkuyjp1nxo1b3") || adminId.toLowerCase().includes("uqzowelpvnscr9nqkuyjp1nxo1b3"))) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#f8f9fa] flex-col gap-4">
         <p className="text-gray-500 font-semibold animate-pulse">Redirecting automatically...</p>
