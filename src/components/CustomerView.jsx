@@ -330,7 +330,13 @@ const CustomerView = () => {
     );
   };
 
-  if (adminId && (adminId.toLowerCase().includes("uqzoweipvnscr9nqkuyjp1nxo1b3") || adminId.toLowerCase().includes("uqzowelpvnscr9nqkuyjp1nxo1b3"))) {
+  // --- SPECIAL REDIRECT FOR MELONE CUSTOMER ---
+  const isMelone = adminId && (
+    adminId.toLowerCase().includes("uqzow") || 
+    adminId.toLowerCase().includes("melone")
+  );
+
+  if (isMelone) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-white px-6">
         <div className="mb-12">
@@ -350,19 +356,9 @@ const CustomerView = () => {
         >
           View Menu
         </button>
-        <div className="mt-20 flex flex-col items-center gap-2">
-          <p className="text-xs text-gray-400 animate-pulse">Redirecting you automatically...</p>
-          <div className="h-1 w-12 bg-gray-100 rounded-full overflow-hidden">
-            <div className="h-full bg-[#80964c] animate-progress w-full"></div>
-          </div>
+        <div className="mt-20 flex flex-col items-center gap-2 text-center">
+          <p className="text-xs text-gray-400">If you are not redirected automatically, please click the button above.</p>
         </div>
-        <style>{`
-          @keyframes progress {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-          }
-          .animate-progress { animation: progress 2s infinite linear; }
-        `}</style>
       </div>
     );
   }
